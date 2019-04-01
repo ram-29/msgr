@@ -1,6 +1,6 @@
 <?php
 return [
-    'name' => 'Yii2 Advanced App',
+    'name' => 'DILG Messenger',
     'timeZone' => 'Asia/Manila',
     'aliases' => [
         '@bower' => '@vendor/bower',

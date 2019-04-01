@@ -5,6 +5,7 @@ namespace common\helpers;
 use Yii;
 use yii\db\Query;
 use yii\helpers\Url;
+use yii\helpers\Html;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -18,6 +19,9 @@ use common\helpers\Logger;
  */
 class Getter {
 
-    // @todo Define your logic here ..
+    public static function getShortenedText($str, $len = 34)
+    {
+        return mb_strimwidth(Html::encode($str), 0, $len, ' ...');
+    }
     
 }

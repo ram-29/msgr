@@ -1,3 +1,13 @@
+(_ => {
+    $('[data-toggle="tooltip"]').tooltip()
+    
+    $('.msgr-sidebar-list').overlayScrollbars({})
+    $('.msgr-main-content-chatbox-list').overlayScrollbars({})
+
+    $('.msgr-main-content-tools-user-list').overlayScrollbars({})
+    $('.tab-pane').overlayScrollbars({})
+})()
+
 const brwConfirm = url => _ => {
     if (window.history && history.pushState) {
         if (document.location.pathname === url) {
