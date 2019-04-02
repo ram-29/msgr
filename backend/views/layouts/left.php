@@ -38,6 +38,16 @@ use yii\helpers\Url;
 
 
             $menuItems = [
+                ['label' => 'Main Navigation', 'options' => ['class' => 'header']],
+                [
+                    'label' => 'Member', 'icon' => 'user', 'url' => ['/member'],
+                    'active' => (strpos(Yii::$app->request->url, '/member') !== false) ? true : false
+                ],
+                [
+                    'label' => 'Thread', 'icon' => 'list', 'url' => ['/thread'],
+                    'active' => (strpos(Yii::$app->request->url, '/thread') !== false) ? true : false
+                ],
+
                 ['label' => 'System Tools', 'options' => ['class' => 'header']],
                 [
                     'label' => 'User Management', 'icon' => 'wrench', 'url' => ['/user/admin'], 

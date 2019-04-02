@@ -14,6 +14,15 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
+        ],
+        'response' => [
+			'formatters' => [
+                'charset' => 'UTF-8',
+				'json' => 'backend\modules\api\components\PrettyJsonResponseFormatter',
+			],
         ],
         // 'user' => [
         //     'identityClass' => 'common\models\User',
@@ -38,9 +47,26 @@ return [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
+            // 'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread', 'pluralize' => false, 'tokens' => ['{id}' => '<id:\w+>']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member'],
+
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member'],
+
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-global-config'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member-config'],
+
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message-seen'],
             ],
+        ],
+    ],
+    'modules' => [
+        'api' => [
+            'basePath' => '@backend/modules/api',
+            'class' => 'backend\modules\api\Module',
         ],
     ],
     'params' => $params,

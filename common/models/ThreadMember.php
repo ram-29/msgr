@@ -1,0 +1,84 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "thread_member".
+ *
+ * @property string $id
+ * @property string $thread_id
+ * @property string $member_id
+ * @property string $nickname
+ * @property string $role
+ *
+ * @property Thread $thread
+ * @property Member $member
+ */
+class ThreadMember extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'thread_member';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['id', 'thread_id', 'member_id', 'role'], 'required'],
+            [['role'], 'string'],
+            [['id', 'thread_id', 'member_id'], 'string', 'max' => 36],
+            [['nickname'], 'string', 'max' => 200],
+            [['id'], 'unique'],
+            [['thread_id'], 'exist', 'skipOnError' => true, 'targetClass' => Thread::className(), 'targetAttribute' => ['thread_id' => 'id']],
+            [['member_id'], 'exist', 'skipOnError' => true, 'targetClass' => Member::className(), 'targetAttribute' => ['member_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+
+        parent::init();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'Id',
+            'thread_id' => 'Thread ID',
+            'member_id' => 'Member ID',
+            'nickname' => 'Nickname',
+            'role' => 'Role',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getThread()
+    {
+        return $this->hasOne(Thread::className(), ['id' => 'thread_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMember()
+    {
+        return $this->hasOne(Member::className(), ['id' => 'member_id']);
+    }
+}
