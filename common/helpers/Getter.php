@@ -19,9 +19,31 @@ use common\helpers\Logger;
  */
 class Getter {
 
+    public static function getModelName($model)
+    {
+        return ucwords(strtolower(StringHelper::basename(get_class($model))));
+    }
+
     public static function getShortenedText($str, $len = 34)
     {
         return mb_strimwidth(Html::encode($str), 0, $len, ' ...');
     }
-    
+
+    public static function setFlash($text, $type)
+    {
+        $opts = [
+            'title' => 'Success!',
+        ];
+
+        switch($type) {
+            case 'afterInsert':
+                $opts['text'] = "You have successfully created {$text}";
+            break;
+            case 'afterUpdate':
+                $opts['text'] = "You have successfully edited {$text}";
+            break;
+        }
+
+        Yii::$app->session->setFlash(Alert::TYPE_SUCCESS, [ $opts ]);
+    }
 }

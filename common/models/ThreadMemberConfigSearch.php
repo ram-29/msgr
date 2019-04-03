@@ -46,7 +46,9 @@ class ThreadMemberConfigSearch extends ThreadMemberConfig
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,        ]);
+            'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]]
+        ]);
 
         $this->load($params);
 

@@ -45,9 +45,27 @@ class Thread extends \yii\db\ActiveRecord
      */
     public function init()
     {
-        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $this->on(self::EVENT_AFTER_INSERT, [ $this, 'setFlash' ]);
+        $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
 
         parent::init();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setFlash($event)
+    {
+        $mName = \common\helpers\Getter::getModelName($event->sender);
+        \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAttrs()
+    {
+        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
     }
 
     /**
@@ -56,7 +74,7 @@ class Thread extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'Id',
+            'id' => 'ID',
             'type' => 'Type',
             'created_at' => 'Created At',
         ];

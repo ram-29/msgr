@@ -15,8 +15,8 @@ use Yii;
  * @property string $created_at
  * @property string $deleted_by
  *
- * @property Thread $thread
  * @property Member $member
+ * @property Thread $thread
  * @property ThreadMessageSeen[] $threadMessageSeens
  */
 class ThreadMessage extends \yii\db\ActiveRecord
@@ -41,8 +41,8 @@ class ThreadMessage extends \yii\db\ActiveRecord
             [['id', 'thread_id', 'member_id'], 'string', 'max' => 36],
             [['file'], 'string', 'max' => 200],
             [['id'], 'unique'],
-            [['thread_id'], 'exist', 'skipOnError' => true, 'targetClass' => Thread::className(), 'targetAttribute' => ['thread_id' => 'id']],
             [['member_id'], 'exist', 'skipOnError' => true, 'targetClass' => Member::className(), 'targetAttribute' => ['member_id' => 'id']],
+            [['thread_id'], 'exist', 'skipOnError' => true, 'targetClass' => Thread::className(), 'targetAttribute' => ['thread_id' => 'id']],
         ];
     }
 
@@ -52,7 +52,7 @@ class ThreadMessage extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'Id',
+            'id' => 'ID',
             'thread_id' => 'Thread ID',
             'member_id' => 'Member ID',
             'text' => 'Text',
@@ -67,17 +67,27 @@ class ThreadMessage extends \yii\db\ActiveRecord
      */
     public function init()
     {
-        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $this->on(self::EVENT_AFTER_INSERT, [ $this, 'setFlash' ]);
+        $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
 
         parent::init();
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
-    public function getThread()
+    protected function setFlash($event)
     {
-        return $this->hasOne(Thread::className(), ['id' => 'thread_id']);
+        $mName = \common\helpers\Getter::getModelName($event->sender);
+        \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAttrs()
+    {
+        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
     }
 
     /**
@@ -86,6 +96,14 @@ class ThreadMessage extends \yii\db\ActiveRecord
     public function getMember()
     {
         return $this->hasOne(Member::className(), ['id' => 'member_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getThread()
+    {
+        return $this->hasOne(Thread::className(), ['id' => 'thread_id']);
     }
 
     /**

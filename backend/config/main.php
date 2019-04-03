@@ -18,12 +18,6 @@ return [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
-        'response' => [
-			'formatters' => [
-                'charset' => 'UTF-8',
-				'json' => 'backend\modules\api\components\PrettyJsonResponseFormatter',
-			],
-        ],
         // 'user' => [
         //     'identityClass' => 'common\models\User',
         //     'enableAutoLogin' => true,
@@ -50,16 +44,16 @@ return [
             // 'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread', 'pluralize' => false, 'tokens' => ['{id}' => '<id:\w+>']],
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
 
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
 
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-global-config'],
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member-config'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-global-config', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member-config', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
 
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message'],
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message-seen'],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message-seen', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
             ],
         ],
     ],

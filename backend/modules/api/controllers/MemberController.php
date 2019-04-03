@@ -24,4 +24,32 @@ class MemberController extends \yii\rest\ActiveController
 
 		return $behaviors;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actions()
+    {
+        $actions = parent::actions();
+        unset($actions['create']);
+        
+        return $actions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actionCreate()
+    {
+        // Initalize a model.
+        $model = new \common\models\Member();
+        $model->load(\Yii::$app->request->post(), '');
+
+        // Set attributes.
+        $model->setAttrs();
+
+        // Save & return.
+        $model->save();
+        return $model;
+    }
 }

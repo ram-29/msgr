@@ -28,7 +28,7 @@ class m190402_013752_create_thread_member_config_table extends Migration
                 0 => 'PRIMARY KEY (`id`)',
                 'thread_id' => 'CHAR(36) NOT NULL',
                 'member_id' => 'CHAR(36) NOT NULL',
-                'is_muted' => 'TINYINT(1) NOT NULL',
+                'is_muted' => 'TINYINT(1) NOT NULL DEFAULT \'0\'',
             ], $tableOptions_mysql);
         }
         }

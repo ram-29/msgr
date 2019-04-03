@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
     <div class="box-body table-responsive">
 
-        <?= $form->field($model, '_id')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'id')->textInput(['maxlength' => true]) ?>
 
         <?= $form->field($model, 'thread_message_id')->textInput(['maxlength' => true]) ?>
 

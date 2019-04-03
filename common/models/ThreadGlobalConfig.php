@@ -13,7 +13,7 @@ use Yii;
  * @property string $emoji
  * @property string $picx
  *
- * @property Thread $
+ * @property Thread $thread
  */
 class ThreadGlobalConfig extends \yii\db\ActiveRecord
 {
@@ -39,23 +39,13 @@ class ThreadGlobalConfig extends \yii\db\ActiveRecord
         ];
     }
 
-   /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
-
-        parent::init();
-    }
-
     /**
      * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
-            'id' => 'Id',
+            'id' => 'ID',
             'name' => 'Name',
             'color' => 'Color',
             'emoji' => 'Emoji',
@@ -64,9 +54,37 @@ class ThreadGlobalConfig extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_INSERT, [ $this, 'setFlash' ]);
+        $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
+
+        parent::init();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setFlash($event)
+    {
+        $mName = \common\helpers\Getter::getModelName($event->sender);
+        \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    // public function setAttrs()
+    // {
+    //     $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+    // }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
-    public function get()
+    public function getThread()
     {
         return $this->hasOne(Thread::className(), ['id' => 'id']);
     }
