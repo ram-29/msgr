@@ -88,6 +88,51 @@ class Member extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return [
+            'threads' => function($x) {
+                return \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
+
+                    $th = \common\models\Thread::findOne($thm['thread_id']);
+                    $cfg = \common\models\ThreadGlobalConfig::findOne($thm['thread_id']);
+
+                    // Get thread name.
+                    $name = null;
+                    if($th->type == 'GROUP') {
+                        $name = $cfg->name;
+                    } else {
+                        $mMember = \yii\helpers\ArrayHelper::getColumn($th->threadMembers, 'member_id');
+
+                        if (($key = array_search($thm['member_id'], $mMember)) !== false) {
+                            unset($mMember[$key]);
+                            $name = \common\models\Member::findOne(array_values($mMember))->name;
+                        }
+                    }
+
+                    // Get recent message.
+                    $message = null;
+                    if(!empty($mMsgs = $th->getThreadMessages()->orderBy(['created_at' => SORT_DESC])->all())) {
+                        $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
+                        $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
+
+                        $message = compact("latest", "time");
+                    }
+
+                    return [
+                        'id' => $th->id,
+                        'type' => $th->type,
+                        'name' => $name,
+                        'message' => $message
+                    ];
+                });
+            }
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getThreadMembers()

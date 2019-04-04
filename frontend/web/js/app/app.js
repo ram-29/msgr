@@ -19,9 +19,42 @@ const btnChatboxSend = $('#btn-chatbox-send')
 const btnUserChat = $('#btn-user-chat')
 const btnUserGroup = $('#btn-user-group')
 
-// Initialize SocketIO
-const socket = io('http://localhost:1337/', { query: `_id=${1}&name=${'John Doe'}` })
+// For testing purpose
+const id = 'd49a82aa-a674-454c-8398-2d643403e097'
+const name = 'John Doe'
 
-socket.on('connect', _ => {
-    console.log(`Connected to server.`)
+// Generate query params
+const query = $.param({ id, name })
+
+// Initialize SocketIO
+const socket = io(`http://localhost:1337/${id}`, { query })
+
+socket.on('connect', _ => console.log(`Connected to server.`))
+
+socket.on('member-data', resp => {
+    // Generate sidebar list.
+    const template = resp.threads.map(th => {
+        return `
+            <div class="msgr-sidebar-list-item">
+                <div class="msgr-sidebar-list-item-content">
+                    <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : '1'}.png" alt="User image">                        
+                    <div class="msgr-sidebar-list-item-content-details">
+                        <h4>${th.name}</h4>
+                        <p>${th.message ? th.message.latest : '-'}</p>
+                    </div>
+                </div>
+
+                <div class="msgr-sidebar-list-item-settings">
+                    <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
+                    <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm"><i class="fa fa-cog fa-fw"></i></button>
+                </div>
+            </div>
+        `
+    }).join('')
+
+    // Inject sidebar list.
+    $('.msgr-sidebar-list').html(template)
+
+    // Initialize sidebar.
+    $('.msgr-sidebar-list').overlayScrollbars({})
 })

@@ -3,6 +3,8 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use yii\web\View;
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
@@ -26,9 +28,7 @@ AppAsset::register($this);
 
     <?php if (in_array(Yii::$app->controller->module->id, ['forums', 'rbac', 'user', 'messenger', 'auditlogs', 'utility'])) :?>
 
-        <style>
-            html, body { overflow-y: auto !important; }
-        </style>
+        <style> html, body { overflow-y: auto !important; } </style>
 
         <div class="container">
             <div class="row">
@@ -43,8 +43,8 @@ AppAsset::register($this);
 
     <?php else :?>
 
-    <?= Alert::widget(['useSessionFlash' => true]) ?>
-    <?= $content ?>
+        <?= Alert::widget(['useSessionFlash' => true]) ?>
+        <?= $content ?>
 
     <?php endif ?>
 

@@ -31,6 +31,7 @@ class MemberController extends \yii\rest\ActiveController
     public function actions()
     {
         $actions = parent::actions();
+        unset($actions['update']);
         unset($actions['create']);
         
         return $actions;
@@ -50,6 +51,26 @@ class MemberController extends \yii\rest\ActiveController
 
         // Save & return.
         $model->save();
+        return $model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actionUpdate($id)
+    {
+        $model = \common\models\Member::findOne($id);
+        $type = \Yii::$app->request->getBodyParam('type');
+
+        if($type == 'CONNECT') {
+            $model->status = 'ACTIVE';
+            $model->logged_at = date("Y-m-d H:i:s", time());
+            $model->save();
+        } else {
+            $model->status = 'INACTIVE';
+            $model->save();
+        }
+
         return $model;
     }
 }

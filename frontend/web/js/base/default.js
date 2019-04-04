@@ -1,7 +1,7 @@
 (_ => {
     $('[data-toggle="tooltip"]').tooltip()
     
-    $('.msgr-sidebar-list').overlayScrollbars({})
+    // $('.msgr-sidebar-list').overlayScrollbars({})
     $('.msgr-main-content-chatbox-list').overlayScrollbars({})
 
     $('.msgr-main-content-tools-user-list').overlayScrollbars({})

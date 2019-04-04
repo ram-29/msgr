@@ -34,7 +34,7 @@ html, body, .msgr-index {
 /* Sidebar List & List Item */
 .msgr-sidebar-list {
     height: 90vh;
-    overflow-y: scroll;
+    overflow-y: hidden;
 }
 
 .msgr-sidebar-list-item {

@@ -41,34 +41,7 @@ $this->title = Yii::$app->name;
             </div>
         </div>
 
-        <div class="msgr-sidebar-list">
-            <?php foreach(range(0, 15) as $i) :?>
-
-                <?php $idx = array_rand([1, 2, 3]) + 1 ?>
-
-                <div class="msgr-sidebar-list-item">
-                    <div class="msgr-sidebar-list-item-content">
-                        <?= Html::img("@web/img/{$idx}.png", [
-                            'class' => 'img-circle', 
-                            'alt' => 'User image'
-                        ]) ?>
-                        <div class="msgr-sidebar-list-item-content-details">
-                            <h4>John Doe</h4>
-                            <p><?= Getter::getShortenedText('Lorem ipsum dolor sit amet.') ?></p>
-                        </div>
-                    </div>
-
-                    <div class="msgr-sidebar-list-item-settings">
-                        <span>Mon</span>
-                        <?= Html::button(FA::icon('cog')->fixedWidth(), [
-                            'class' => 'btn btn-default btn-sm',
-                            'id' => 'btn-list-item-setting'
-                        ]) ?>
-                    </div>
-                </div>
-
-            <?php endforeach ?>
-        </div>
+        <div class="msgr-sidebar-list"></div>
 
     </div>
 
