@@ -32,5 +32,6 @@ class AppAsset extends AssetBundle
         'frontend\assets\OverlayScrollbarAsset',
         'frontend\assets\EmojiOneAreaAsset',
         'frontend\assets\SocketIOAsset',
+        'frontend\assets\AxiosAsset',
     ];
 }

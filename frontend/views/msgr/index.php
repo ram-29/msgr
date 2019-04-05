@@ -49,8 +49,8 @@ $this->title = Yii::$app->name;
         
         <div class="msgr-main-header">
             <div class="msgr-main-header-details">
-                <h4>John Doe</h4>
-                <p>Active 2m ago</p>
+                <h4></h4>
+                <!-- <p>Active 2m ago</p> -->
             </div>
             <?= Html::button(FA::icon('info')->size(FA::SIZE_LARGE)->fixedWidth(), [
                 'class' => 'btn btn-default btn-sm'
@@ -60,45 +60,14 @@ $this->title = Yii::$app->name;
         <div class="msgr-main-content">
             <div class="msgr-main-content-chatbox">
                 <div class="msgr-main-content-chatbox-header">
-                    <?= Html::img("@web/img/1.png", [
-                        'class' => 'img-circle', 
-                        'alt' => 'User image'
-                    ]) ?>
+                    <img class="img-circle" src="">
                     <div class="msgr-main-content-chatbox-header-details">
-                        <h4>John Doe</h4>
-                        <p>Software Engineer at Google</p>
+                        <h4></h4>
+                        <!-- <p>Software Engineer at Google</p> -->
                     </div>
                 </div>
 
-                <div class="msgr-main-content-chatbox-list">
-                    <?php foreach (range(0, 15) as $i) :?>
-                        <?php $idx = array_rand([1, 2]) + 1 ?>
-
-                        <div class="msgr-main-content-chatbox-list-item">
-                            <span>Mar 16, 2019, 7:27 PM</span>
-
-                            <div class="msgr-main-content-chatbox-list-item-details <?= $idx == 1 ? "owner" : "" ?>">
-                                <?= Html::img("@web/img/1.png", [ 
-                                    'class' => 'img-circle', 
-                                    'alt' => 'User image',
-                                ]) ?>
-
-                                <div class="msgr-main-content-chatbox-list-item-details-content">
-                                    <?php if($idx == 1) :?>
-                                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing.</p>
-                                        <p>Delectus laborum recusandae dolores inventore, ratione magnam.</p>
-                                        <p>Eveniet sit ut, veniam accusantium deserunt dicta impedit quisquam suscipit vel voluptatibus temporibus dolorem autem vitae quidem magnam, dolore minus dignissimos soluta repudiandae, nisi at a consequuntur? Accusantium, fugiat dolorem?</p>
-                                    <?php else :?>
-                                        <p>Magnam fugiat iste totam, ut saepe ex.</p>
-                                        <p>Pariatur, rem tempore numquam harum vitae nisi!</p>
-                                        <p>Nihil aut quasi, omnis voluptatem corporis eum qui illo esse blanditiis beatae, ullam fugiat voluptatibus. Nulla voluptates excepturi nesciunt voluptate cum officiis incidunt ad aperiam, reiciendis reprehenderit quos tempore eaque?</p>
-                                    <?php endif ?>
-                                </div>
-                            </div>
-                        </div>
-
-                    <?php endforeach ?>
-                </div>
+                <div class="msgr-main-content-chatbox-list"></div>
                 
                 <div class="msgr-main-content-chatbox-input">
                     <div class="input-group" style="width:100%">

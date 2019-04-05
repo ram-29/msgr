@@ -1,6 +1,7 @@
 html, body, .msgr-index {
     height: 100vh;
     overflow-y: hidden;
+    overflow-x: hidden;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -119,7 +120,7 @@ html, body, .msgr-index {
 
 /* Main Content Chatbox Header */
 .msgr-main-content-chatbox-header {
-    /* height: 10vh; */
+    height: 8rem;
     padding: 1rem;
     display: flex;
     align-items: center;
@@ -165,16 +166,17 @@ html, body, .msgr-index {
 }
 
 .msgr-main-content-chatbox-list-item-details-content {
-    display: flex;
-    max-width: 70%;
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex !important;
+    max-width: 70% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
 }
 
 .msgr-main-content-chatbox-list-item-details-content > p {
     padding: 1.5rem;
     border-radius: 2.5rem;
     background-color: #f1f0f0;
+    word-break: break-all !important;
 }
 
 /* Main Content Chatbox List Item (Owner) */
@@ -188,7 +190,7 @@ html, body, .msgr-index {
 
 .msgr-main-content-chatbox-list-item-details.owner >
 .msgr-main-content-chatbox-list-item-details-content {
-    align-items: flex-end;
+    align-items: flex-end !important;
 }
 
 .msgr-main-content-chatbox-list-item-details.owner >

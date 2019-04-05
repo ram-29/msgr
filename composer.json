@@ -54,7 +54,8 @@
 
         "npm-asset/overlayscrollbars": "@dev",
         "bower-asset/emojionearea": "@dev",
-        "npm-asset/socket.io-client": "@dev"
+        "npm-asset/socket.io-client": "@dev",
+        "npm-asset/axios": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -24,29 +24,32 @@ const PORT = process.env.PORT || 1337
 server.listen(PORT, _ => { console.log(`Server running on port ${PORT}.`) })
 
 axios
-    .get(`${BASE_URL}/api/member`)
+    .get(`${BASE_URL}/api/thread`)
     .then(resp => {
-        resp.data.map(member => {
-            io.of(`/${member.id}`).on('connection', client => {
+        resp.data.map(thread => {
+            io.of(`/${thread.id}`).on('connection', client => {
 
                 // User id & name.
                 const { id, name } = client.handshake.query
+                console.log(`${name} connected to ${client.nsp.name}`)
+
+                // Emit back to client
+                client.on('chat', data => client.broadcast.emit('chat', data))
                 
                 // Update user login status.
-                console.log(`${name} has connected.`)
-                axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'CONNECT' })
+                // axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'CONNECT' })
             
                 // Request to yii backend server.
-                axios
-                    .get(`${BASE_URL}/api/member/${id}?expand=threads`)
-                    .then(resp => client.emit('member-data', resp.data))
+                // axios
+                //     .get(`${BASE_URL}/api/member/${id}?expand=threads`)
+                //     .then(resp => client.emit('member-data', resp.data))
             
                 // User disconnect.
                 client.on('disconnect', _ => {
             
                     // Update user login status.
-                    console.log(`${name} has disconnected.`)
-                    axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'DISCONNECT' })
+                    console.log(`${name} disconnected to ${client.nsp.name}`)
+                    // axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'DISCONNECT' })
                 })
             })
         })

@@ -22,6 +22,10 @@ class ThreadMessageController extends \yii\rest\ActiveController
             ],
         ];
 
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+        ];
+
 		return $behaviors;
     }
 

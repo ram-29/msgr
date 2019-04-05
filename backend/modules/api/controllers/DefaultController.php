@@ -2,12 +2,10 @@
 
 namespace backend\modules\api\controllers;
 
-use yii\web\Controller;
-
 /**
  * Default controller for the `Api` module
  */
-class DefaultController extends Controller
+class DefaultController extends \yii\web\Controller
 {
     /**
      * Renders the index view for the module
