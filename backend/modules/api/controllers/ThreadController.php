@@ -52,8 +52,16 @@ class ThreadController extends \yii\rest\ActiveController
         // Set attributes.
         $model->setAttrs();
 
-        // Save & return.
+        // Save Thread.
         $model->save();
+
+        // Create ThreadGlobalConfig.
+        $thGlobCfg = new \common\models\ThreadGlobalConfig();
+        $thGlobCfg->id = $model->id;
+        $thGlobCfg->name = 'new Group()';
+        $thGlobCfg->save();
+
+        // Return Thread.
         return $model;
     }
 }

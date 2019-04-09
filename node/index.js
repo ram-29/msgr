@@ -1,18 +1,25 @@
 const cors = require('cors')
-const axios = require('axios')
 const morgan = require('morgan')
 const express = require('express')
 const bodyParser = require('body-parser')
-const session = require('express-session')
 const errorhandler = require('errorhandler')
+const sharedsession = require('express-socket.io-session')
+
+const session = require('express-session')({ 
+    secret: '$2a$07$sXmjRkhWZxKDsudVk281X.Y.RLqgzlfysiBOfXizwLLzea7IbUGWG', 
+    cookie: { maxAge: 60000 }, 
+    resave: true,
+    saveUninitialized: true
+})
+
 const app = express()
 
 app.use(cors())
+app.use(session)
 app.use(errorhandler())
 app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(session({ secret: '$2a$07$sXmjRkhWZxKDsudVk281X.Y.RLqgzlfysiBOfXizwLLzea7IbUGWG', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false }))
 
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
@@ -23,34 +30,52 @@ const PORT = process.env.PORT || 1337
 
 server.listen(PORT, _ => { console.log(`Server running on port ${PORT}.`) })
 
-axios
-    .get(`${BASE_URL}/api/thread`)
-    .then(resp => {
-        resp.data.map(thread => {
-            io.of(`/${thread.id}`).on('connection', client => {
+// Private Messaging
+io.of('/simple')
+    .use(sharedsession(session, { autoSave: true }))
+    .on('connection', simple => {
 
-                // User id & name.
-                const { id, name } = client.handshake.query
-                console.log(`${name} connected to ${client.nsp.name}`)
+    // User id & name.
+    const { id, name } = simple.handshake.query
 
-                // Emit back to client
-                client.on('chat', data => client.broadcast.emit('chat', data))
-                
-                // Update user login status.
-                // axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'CONNECT' })
-            
-                // Request to yii backend server.
-                // axios
-                //     .get(`${BASE_URL}/api/member/${id}?expand=threads`)
-                //     .then(resp => client.emit('member-data', resp.data))
-            
-                // User disconnect.
-                client.on('disconnect', _ => {
-            
-                    // Update user login status.
-                    console.log(`${name} disconnected to ${client.nsp.name}`)
-                    // axios.patch(`${BASE_URL}/api/member/${id}`, { type: 'DISCONNECT' })
-                })
-            })
-        })
+    // Join Room
+    simple.on('join-room', room => {
+        simple.join(room.id)
+        console.log(`${name} has joined PM: ${room.id}`)
     })
+
+    // Chat handler
+    simple.on('chat', ({ cId, uId, message, timestamp }) => {
+        io.of('/simple').in(cId).emit('chat', { uId, message, timestamp })
+    })
+
+    // Disconnect Handler
+    simple.on('disconnect', _ => {
+        console.log(`${name} disconnected to PM`)
+    })
+})
+
+// Group Messaging
+io.of('/group')
+    .use(sharedsession(session, { autoSave: true }))
+    .on('connection', group => {
+
+    // User id & name.
+    const { id, name } = group.handshake.query
+
+    // Join Room
+    group.on('join-room', room => {
+        group.join(room.id)
+        console.log(`${name} has joined PM: ${room.id}`)
+    })
+
+    // Chat handler
+    group.on('chat', ({ cId, uId, message, timestamp }) => {
+        io.of('/group').in(cId).emit('chat', { uId, message, timestamp })
+    })
+
+    // Disconnect Handler
+    group.on('disconnect', _ => {
+        console.log(`${name} disconnected to GM`)
+    })
+})

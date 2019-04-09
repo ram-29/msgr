@@ -35,8 +35,8 @@ class MemberController extends \yii\rest\ActiveController
     public function actions()
     {
         $actions = parent::actions();
-        unset($actions['update']);
         unset($actions['create']);
+        unset($actions['update']);
         
         return $actions;
     }

@@ -177,6 +177,7 @@ html, body, .msgr-index {
     border-radius: 2.5rem;
     background-color: #f1f0f0;
     word-break: break-all !important;
+    white-space: pre-wrap !important;
 }
 
 /* Main Content Chatbox List Item (Owner) */

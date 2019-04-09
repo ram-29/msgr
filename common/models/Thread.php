@@ -81,6 +81,22 @@ class Thread extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return [
+            'global-config' => function($x) {
+
+                $cfg = \common\models\ThreadGlobalConfig::findOne($x->id);
+                unset($cfg->id);
+                
+                return $cfg;
+            }
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getThreadGlobalConfig()

@@ -9,6 +9,7 @@ use Yii;
  *
  * @property string $id
  * @property string $name
+ * @property string $sex
  * @property string $status
  * @property string $joined_at
  * @property string $logged_at
@@ -35,7 +36,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             [['id', 'name'], 'required'],
-            [['status'], 'string'],
+            [['sex', 'status'], 'string'],
             [['joined_at', 'logged_at'], 'safe'],
             [['id'], 'string', 'max' => 36],
             [['name'], 'string', 'max' => 200],
@@ -81,6 +82,7 @@ class Member extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'sex' => 'Sex',
             'status' => 'Status',
             'joined_at' => 'Joined At',
             'logged_at' => 'Logged At',
@@ -101,6 +103,7 @@ class Member extends \yii\db\ActiveRecord
 
                     // Get thread name.
                     $name = null;
+                    $sex = null;
                     if($th->type == 'GROUP') {
                         $name = $cfg->name;
                     } else {
@@ -108,7 +111,10 @@ class Member extends \yii\db\ActiveRecord
 
                         if (($key = array_search($thm['member_id'], $mMember)) !== false) {
                             unset($mMember[$key]);
-                            $name = \common\models\Member::findOne(array_values($mMember))->name;
+                            $mmMember = \common\models\Member::findOne(array_values($mMember));
+
+                            $name = $mmMember->name;
+                            $sex = $mmMember->sex;
                         }
                     }
 
@@ -121,10 +127,16 @@ class Member extends \yii\db\ActiveRecord
                         $message = compact("latest", "time");
                     }
 
-                    return [
+                    return $th->type == 'GROUP' ? [
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
+                        'message' => $message
+                    ] : [
+                        'id' => $th->id,
+                        'type' => $th->type,
+                        'name' => $name,
+                        'sex' => $sex,
                         'message' => $message
                     ];
                 });
