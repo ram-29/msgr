@@ -7,6 +7,7 @@ let btnHeaderSetting,
     mainHeader,
     contentChatboxHeader,
     contentChatboxList,
+    contentChatboxInput,
     contentChatboxInputBox,
     btnChatboxPhoto,
     btnChatboxFile,
@@ -16,6 +17,11 @@ let btnHeaderSetting,
 const buildURLQuery = obj => Object.entries(obj)
     .map(pair => pair.map(encodeURIComponent).join('='))
     .join('&')
+
+const showInput = _ => {
+    contentChatboxInput.children[0].style.visibility = 'visible';
+    contentChatboxInput.children[1].style.visibility = 'visible';
+}
 
 const initUI = el => {
     
@@ -114,6 +120,7 @@ const connect = (el, id, type) => {
     }
 
     initUI(el)
+    showInput()
 }
 
 document.addEventListener('DOMContentLoaded', _ => {
@@ -125,6 +132,7 @@ document.addEventListener('DOMContentLoaded', _ => {
     contentChatboxHeaderImg = document.querySelector('.msgr-main-content-chatbox-header > img')
     contentChatboxHeaderDetailsH4 = document.querySelector('.msgr-main-content-chatbox-header-details > h4')
     contentChatboxList = document.querySelector('.msgr-main-content-chatbox-list > .os-padding > .os-viewport > .os-content')
+    contentChatboxInput = document.querySelector('.msgr-main-content-chatbox-input')
     contentChatboxInputBox = document.querySelector('#content-chatbox-input-box')
     btnChatboxPhoto = document.querySelector('#btn-chatbox-photo')
     btnChatboxFile = document.querySelector('#btn-chatbox-file')

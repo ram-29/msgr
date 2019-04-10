@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06f44e160213c3b943f4ddad8098b832",
+    "content-hash": "1f34de4fbb544fc7a75ff64089c563d5",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -522,7 +522,7 @@
             "version": "v7.33.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sweetalert2/sweetalert2.git",
+                "url": "git@github.com:sweetalert2/sweetalert2.git",
                 "reference": "296862833b24e446c7bda35f040712840911cc7a"
             },
             "dist": {
@@ -2911,6 +2911,221 @@
             ]
         },
         {
+            "name": "npm-asset/filepond",
+            "version": "4.3.5",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond/-/filepond-4.3.5.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-encode",
+            "version": "2.1.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-encode/-/filepond-plugin-file-encode-2.1.4.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-metadata",
+            "version": "1.0.6",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-metadata/-/filepond-plugin-file-metadata-1.0.6.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-poster",
+            "version": "2.0.2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-poster/-/filepond-plugin-file-poster-2.0.2.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-rename",
+            "version": "1.1.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-rename/-/filepond-plugin-file-rename-1.1.4.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-validate-size",
+            "version": "2.1.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-validate-size/-/filepond-plugin-file-validate-size-2.1.3.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-file-validate-type",
+            "version": "1.2.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.4.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-crop",
+            "version": "2.0.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-crop/-/filepond-plugin-image-crop-2.0.3.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-edit",
+            "version": "1.2.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-edit/-/filepond-plugin-image-edit-1.2.0.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-exif-orientation",
+            "version": "1.0.6",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-exif-orientation/-/filepond-plugin-image-exif-orientation-1.0.6.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-preview",
+            "version": "4.0.5",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-preview/-/filepond-plugin-image-preview-4.0.5.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-resize",
+            "version": "2.0.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-resize/-/filepond-plugin-image-resize-2.0.4.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-size-metadata",
+            "version": "1.0.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-size-metadata/-/filepond-plugin-image-size-metadata-1.0.1.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-transform",
+            "version": "3.20",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pqina/filepond-plugin-image-transform.git",
+                "reference": "1747bf28ab52516c40839e00bc2ae96b3301aab4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pqina/filepond-plugin-image-transform/zipball/1747bf28ab52516c40839e00bc2ae96b3301aab4",
+                "reference": "1747bf28ab52516c40839e00bc2ae96b3301aab4",
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/filepond-plugin-image-validate-size",
+            "version": "1.2.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/filepond-plugin-image-validate-size/-/filepond-plugin-image-validate-size-1.2.3.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "npm-asset/follow-redirects",
             "version": "1.6.1",
             "dist": {
@@ -3117,6 +3332,20 @@
             "type": "npm-asset",
             "license": [
                 "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/socketio-file-upload",
+            "version": "0.7.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/socketio-file-upload/-/socketio-file-upload-0.7.0.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "npm-asset",
+            "license": [
+                "X11"
             ]
         },
         {
@@ -7174,7 +7403,16 @@
         "npm-asset/overlayscrollbars": 20,
         "bower-asset/emojionearea": 20,
         "npm-asset/socket.io-client": 20,
-        "npm-asset/axios": 20
+        "npm-asset/axios": 20,
+        "npm-asset/filepond": 20,
+        "npm-asset/filepond-plugin-image-preview": 20,
+        "npm-asset/filepond-plugin-image-exif-orientation": 20,
+        "npm-asset/filepond-plugin-image-resize": 20,
+        "npm-asset/filepond-plugin-image-crop": 20,
+        "npm-asset/filepond-plugin-image-transform": 20,
+        "npm-asset/filepond-plugin-file-validate-type": 20,
+        "npm-asset/filepond-plugin-file-encode": 20,
+        "npm-asset/filepond-plugin-file-validate-size": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

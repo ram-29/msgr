@@ -70,14 +70,13 @@ $this->title = Yii::$app->name;
                 <div class="msgr-main-content-chatbox-list"></div>
                 
                 <div class="msgr-main-content-chatbox-input">
-                    <div class="input-group" style="width:100%">
+                    <div class="input-group" style="width:100%; visibility:hidden;">
                         <?= Html::textarea('content-chatbox-input-box', null, [
                             'id' => 'content-chatbox-input-box',
                             'placeholder' => 'Type a message ..',
                         ]) ?>
                     </div>
-
-                    <div class="msgr-main-content-chatbox-input-tools">
+                    <div class="msgr-main-content-chatbox-input-tools" style="visibility:hidden;">
                         <div class="msgr-main-content-chatbox-input-tools-left">
                             <?= Html::button(FA::icon('picture-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
                                 'class' => 'btn btn-default btn-sm',

@@ -32,6 +32,10 @@ class AppAsset extends AssetBundle
         'frontend\assets\OverlayScrollbarAsset',
         'frontend\assets\EmojiOneAreaAsset',
         'frontend\assets\SocketIOAsset',
+        'frontend\assets\SocketIOFileUploadAsset',
         'frontend\assets\AxiosAsset',
+
+        'frontend\assets\FilepondAsset',
+        'frontend\assets\FilepondImagePreviewAsset',
     ];
 }
