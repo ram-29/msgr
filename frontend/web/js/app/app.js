@@ -14,6 +14,37 @@ let btnHeaderSetting,
     btnChatboxEmoji,
     btnChatboxSend;
 
+const test = _ => {
+    swal({
+        title: 'Upload files here ..',
+        html: '<input type="file" class="filepond" name="filepond" multiple data-max-files="10"/>',
+        // footer: '<a href>Why do I have this issue?</a>', @TODO
+        showCloseButton: true,
+        showCancelButton: false,
+        showConfirmButton: false,
+        focusConfirm: false,
+        allowOutsideClick: false,
+        customClass: 'mSwal'
+    })
+
+    FilePond.create(document.querySelector('input[type="file"]'), {
+        instantUpload: false,
+        server: {
+            url: 'http://192.168.0.100',
+            process: {
+                url: './process',
+                method: 'POST',
+                withCredentials: false,
+                headers: {},
+                timeout: 7000,
+                onload: null,
+                onerror: null,
+                ondata: null
+            }
+        }
+    })
+}
+
 const buildURLQuery = obj => Object.entries(obj)
     .map(pair => pair.map(encodeURIComponent).join('='))
     .join('&')
@@ -124,6 +155,23 @@ const connect = (el, id, type) => {
 }
 
 document.addEventListener('DOMContentLoaded', _ => {
+
+    FilePond.registerPlugin(
+        FilePondPluginImageCrop,
+        FilePondPluginImageEdit,
+	    FilePondPluginImageExifOrientation,
+        FilePondPluginImagePreview,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform,
+        FilePondPluginImageValidateSize,
+
+        FilePondPluginFileEncode,
+        FilePondPluginFileMetadata,
+        FilePondPluginFilePoster,
+        FilePondPluginFileRename,
+	    FilePondPluginFileValidateSize,
+	    FilePondPluginFileValidateType,
+    )
     
     btnHeaderSetting = document.querySelector('#btn-header-setting')
     btnHeaderMessage = document.querySelector('#btn-header-message')
