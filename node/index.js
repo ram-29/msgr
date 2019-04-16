@@ -1,3 +1,4 @@
+const fs = require('fs')
 const cors = require('cors')
 const morgan = require('morgan')
 const express = require('express')
@@ -64,7 +65,36 @@ io.of('/simple')
     
     // Upload Image Handler
     simple.on('upload-img', data => {
-        console.log(data)
+        var files = {}, 
+            struct = { 
+                name: null, 
+                type: null, 
+                size: 0, 
+                data: [], 
+                slice: 0, 
+            };
+
+        if (!files[data.name]) { 
+            files[data.name] = Object.assign({}, struct, data)
+            files[data.name].data = []
+        }
+
+        data.data = Buffer.from(new Uint8Array(data.data))
+        
+        files[data.name].data.push(data.data)
+        files[data.name].slice++
+
+        if (files[data.name].slice * 100000 >= files[data.name].size) { 
+            const fileBuffer = Buffer.concat(files[data.name].data)
+
+            fs.writeFile('tmp/'+data.name, fileBuffer, (err) => { 
+                delete files[data.name]
+                if (err) return simple.emit('upload error')
+                simple.emit('end upload')
+            })
+        } else {
+            simple.emit('request slice upload', { currentSlice: files[data.name].slice })
+        }
     })
 
     // Join Room Handler

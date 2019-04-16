@@ -38,7 +38,7 @@ const initUpload = e => {
         }
     }).then(res => {
         // @TODO: Handle this.
-        console.log(res)
+        // console.log(res)
     })
 
     // Hoisted.
@@ -50,14 +50,24 @@ const initUpload = e => {
                 
                 load('OK')
 
+                const fileReader = new FileReader()
+                const slice = file.slice(0, 100000)
+
                 switch(e.getAttribute('data-conn')) {
                     case 'SIMPLE':
-                        // @TODO: Handle in backend
-                        SIMPLE.emit('upload-img', { messaage: 'simple-upload' })
+                        fileReader.readAsArrayBuffer(slice)
+                        fileReader.onload = e => {
+                            SIMPLE.emit('upload-img', {
+                                name: file.name, 
+                                type: file.type, 
+                                size: file.size, 
+                                data: fileReader.result 
+                            })
+                        }
                     break
                     case 'GROUP':
                         // @TODO: Handle in backend
-                        GROUP.emit('upload-img', { messaage: 'group-upload' })
+                        GROUP.emit('upload-img', { file })
                     break
                 }
 
@@ -229,7 +239,7 @@ document.addEventListener('DOMContentLoaded', _ => {
             // id = result.value[0]
             // name = result.value[1]
 
-            id = 'd49a82aa-a674-454c-8398-2d643403e097'
+            id = 'b7eb64d0-f568-4e4a-a253-be3ded0d3b1a'
             name = 'John Doe'
 
             axios.get(`${BASE_URL}/api/member/${id}?expand=threads`).then(resp => {
