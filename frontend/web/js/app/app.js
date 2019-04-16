@@ -14,32 +14,59 @@ let btnHeaderSetting,
     btnChatboxEmoji,
     btnChatboxSend;
 
-const test = _ => {
+const initUpload = e => {
     swal({
         title: 'Upload files here ..',
-        html: '<input type="file" class="filepond" name="filepond" multiple data-max-files="10"/>',
-        // footer: '<a href>Why do I have this issue?</a>', @TODO
+        html: `<input id="filepond" type="file" class="filepond" name="filepond" multiple data-max-files="10"/>`,
         showCloseButton: true,
         showCancelButton: false,
-        showConfirmButton: false,
+        showConfirmButton: true,
         focusConfirm: false,
         allowOutsideClick: false,
-        customClass: 'mSwal'
+        customClass: 'mSwal',
+        confirmButtonText: 'Upload all <i class="fa fa-upload"></i>',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: _ => !Swal.isLoading(),
+        preConfirm: async _ => {
+            if(filepond.getFiles().length) {
+                swal.resetValidationMessage()
+
+                return filepond.processFiles()
+            }
+
+            return swal.showValidationMessage(`Should have enough files first.`)
+        }
+    }).then(res => {
+        // @TODO: Handle this.
+        console.log(res)
     })
 
-    FilePond.create(document.querySelector('input[type="file"]'), {
+    // Hoisted.
+    const filepond = FilePond.create(document.querySelector('#filepond'), {
         instantUpload: false,
         server: {
-            url: 'http://192.168.0.100',
-            process: {
-                url: './process',
-                method: 'POST',
-                withCredentials: false,
-                headers: {},
-                timeout: 7000,
-                onload: null,
-                onerror: null,
-                ondata: null
+            url: null,
+            process: (fieldName, file, metadata, load, error, progress, abort) => {
+                
+                load('OK')
+
+                switch(e.getAttribute('data-conn')) {
+                    case 'SIMPLE':
+                        // @TODO: Handle in backend
+                        SIMPLE.emit('upload-img', { messaage: 'simple-upload' })
+                    break
+                    case 'GROUP':
+                        // @TODO: Handle in backend
+                        GROUP.emit('upload-img', { messaage: 'group-upload' })
+                    break
+                }
+
+                return {
+                    abort: () => {
+                        request.abort()
+                        abort()
+                    }
+                }
             }
         }
     })
@@ -49,13 +76,7 @@ const buildURLQuery = obj => Object.entries(obj)
     .map(pair => pair.map(encodeURIComponent).join('='))
     .join('&')
 
-const showInput = _ => {
-    contentChatboxInput.children[0].style.visibility = 'visible';
-    contentChatboxInput.children[1].style.visibility = 'visible';
-}
-
 const initUI = el => {
-    
     const cImg = el.firstElementChild.children[0].src
     contentChatboxHeaderImg.setAttribute('src', cImg)
 
@@ -63,6 +84,8 @@ const initUI = el => {
     mainHeaderDetailsH4.textContent = cName
     contentChatboxHeaderDetailsH4.textContent = cName
 
+    contentChatboxInput.children[0].style.visibility = 'visible'
+    contentChatboxInput.children[1].style.visibility = 'visible'
 }
 
 // d49a82aa-a674-454c-8398-2d643403e097 : John Doe
@@ -143,15 +166,16 @@ const connect = (el, id, type) => {
         case 'SIMPLE':
             SIMPLE.emit('join-room', { id })
             mConn = { id, type: 'SIMPLE' }
+            btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
         break;
         case 'GROUP':
             GROUP.emit('join-room', { id })
             mConn = { id, type: 'GROUP' }
+            btnChatboxPhoto.setAttribute('data-conn', 'GROUP')
         break;
     }
 
     initUI(el)
-    showInput()
 }
 
 document.addEventListener('DOMContentLoaded', _ => {
@@ -202,8 +226,11 @@ document.addEventListener('DOMContentLoaded', _ => {
         const x = result.value.filter(x => x)
         if (!(x === undefined || x.length == 0)) {
 
-            id = result.value[0]
-            name = result.value[1]
+            // id = result.value[0]
+            // name = result.value[1]
+
+            id = 'd49a82aa-a674-454c-8398-2d643403e097'
+            name = 'John Doe'
 
             axios.get(`${BASE_URL}/api/member/${id}?expand=threads`).then(resp => {
                 const template = resp.data.threads.map(th => {

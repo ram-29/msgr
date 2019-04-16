@@ -11,6 +11,14 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'modules' => [
+        'user' => [
+            'as frontend' => [
+                'class' => 'dektrium\user\filters\FrontendFilter',
+                // 'class' => 'niksko12\user\filters\FrontendFilter'
+            ],
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',

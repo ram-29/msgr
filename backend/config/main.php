@@ -11,6 +11,18 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'backend\controllers',
+    'modules' => [
+        'api' => [
+            'basePath' => '@backend/modules/api',
+            'class' => 'backend\modules\api\Module',
+        ],
+        'user' => [
+            'as backend' => [
+                'class' => 'dektrium\user\filters\BackendFilter',
+                // 'class' => 'niksko12\user\filters\BackendFilter'
+            ],
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
@@ -55,12 +67,6 @@ return [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-message-seen', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
             ],
-        ],
-    ],
-    'modules' => [
-        'api' => [
-            'basePath' => '@backend/modules/api',
-            'class' => 'backend\modules\api\Module',
         ],
     ],
     'params' => $params,
