@@ -8,7 +8,7 @@ const sharedsession = require('express-socket.io-session')
 
 const session = require('express-session')({ 
     secret: '$2a$07$sXmjRkhWZxKDsudVk281X.Y.RLqgzlfysiBOfXizwLLzea7IbUGWG', 
-    cookie: { maxAge: 60000 }, 
+    cookie: { maxAge: 60000 },
     resave: true,
     saveUninitialized: true
 })
@@ -60,7 +60,12 @@ io.of('/simple')
     sUploader.on('error', data => {
 		console.log(`Error: ${data.memo}`)
 		console.log(data.error)
-	})
+    })
+    
+    // Upload Image Handler
+    simple.on('upload-img', data => {
+        console.log(data)
+    })
 
     // Join Room Handler
     simple.on('join-room', room => {
@@ -106,7 +111,12 @@ io.of('/group')
     gUploader.on('error', data => {
 		console.log(`Error: ${data.memo}`)
 		console.log(data.error)
-	})
+    })
+    
+    // Upload Image Handler
+    group.on('upload-img', data => {
+        console.log(data)
+    })
 
     // Join Room Handler
     group.on('join-room', room => {
