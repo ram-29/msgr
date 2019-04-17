@@ -1,5 +1,7 @@
 const fs = require('fs')
 const cors = require('cors')
+const uuid = require('uuid/v4')
+const multer = require('multer')
 const morgan = require('morgan')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -65,14 +67,14 @@ io.of('/simple')
     
     // Upload Image Handler
     simple.on('upload-img', data => {
-        var files = {}, 
-            struct = { 
-                name: null, 
-                type: null, 
-                size: 0, 
-                data: [], 
-                slice: 0, 
-            };
+        let files = {} 
+        let struct = { 
+            name: null, 
+            type: null, 
+            size: 0, 
+            data: [], 
+            slice: 0,
+        }
 
         if (!files[data.name]) { 
             files[data.name] = Object.assign({}, struct, data)
@@ -86,11 +88,15 @@ io.of('/simple')
 
         if (files[data.name].slice * 100000 >= files[data.name].size) { 
             const fileBuffer = Buffer.concat(files[data.name].data)
+            const filename = `${uuid()}-${data.name}`
 
-            fs.writeFile('tmp/'+data.name, fileBuffer, (err) => { 
+            // @TODO Send buffer data to client.
+            // Encode to base64
+
+            fs.writeFile(`tmp/${filename}`, fileBuffer, (err) => { 
                 delete files[data.name]
                 if (err) return simple.emit('upload error')
-                simple.emit('end upload')
+                simple.emit('upload-img', { filename })
             })
         } else {
             simple.emit('request slice upload', { currentSlice: files[data.name].slice })
