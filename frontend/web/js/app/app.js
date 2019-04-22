@@ -50,24 +50,14 @@ const initUpload = e => {
                 
                 load('OK')
 
-                const fileReader = new FileReader()
-                const slice = file.slice(0, 100000)
-
                 switch(e.getAttribute('data-conn')) {
                     case 'SIMPLE':
-                        fileReader.readAsArrayBuffer(slice)
-                        fileReader.onload = e => {
-                            SIMPLE.emit('upload-img', {
-                                name: file.name, 
-                                type: file.type, 
-                                size: file.size, 
-                                data: fileReader.result 
-                            })
-                        }
+                        const sSiofu = new SocketIOFileUpload(SIMPLE)
+                        sSiofu.submitFiles([new File([file], file.name)])
                     break
                     case 'GROUP':
-                        // @TODO: Handle in backend
-                        GROUP.emit('upload-img', { file })
+                        const gSiofu = new SocketIOFileUpload(GROUP)
+                        gSiofu.submitFiles([new File([file], file.name)])
                     break
                 }
 
