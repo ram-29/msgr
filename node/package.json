@@ -1,0 +1,41 @@
+{
+  "name": "msgr",
+  "version": "1.0.0",
+  "description": "Just yet another messenger clone",
+  "main": "index.js",
+  "scripts": {
+    "server": "node index.js",
+    "gulp": "gulp",
+    "nodemon": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ram-29/msgr.git"
+  },
+  "author": "Ram Delatina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ram-29/msgr/issues"
+  },
+  "homepage": "https://github.com/ram-29/msgr#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "errorhandler": "^1.5.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "morgan": "^1.9.1",
+    "socket.io": "^2.2.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-livereload": "^4.0.1",
+    "gulp-minify": "^3.1.0",
+    "gulp-open": "^3.0.1",
+    "gulp-rename": "^1.4.0",
+    "nodemon": "^1.18.10"
+  }
+}
