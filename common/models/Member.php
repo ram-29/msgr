@@ -9,6 +9,7 @@ use Yii;
  *
  * @property string $id
  * @property string $name
+ * @property string $username
  * @property string $sex
  * @property string $status
  * @property string $joined_at
@@ -35,7 +36,7 @@ class Member extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name'], 'required'],
+            [['id', 'name', 'username'], 'required'],
             [['sex', 'status'], 'string'],
             [['joined_at', 'logged_at'], 'safe'],
             [['id'], 'string', 'max' => 36],
@@ -113,8 +114,10 @@ class Member extends \yii\db\ActiveRecord
                             unset($mMember[$key]);
                             $mmMember = \common\models\Member::findOne(array_values($mMember));
 
-                            $name = $mmMember->name;
-                            $sex = $mmMember->sex;
+                            // $name = $mmMember->name;
+                            // $sex = $mmMember->sex;
+
+                            $name = array_values($mMember);
                         }
                     }
 
@@ -175,4 +178,16 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMessageSeen::className(), ['member_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */    
+    public static function findByMemberUsername($username) {
+        $user = self::find()->where(["username" => $username])->one();
+        if (!count($user)) {
+            return null;
+        }
+        
+        return $user;
+    }    
 }
