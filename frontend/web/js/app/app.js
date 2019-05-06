@@ -1,4 +1,3 @@
-const BASE_URL = `http://bk.msgr.io`
 const SOCKET_URL = `http://localhost:1337`
 
 let btnHeaderSetting,
@@ -178,6 +177,94 @@ const connect = (el, id, type) => {
     initUI(el)
 }
 
+const groupConfirm = params => {
+
+    const h4 = params.parentElement
+        .previousElementSibling.children[1].children[0]
+
+    const mId = h4.dataset.id
+    const mName = h4.textContent
+    const mMembers = [
+        { member_id: id, role: 'ADMIN' },
+        { member_id: mId, role: 'MEMBER' }
+    ]
+
+    swal({
+        width: '50rem',
+        type: 'question',
+        title: 'Please choose an option',
+        focusConfirm: false,
+        showCloseButton: true,
+        showCancelButton: true,
+        showConfirmButton: true,
+        allowOutsideClick: false,
+        confirmButtonColor: '#5cb85c',
+        confirmButtonText: `
+            <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
+            <br/>Add <strong>${mName}</strong> <br/>to a New Group
+        `,
+        confirmButtonAriaLabel: 'Add to New Group',
+        cancelButtonColor: '#337ab7',
+        cancelButtonText: `
+            <i class="fa fa-users fa-2x" aria-hidden="true"></i>
+            <br/>Add <strong>${mName}</strong> <br/>to an Existing Group
+        `,
+        cancelButtonAriaLabel: 'Add to an Existing Group',
+    }).then(res => {
+        if(res.value) {
+            // New Group
+            swal({
+                title: 'Please specify a group name',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                confirmButtonText: 'Submit',
+                showLoaderOnConfirm: true,
+                preConfirm: grpName => {
+                    if(grpName) {
+                        return fetch(`${BK_URL}/api/thread`, {
+                            method: 'POST',
+                            body: JSON.stringify({ 
+                                type: 'GROUP',
+                                name: grpName,
+                                members: mMembers
+                            }),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(async resp => {
+                            if (!resp.ok) {
+                                throw new Error(resp.statusText)
+                            }
+
+                            // Crappy, Recreating response on frontend.
+                            const result = await resp.json()
+                            result.result = grpName
+                            result.members = mMembers
+
+                            return result
+                        }).catch(err => {
+                            Swal.showValidationMessage(
+                                `Request failed: ${err}`
+                            )
+                        })
+                    } else {
+                        Swal.showValidationMessage(`Please specify a group name`)
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then(res => {
+                console.log(res)
+            })
+        } else {
+            // Existing Group
+            console.log('Existing Group')
+        }
+    })
+}
+
 document.addEventListener('DOMContentLoaded', _ => {
 
     FilePond.registerPlugin(
@@ -226,13 +313,15 @@ document.addEventListener('DOMContentLoaded', _ => {
         const x = result.value.filter(x => x)
         if (!(x === undefined || x.length == 0)) {
 
-            // id = result.value[0]
-            // name = result.value[1]
+            id = result.value[0]
+            name = result.value[1]
 
-            id = 'd49a82aa-a674-454c-8398-2d643403e097'
-            name = 'John Doe'
+            // id = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf'
+            // name = 'Maria Powell'
 
-            axios.get(`${BASE_URL}/api/member/${id}?expand=threads`).then(resp => {
+            // 312615cc-96f1-4e0f-9da5-ef482e72d889
+
+            axios.get(`${BK_URL}/api/member/${id}?expand=threads`).then(resp => {
                 const template = resp.data.threads.map(th => {
                     return `
                         <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">

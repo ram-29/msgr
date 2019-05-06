@@ -64,9 +64,10 @@ class MemberController extends \yii\rest\ActiveController
     public function actionUpdate($id)
     {
         $model = \common\models\Member::findOne($id);
-        $type = \Yii::$app->request->getBodyParam('type');
+        $params = \Yii::$app->request->getBodyParams();
+        $model->load($params, '');
 
-        if($type == 'CONNECT') {
+        if($params['type'] == 'CONNECT') {
             $model->status = 'ACTIVE';
             $model->logged_at = date("Y-m-d H:i:s", time());
             $model->save();

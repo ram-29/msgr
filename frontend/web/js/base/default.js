@@ -1,5 +1,5 @@
 (_ => {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
     $('.msgr-main-content-chatbox-list').overlayScrollbars({})

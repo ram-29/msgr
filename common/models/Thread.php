@@ -18,6 +18,8 @@ use Yii;
  */
 class Thread extends \yii\db\ActiveRecord
 {
+    public $globalConfig;
+
     /**
      * {@inheritdoc}
      */
@@ -92,6 +94,17 @@ class Thread extends \yii\db\ActiveRecord
                 unset($cfg->id);
                 
                 return $cfg;
+            },
+            'members' => function($x) {
+                $members = array_map(function($mem) {
+                    return [
+                        'id' => $mem['member_id'],
+                        'nickname' => $mem['nickname'],
+                        'role' => $mem['role'],
+                    ];
+                }, \common\models\ThreadMember::findAll(['thread_id' => $x->id]));
+
+                return $members;
             }
         ];
     }

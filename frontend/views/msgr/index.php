@@ -125,20 +125,19 @@ $this->title = Yii::$app->name;
                     </div>
 
                     <div class="msgr-main-content-tools-user-list">
-                        <?php foreach(range(0, 15) as $i) :?>
-
-                            <?php $idx = array_rand([1, 2, 3]) + 1 ?>
+                        <?php foreach($members as $i => $member) :?>
+                            <?php $img = $member['sex'] == 'M' ? "1" : "2"; ?>
 
                             <div class="msgr-main-content-tools-user-list-item">
                                 <div class="msgr-main-content-tools-user-list-item-content">
-                                    <?= Html::img("@web/img/{$idx}.png", [
-                                        'class' => 'img-circle', 
+                                    <?= Html::img("@web/img/{$img}.png", [
+                                        'class' => 'img-circle',
                                         'alt' => 'User image'
                                     ]) ?>
 
                                     <div class="msgr-main-content-tools-user-list-item-content-details">
-                                        <h4>John Doe</h4>
-                                        <p>Associate Software Engineer</p>
+                                        <h4 data-id="<?= $member['id'] ?>"><?= $member['name'] ?></h4>
+                                        <!-- <p>Associate Software Engineer</p> -->
                                     </div>
                                 </div>
 
@@ -157,7 +156,8 @@ $this->title = Yii::$app->name;
                                         'data-toggle' => 'tooltip',
                                         'data-placement' => 'left',
                                         'data-html' => 'true',
-                                        'title' => 'Add this person to a group'
+                                        'title' => 'Add this person to a group',
+                                        'onclick' => new JsExpression("groupConfirm(this)")
                                     ]) ?>
                                 </div>
                             </div>
