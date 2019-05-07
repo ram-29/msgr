@@ -13,10 +13,12 @@ let btnHeaderSetting,
     btnChatboxEmoji,
     btnChatboxSend;
 
-const initUpload = e => {
+const initUpload = (e, type) => {
+    const mFilePond = `filepond-${type.toLowerCase()}`
+
     swal({
-        title: 'Upload files here ..',
-        html: `<input id="filepond" type="file" class="filepond" name="filepond" multiple data-max-files="10"/>`,
+        title: `Upload your ${type === 'IMG' ? 'image/s' : 'file/s'} here ..`,
+        html: `<input id="${mFilePond}" type="file" class="filepond" name="${mFilePond}" multiple data-max-files="10"/>`,
         showCloseButton: true,
         showCancelButton: false,
         showConfirmButton: true,
@@ -40,8 +42,37 @@ const initUpload = e => {
         // console.log(res)
     })
 
+    const fileType = [
+        // Office
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/msword',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.sun.xml.writer',
+        'application/vnd.sun.xml.writer.global',
+        'application/vnd.sun.xml.calc',
+        'application/vnd.sun.xml.impress',
+        'application/pdf',
+
+        // Videos
+        // 'video/x-flv',
+        // 'video/mp4',
+        // 'application/x-mpegURL',
+        // 'video/MP2T',
+        // 'video/3gpp',
+        // 'video/quicktime',
+        // 'video/x-msvideo',
+        // 'video/x-ms-wmv',
+
+        // Others
+        'text/plain'
+    ];
+
     // Hoisted.
-    const filepond = FilePond.create(document.querySelector('#filepond'), {
+    const filepond = FilePond.create(document.querySelector(`#${mFilePond}`), {
+        acceptedFileTypes: type === 'IMG' ? ['image/*'] : fileType,
         instantUpload: false,
         server: {
             url: null,
@@ -52,10 +83,24 @@ const initUpload = e => {
                 switch(e.getAttribute('data-conn')) {
                     case 'SIMPLE':
                         const sSiofu = new SocketIOFileUpload(SIMPLE)
+                        sSiofu.addEventListener('start', function(evt){
+                            evt.file.meta = { 
+                                threadId: mConn.id,
+                                fileType: file.type,
+                            }
+                        })
+
                         sSiofu.submitFiles([new File([file], file.name)])
                     break
                     case 'GROUP':
                         const gSiofu = new SocketIOFileUpload(GROUP)
+                        gSiofu.addEventListener('start', function(evt){
+                            evt.file.meta = { 
+                                threadId: mConn.id,
+                                fileType: file.type,
+                            }
+                        })
+
                         gSiofu.submitFiles([new File([file], file.name)])
                     break
                 }
@@ -166,11 +211,13 @@ const connect = (el, id, type) => {
             SIMPLE.emit('join-room', { id })
             mConn = { id, type: 'SIMPLE' }
             btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
+            btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
         break;
         case 'GROUP':
             GROUP.emit('join-room', { id })
             mConn = { id, type: 'GROUP' }
             btnChatboxPhoto.setAttribute('data-conn', 'GROUP')
+            btnChatboxFile.setAttribute('data-conn', 'GROUP')
         break;
     }
 
@@ -313,11 +360,11 @@ document.addEventListener('DOMContentLoaded', _ => {
         const x = result.value.filter(x => x)
         if (!(x === undefined || x.length == 0)) {
 
-            id = result.value[0]
-            name = result.value[1]
+            // id = result.value[0]
+            // name = result.value[1]
 
-            // id = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf'
-            // name = 'Maria Powell'
+            id = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf'
+            name = 'Maria Powell'
 
             // 312615cc-96f1-4e0f-9da5-ef482e72d889
 

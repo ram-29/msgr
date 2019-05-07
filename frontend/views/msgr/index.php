@@ -87,7 +87,7 @@ $this->title = Yii::$app->name;
                                 'data-html' => 'true',
                                 'title' => 'Attach a photo',
                                 'data-conn' => 'null',
-                                'onclick' => new JsExpression('initUpload(this)'),
+                                'onclick' => new JsExpression('initUpload(this, "IMG")'),
                             ]) ?>
                             <?= Html::button(FA::icon('paperclip')->size(FA::SIZE_LARGE)->fixedWidth(), [
                                 'class' => 'btn btn-default btn-sm',
@@ -95,7 +95,9 @@ $this->title = Yii::$app->name;
                                 'data-toggle' => 'tooltip',
                                 'data-placement' => 'top',
                                 'data-html' => 'true',
-                                'title' => 'Attach a file'
+                                'title' => 'Attach a file',
+                                'data-conn' => 'null',
+                                'onclick' => new JsExpression('initUpload(this, "FILE")'),
                             ]) ?>
                             <?= Html::button(FA::icon('smile-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
                                 'class' => 'btn btn-default btn-sm',

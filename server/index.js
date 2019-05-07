@@ -1,5 +1,6 @@
-const fs = require('fs')
+const path = require('path')
 const cors = require('cors')
+const fs = require('fs-extra')
 const uuid = require('uuid/v4')
 const multer = require('multer')
 const morgan = require('morgan')
@@ -56,8 +57,23 @@ io.of('/simple')
 	})
 
     sUploader.on('saved', event => {
-        console.log(event.file)
-        // @todo move file to appropriate folder.
+        // Filename
+        let mName = path.basename(event.file.pathName)
+        mName = `${uuid()}`+path.parse(mName).ext
+
+        // Create Directory
+        let mDir = `../frontend/web/files/${event.file.meta.threadId}`
+        !fs.existsSync(mDir) && fs.mkdirSync(mDir)
+
+        mDir = event.file.meta.fileType.includes('image') ?
+            `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
+
+        // Move File
+        fs.move(event.file.pathName, mDir, err => {
+            if (err) return console.error(err)
+        })
+
+        // @TODO Request to yii backend db server.
 	})
 
     sUploader.on('error', data => {
