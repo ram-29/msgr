@@ -1,8 +1,8 @@
 const path = require('path')
 const cors = require('cors')
 const fs = require('fs-extra')
+const axios = require('axios')
 const uuid = require('uuid/v4')
-const multer = require('multer')
 const morgan = require('morgan')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -31,7 +31,9 @@ const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
 // Change `BASE_URL` on production.
-const BASE_URL = `http://bk.msgr.io`
+const BK_URL = `http://localhost:80/msgr/backend/web`
+const FR_URL = `http://localhost:80/msgr/frontend/web`
+
 const PORT = process.env.PORT || 1337
 
 server.listen(PORT, _ => { console.log(`Server running on port ${PORT}.`) })
@@ -58,8 +60,8 @@ io.of('/simple')
 
     sUploader.on('saved', event => {
         // Filename
-        let mName = path.basename(event.file.pathName)
-        mName = `${uuid()}`+path.parse(mName).ext
+        let fName = path.basename(event.file.pathName)
+        let mName = `${uuid() + path.parse(fName).ext}`
 
         // Create Directory
         let mDir = `../frontend/web/files/${event.file.meta.threadId}`
@@ -70,10 +72,29 @@ io.of('/simple')
 
         // Move File
         fs.move(event.file.pathName, mDir, err => {
-            if (err) return console.error(err)
+            if (err) return console.log(err)
         })
 
-        // @TODO Request to yii backend db server.
+        // Request to yii backend db server.
+        axios.post(`${BK_URL}/api/thread-message`, { 
+            thread_id: event.file.meta.threadId,
+            member_id: event.file.meta.memberId,
+            text: null,
+            file: mDir,
+            created_at: event.file.meta.createdAt
+        })
+        .then(resp => {
+            // @TODO: Emit back to client
+            io.of('/simple').in(event.file.meta.threadId).emit('file', { 
+                member_id: event.file.meta.memberId, 
+                filename: fName,
+                filepath: mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL),
+                type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
+                created_at: event.file.meta.createdAt,
+            })
+            
+        })
+        .catch(err => console.log(err.response.data))
 	})
 
     sUploader.on('error', data => {

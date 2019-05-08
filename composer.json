@@ -73,15 +73,18 @@
         "npm-asset/filepond-plugin-file-metadata": "~1.0.6",
         "npm-asset/filepond-plugin-file-poster": "~2.0.2",
         "npm-asset/filepond-plugin-file-rename": "~1.1.4",
-        "npm-asset/filepond-plugin-file-validate-size": "@dev"
+        "npm-asset/filepond-plugin-file-validate-size": "@dev",
+
+        "npm-asset/nanogallery2": "~2.4.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.1.0",
         "yiisoft/yii2-faker": "~2.0.0",
-        "codeception/base": "^2.4.0",
-        "phpunit/phpunit": "~6.5.5",
-        "codeception/verify": "~1.0.0",
+
+        "codeception/base": "~2.3.0",
+        "codeception/verify": "~0.4.0",
+        "codeception/specify": "~0.4.6",
         "symfony/browser-kit": ">=2.7 <=4.2.4"
     },
     "extra": {

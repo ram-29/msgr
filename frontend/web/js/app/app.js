@@ -13,6 +13,35 @@ let btnHeaderSetting,
     btnChatboxEmoji,
     btnChatboxSend;
 
+let id, name, SIMPLE, GROUP
+const fileTypes = [
+    // Office
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/msword',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.sun.xml.writer',
+    'application/vnd.sun.xml.writer.global',
+    'application/vnd.sun.xml.calc',
+    'application/vnd.sun.xml.impress',
+    'application/pdf',
+
+    // Videos
+    // 'video/x-flv',
+    // 'video/mp4',
+    // 'application/x-mpegURL',
+    // 'video/MP2T',
+    // 'video/3gpp',
+    // 'video/quicktime',
+    // 'video/x-msvideo',
+    // 'video/x-ms-wmv',
+
+    // Others
+    'text/plain'
+];
+
 const initUpload = (e, type) => {
     const mFilePond = `filepond-${type.toLowerCase()}`
 
@@ -42,37 +71,9 @@ const initUpload = (e, type) => {
         // console.log(res)
     })
 
-    const fileType = [
-        // Office
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'application/msword',
-        'application/vnd.ms-excel',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.sun.xml.writer',
-        'application/vnd.sun.xml.writer.global',
-        'application/vnd.sun.xml.calc',
-        'application/vnd.sun.xml.impress',
-        'application/pdf',
-
-        // Videos
-        // 'video/x-flv',
-        // 'video/mp4',
-        // 'application/x-mpegURL',
-        // 'video/MP2T',
-        // 'video/3gpp',
-        // 'video/quicktime',
-        // 'video/x-msvideo',
-        // 'video/x-ms-wmv',
-
-        // Others
-        'text/plain'
-    ];
-
     // Hoisted.
     const filepond = FilePond.create(document.querySelector(`#${mFilePond}`), {
-        acceptedFileTypes: type === 'IMG' ? ['image/*'] : fileType,
+        acceptedFileTypes: type === 'IMG' ? ['image/*'] : fileTypes,
         instantUpload: false,
         server: {
             url: null,
@@ -86,7 +87,9 @@ const initUpload = (e, type) => {
                         sSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
                                 threadId: mConn.id,
+                                memberId: id,
                                 fileType: file.type,
+                                createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
                             }
                         })
 
@@ -97,7 +100,9 @@ const initUpload = (e, type) => {
                         gSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
                                 threadId: mConn.id,
+                                memberId: id,
                                 fileType: file.type,
+                                createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
                             }
                         })
 
@@ -138,7 +143,6 @@ const initUI = el => {
 // b7eb64d0-f568-4e4a-a253-be3ded0d3b1a : John Doe
 // 6786e939-9afd-4da1-a641-d8281368f5c5 : Maria Powell
 
-let id, name, SIMPLE, GROUP
 const initConn = (id, name) => {
     const query = buildURLQuery({ id, name })
 
@@ -164,6 +168,28 @@ const initConn = (id, name) => {
                 </div>
             </div>
         `
+        contentChatboxList.insertAdjacentHTML('beforeend', template)
+        contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+    })
+
+    SIMPLE.on('file', data => {
+        const { member_id, filename, filepath, type, created_at } = data
+
+        const src = contentChatboxHeaderImg.getAttribute('src')
+
+        const template = `
+            <div class="msgr-main-content-chatbox-list-item">
+                <span>${created_at}</span>
+
+                <div class="msgr-main-content-chatbox-list-item-details ${member_id === id ? 'owner' : ''}">
+                    <img class="img-circle" src="${src}" alt="User image">
+                    <div class="msgr-main-content-chatbox-list-item-details-content">
+                        ${type === 'image' ? `<img src="${filepath}" alt="${filename}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${filepath}" target="_blank" style="color:#fff !important; text-decoration:underline;">${filename}</a></p>`}
+                    </div>
+                </div>
+            </div>
+        `
+
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
     })
