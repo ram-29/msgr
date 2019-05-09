@@ -28,7 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'thread_id',
                 'member_id',
                 'text:ntext',
-                'file',
+                'file:ntext',
+                // 'file_name:ntext',
+                // 'file_type:ntext',
                 // 'created_at',
                 // 'deleted_by:ntext',
 

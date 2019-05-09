@@ -8,6 +8,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
 const siofu = require('socketio-file-upload')
+const thumb = require('node-thumbnail').thumb
 const sharedsession = require('express-socket.io-session')
 
 const session = require('express-session')({ 
@@ -46,7 +47,7 @@ io.of('/simple')
     // User id & name.
     const { id, name } = simple.handshake.query
 
-    // Upload listener
+    // File Upload listener
     const sUploader = new siofu()
     sUploader.dir = '../frontend/web/files';
     sUploader.listen(simple)
@@ -59,18 +60,18 @@ io.of('/simple')
 	})
 
     sUploader.on('saved', event => {
-        // Filename
+        // Filename.
         let fName = path.basename(event.file.pathName)
         let mName = `${uuid() + path.parse(fName).ext}`
 
-        // Create Directory
+        // Create Directory.
         let mDir = `../frontend/web/files/${event.file.meta.threadId}`
         !fs.existsSync(mDir) && fs.mkdirSync(mDir)
 
         mDir = event.file.meta.fileType.includes('image') ?
             `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
 
-        // Move File
+        // Move File.
         fs.move(event.file.pathName, mDir, err => {
             if (err) return console.log(err)
         })
@@ -81,20 +82,34 @@ io.of('/simple')
             member_id: event.file.meta.memberId,
             text: null,
             file: mDir,
+            file_name: fName,
+            file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
             created_at: event.file.meta.createdAt
         })
-        .then(resp => {
-            // @TODO: Emit back to client
-            io.of('/simple').in(event.file.meta.threadId).emit('file', { 
-                member_id: event.file.meta.memberId, 
-                filename: fName,
-                filepath: mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL),
-                type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
-                created_at: event.file.meta.createdAt,
+        .then(async _ => {
+            // Generate thumbnail
+            const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
+            !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
+
+            await thumb({
+                source: mDir,
+                destination: mThumb,
+                quiet: true,
+                width: 250,
+                suffix: '-thumb',
             })
-            
+
+            // Emit back to client.
+            const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
+            io.of('/simple').in(event.file.meta.threadId).emit('file', {
+               member_id: event.file.meta.memberId, 
+               filename: fName,
+               filepath: mFilePath,
+               type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
+               created_at: event.file.meta.createdAt,
+            })
         })
-        .catch(err => console.log(err.response.data))
+        .catch(err => console.log(err.response))
 	})
 
     sUploader.on('error', data => {
@@ -127,7 +142,7 @@ io.of('/group')
     // User id & name.
     const { id, name } = group.handshake.query
 
-    // Upload listener
+    // File Upload listener
     const gUploader = new siofu()
     gUploader.listen(group)
 

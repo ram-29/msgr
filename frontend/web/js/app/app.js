@@ -230,7 +230,7 @@ const initConn = (id, name) => {
 }
 
 let mConn = {};
-const connect = (el, id, type) => {
+const connect = async (el, id, type) => {
 
     switch(type) {
         case 'SIMPLE':
@@ -238,6 +238,24 @@ const connect = (el, id, type) => {
             mConn = { id, type: 'SIMPLE' }
             btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
             btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
+
+            const nGalleryImage = $('#nanogallery2-image')
+            nGalleryImage.nanogallery2('destroy')
+
+            const mImages = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=messages`)
+            nGalleryImage.nanogallery2({
+                items: mImages.data.messages.map(msg => {
+                    if(msg.file_path) {
+                        return {
+                            src: msg.file_path,
+                            srct: msg.file_thumb,
+                            title: msg.file_name
+                        }
+                    }
+                }),
+                thumbnailWidth: 'auto',
+                thumbnailHeight: 100,
+            })
         break;
         case 'GROUP':
             GROUP.emit('join-room', { id })
@@ -338,7 +356,7 @@ const groupConfirm = params => {
     })
 }
 
-document.addEventListener('DOMContentLoaded', _ => {
+document.addEventListener('DOMContentLoaded', async _ => {
 
     FilePond.registerPlugin(
         FilePondPluginImageCrop,

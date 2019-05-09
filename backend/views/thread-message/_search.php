@@ -28,6 +28,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'file') ?>
 
+    <?php // echo $form->field($model, 'file_name') ?>
+
+    <?php // echo $form->field($model, 'file_type') ?>
+
     <?php // echo $form->field($model, 'created_at') ?>
 
     <?php // echo $form->field($model, 'deleted_by') ?>

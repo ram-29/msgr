@@ -66,7 +66,6 @@ class ThreadMessageController extends Controller
         $model = new ThreadMessage();
 
         if ($model->load(Yii::$app->request->post())) {
-            
             // Set attributes.
             $model->setAttrs();
 

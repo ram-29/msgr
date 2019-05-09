@@ -176,7 +176,9 @@ $this->title = Yii::$app->name;
                     </ul>
                     
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade in active" id="images">Images</div>
+                        <div role="tabpanel" class="tab-pane fade in active" id="images">
+                            <div id="nanogallery2-image"></div>
+                        </div>
                         <div role="tabpanel" class="tab-pane fade" id="files">Files</div>
                         <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div>
                     </div>

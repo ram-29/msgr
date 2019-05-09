@@ -124,6 +124,14 @@ class Member extends \yii\db\ActiveRecord
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
 
+                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
+                            // Update the ThreadMessage DB = Attrs: file_name, file_type
+                            // Update ThereadMessage Model
+                            // Update Migrations
+
+                            // @TODO : Get the file type
+                        }
+
                         $message = compact("latest", "time");
                     }
 

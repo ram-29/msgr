@@ -89,7 +89,6 @@ class Thread extends \yii\db\ActiveRecord
     {
         return [
             'global-config' => function($x) {
-
                 $cfg = \common\models\ThreadGlobalConfig::findOne($x->id);
                 unset($cfg->id);
                 
@@ -105,6 +104,42 @@ class Thread extends \yii\db\ActiveRecord
                 }, \common\models\ThreadMember::findAll(['thread_id' => $x->id]));
 
                 return $members;
+            },
+            'messages' => function($x) {
+                $thMsgs = array_map(function($thMsg) {
+                    if (!empty($thMsg['file'])) {
+                        $mPathInfo = pathinfo($thMsg['file']);
+
+                        $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
+                        $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
+                        $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+
+                        return [
+                            'member_id' => $thMsg['member_id'],
+                            'text' => $thMsg['text'],
+                            'file_path' => $mFile,
+                            'file_thumb' => $mFileThumb,
+                            'file_name' => $thMsg['file_name'],
+                            'file_type' => $thMsg['file_type'],
+                            'created_at' => $thMsg['created_at'],
+                            'deleted_by' => $thMsg['deleted_by'],
+                        ];
+                    }
+
+                    return [
+                        'member_id' => $thMsg['member_id'],
+                        'text' => $thMsg['text'],
+                        'file_path' => null,
+                        'file_thumb' => null,
+                        'file_name' => null,
+                        'file_type' => null,
+                        'created_at' => $thMsg['created_at'],
+                        'deleted_by' => $thMsg['deleted_by'],
+                    ];
+                    
+                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->orderBy(['created_at' => SORT_ASC])->all());
+
+                return $thMsgs;
             }
         ];
     }

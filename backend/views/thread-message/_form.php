@@ -20,7 +20,11 @@ use yii\widgets\ActiveForm;
 
         <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>
 
-        <?= $form->field($model, 'file')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'file')->textarea(['rows' => 6]) ?>
+
+        <?= $form->field($model, 'file_name')->textarea(['rows' => 6]) ?>
+
+        <?= $form->field($model, 'file_type')->textarea(['rows' => 6]) ?>
 
         <?= $form->field($model, 'created_at')->textInput() ?>
 
