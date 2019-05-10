@@ -172,15 +172,17 @@ $this->title = Yii::$app->name;
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
                         <li role="presentation"><a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a></li>
-                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+                        <!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
                     </ul>
                     
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane fade in active" id="images">
-                            <div id="nanogallery2-image"></div>
+                            <div id="tab-image"></div>
                         </div>
-                        <div role="tabpanel" class="tab-pane fade" id="files">Files</div>
-                        <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div>
+                        <div role="tabpanel" class="tab-pane fade" id="files">
+                            <ul id="tab-docs"></ul>
+                        </div>
+                        <!-- <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div> -->
                     </div>
                 </div>
             </div>

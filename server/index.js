@@ -87,27 +87,38 @@ io.of('/simple')
             created_at: event.file.meta.createdAt
         })
         .then(async _ => {
-            // Generate thumbnail
-            const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
-            !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
+            if(event.file.meta.fileType.includes('image')) {
+                // Generate thumbnail
+                const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
+                !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
 
-            await thumb({
-                source: mDir,
-                destination: mThumb,
-                quiet: true,
-                width: 250,
-                suffix: '-thumb',
-            })
+                await thumb({
+                    source: mDir,
+                    destination: mThumb,
+                    quiet: true,
+                    width: 250,
+                    suffix: '-thumb',
+                })
 
-            // Emit back to client.
-            const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
-            io.of('/simple').in(event.file.meta.threadId).emit('file', {
-               member_id: event.file.meta.memberId, 
-               filename: fName,
-               filepath: mFilePath,
-               type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
-               created_at: event.file.meta.createdAt,
-            })
+                // Emit back to client : IMAGE
+                const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
+                io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                    member_id: event.file.meta.memberId, 
+                    filename: fName,
+                    filepath: mFilePath,
+                    type: 'image',
+                    created_at: event.file.meta.createdAt,
+                })
+            } else {
+                // Emit back to client = DOCS
+                io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                    member_id: event.file.meta.memberId, 
+                    filename: fName,
+                    filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}`,
+                    type: 'docs',
+                    created_at: event.file.meta.createdAt,
+                })
+            }
         })
         .catch(err => console.log(err.response))
 	})

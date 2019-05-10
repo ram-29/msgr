@@ -140,6 +140,42 @@ class Thread extends \yii\db\ActiveRecord
                 }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->orderBy(['created_at' => SORT_ASC])->all());
 
                 return $thMsgs;
+            },
+            'images' => function($x) {
+                return array_map(function($img) {
+
+                    $mPathInfo = pathinfo($img['file']);
+
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+                    $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $img['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
+                    $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+
+                    return [
+                        // 'member_id' => $img['member_id'],
+                        'file_path' => $mFilePath,
+                        'file_thumb' => $mFileThumb,
+                        'file_name' => $img['file_name'],
+                        'created_at' => $img['created_at'],
+                        'deleted_by' => $img['deleted_by'],
+                    ];
+                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->where(['text' => null, 'file_type' => 'image'])->orderBy(['created_at' => SORT_DESC])->all());
+            },
+            'docs' => function($x) {
+                return array_map(function($img) {
+
+                    $mPathInfo = pathinfo($img['file']);
+
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+
+                    return [
+                        // 'member_id' => $img['member_id'],
+                        'file_path' => $mFilePath,
+                        'file_name' => $img['file_name'],
+                        'created_at' => $img['created_at'],
+                        'deleted_by' => $img['deleted_by'],
+                    ];
+
+                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->where(['text' => null, 'file_type' => 'docs'])->orderBy(['created_at' => SORT_DESC])->all());
             }
         ];
     }

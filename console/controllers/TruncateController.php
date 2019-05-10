@@ -9,13 +9,13 @@ use yii\helpers\ArrayHelper;
 class TruncateController extends Controller
 {
     private static $table = [
-        'thread',
-        'member',
+        // 'thread',
+        // 'member',
 
-        'thread_member',
+        // 'thread_member',
 
-        'thread_global_config',
-        'thread_member_config',
+        // 'thread_global_config',
+        // 'thread_member_config',
     
         'thread_message',
         'thread_message_seen',

@@ -239,12 +239,12 @@ const connect = async (el, id, type) => {
             btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
             btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
 
-            const nGalleryImage = $('#nanogallery2-image')
-            nGalleryImage.nanogallery2('destroy')
+            const tabImage = $('#tab-image')
+            tabImage.nanogallery2('destroy')
 
-            const mImages = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=messages`)
-            nGalleryImage.nanogallery2({
-                items: mImages.data.messages.map(msg => {
+            const mImages = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=images`)
+            tabImage.nanogallery2({
+                items: mImages.data.images.map(msg => {
                     if(msg.file_path) {
                         return {
                             src: msg.file_path,
@@ -255,6 +255,19 @@ const connect = async (el, id, type) => {
                 }),
                 thumbnailWidth: 'auto',
                 thumbnailHeight: 100,
+            })
+
+            const tabDocs = $('#tab-docs')
+            tabDocs.html('')
+
+            const mDocs = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=docs`)
+            mDocs.data.docs.map(doc => {
+                tabDocs.append(`
+                    <li style="margin: 1rem 0;">
+                        <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
+                        <span class="label label-default">${moment(doc.created_at).format('MMM. DD, YYYY hh:mm a')}</span>
+                    </li>
+                `)
             })
         break;
         case 'GROUP':
@@ -399,7 +412,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     }).queue([
         'Enter ID',
         'Enter Name',
-    ]).then(result => {
+    ]).then(async result => {
 
         const x = result.value.filter(x => x)
         if (!(x === undefined || x.length == 0)) {
@@ -453,6 +466,8 @@ document.addEventListener('DOMContentLoaded', async _ => {
                     }
 
                     SIMPLE.emit('chat', { cId: mConn.id, uId: id, message, timestamp })
+
+                    contentChatboxInputBox.value = ''
                 }
             })
         }
