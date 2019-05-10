@@ -30,10 +30,10 @@
         "bower-asset/lodash": "~4.17.10",
         "bdelespierre/underscore": "dev-master",
         "axelpal/yii2-attachments": "@dev",
+        "openlss/lib-array2xml": "^0.5.1",
         "paragonie/random_compat": ">=1 <9.99",
         "ramsey/uuid": "^3.7.3",
-        "openlss/lib-array2xml": "^0.5.1",
-
+        
         "kartik-v/yii2-grid": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-datepicker": "@dev",
