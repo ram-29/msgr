@@ -26,6 +26,7 @@ class m190402_012720_create_member_table extends Migration
             $this->createTable('{{%member}}', [
                 'id' => 'CHAR(36) NOT NULL',
                 0 => 'PRIMARY KEY (`id`)',
+                'intranet_id' => 'VARCHAR(200) NULL',
                 'name' => 'VARCHAR(200) NOT NULL',
                 'sex' => 'ENUM(\'M\',\'F\') NOT NULL DEFAULT \'M\'',
                 'status' => 'ENUM(\'ACTIVE\',\'INACTIVE\') NOT NULL DEFAULT \'ACTIVE\'',

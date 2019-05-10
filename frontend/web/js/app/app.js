@@ -427,6 +427,12 @@ document.addEventListener('DOMContentLoaded', async _ => {
 
             axios.get(`${BK_URL}/api/member/${id}?expand=threads`).then(resp => {
                 const template = resp.data.threads.map(th => {
+                    const mBtn = `
+                        <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm">
+                            <i class="fa fa-cog fa-fw"></i>
+                        </button>
+                    `
+
                     return `
                         <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
                             <div class="msgr-sidebar-list-item-content">
@@ -439,9 +445,6 @@ document.addEventListener('DOMContentLoaded', async _ => {
             
                             <div class="msgr-sidebar-list-item-settings">
                                 <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
-                                <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm">
-                                    <i class="fa fa-cog fa-fw"></i>
-                                </button>
                             </div>
                         </div>
                     `

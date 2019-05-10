@@ -22,18 +22,20 @@ class m190402_013907_create_thread_message_table extends Migration
         $tableOptions_sqlite = "";
         /* MYSQL */
         if (!in_array('thread_message', $tables))  { 
-        if ($dbType == "mysql") {
-            $this->createTable('{{%thread_message}}', [
-                'id' => 'CHAR(36) NOT NULL',
-                0 => 'PRIMARY KEY (`id`)',
-                'thread_id' => 'CHAR(36) NOT NULL',
-                'member_id' => 'CHAR(36) NOT NULL',
-                'text' => 'LONGTEXT NOT NULL',
-                'file' => 'VARCHAR(200) NULL',
-                'created_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ',
-                'deleted_by' => 'TEXT NULL',
-            ], $tableOptions_mysql);
-        }
+            if ($dbType == "mysql") {
+                $this->createTable('{{%thread_message}}', [
+                    'id' => 'CHAR(36) NOT NULL',
+                    0 => 'PRIMARY KEY (`id`)',
+                    'thread_id' => 'CHAR(36) NOT NULL',
+                    'member_id' => 'CHAR(36) NOT NULL',
+                    'text' => 'LONGTEXT NULL',
+                    'file' => 'TEXT NULL',
+                    'file_name' => 'TEXT NULL',
+                    'file_type' => 'TEXT NULL',
+                    'created_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ',
+                    'deleted_by' => 'TEXT NULL',
+                ], $tableOptions_mysql);
+            }
         }
          
          

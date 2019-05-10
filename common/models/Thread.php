@@ -106,6 +106,10 @@ class Thread extends \yii\db\ActiveRecord
                 return $members;
             },
             'messages' => function($x) {
+
+                $params = \Yii::$app->request->getQueryParams();
+                $offset = !empty($params['offset']) ? $params['offset'] : 0;
+
                 $thMsgs = array_map(function($thMsg) {
                     if (!empty($thMsg['file'])) {
                         $mPathInfo = pathinfo($thMsg['file']);
@@ -137,7 +141,7 @@ class Thread extends \yii\db\ActiveRecord
                         'deleted_by' => $thMsg['deleted_by'],
                     ];
                     
-                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->orderBy(['created_at' => SORT_ASC])->all());
+                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all());
 
                 return $thMsgs;
             },

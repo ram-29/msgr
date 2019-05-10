@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "member".
  *
  * @property string $id
+ * @property string $intranet_id
  * @property string $name
  * @property string $sex
  * @property string $status
@@ -39,7 +40,7 @@ class Member extends \yii\db\ActiveRecord
             [['sex', 'status'], 'string'],
             [['joined_at', 'logged_at'], 'safe'],
             [['id'], 'string', 'max' => 36],
-            [['name'], 'string', 'max' => 200],
+            [['intranet_id', 'name'], 'string', 'max' => 200],
             [['id'], 'unique'],
         ];
     }
@@ -81,6 +82,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'intranet_id' => 'Intranet ID',
             'name' => 'Name',
             'sex' => 'Sex',
             'status' => 'Status',
@@ -124,12 +126,11 @@ class Member extends \yii\db\ActiveRecord
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
 
+                        // @TODO: Identify if a text or file/images
+                        // This will be used in recent message prompt. 
                         if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
-                            // Update the ThreadMessage DB = Attrs: file_name, file_type
-                            // Update ThereadMessage Model
-                            // Update Migrations
-
-                            // @TODO : Get the file type
+                            $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
+                                'Sent an image.' : 'Sent a document.';
                         }
 
                         $message = compact("latest", "time");
