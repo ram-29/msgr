@@ -36,7 +36,7 @@ class Member extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'username'], 'required'],
+            [['id', 'username'], 'required'],
             [['sex', 'status'], 'string'],
             [['joined_at', 'logged_at'], 'safe'],
             [['id'], 'string', 'max' => 36],
@@ -114,10 +114,8 @@ class Member extends \yii\db\ActiveRecord
                             unset($mMember[$key]);
                             $mmMember = \common\models\Member::findOne(array_values($mMember));
 
-                            // $name = $mmMember->name;
-                            // $sex = $mmMember->sex;
-
-                            $name = array_values($mMember);
+                            $name = $mmMember->name;
+                            $sex = $mmMember->sex;
                         }
                     }
 
