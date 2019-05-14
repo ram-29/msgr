@@ -141,7 +141,7 @@ class Thread extends \yii\db\ActiveRecord
                         'deleted_by' => $thMsg['deleted_by'],
                     ];
                     
-                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all());
+                }, \common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all());
 
                 return $thMsgs;
             },
@@ -162,7 +162,7 @@ class Thread extends \yii\db\ActiveRecord
                         'created_at' => $img['created_at'],
                         'deleted_by' => $img['deleted_by'],
                     ];
-                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->where(['text' => null, 'file_type' => 'image'])->orderBy(['created_at' => SORT_DESC])->all());
+                }, \common\models\ThreadMessage::find()->where(['thread_id' => $x->id, 'text' => null, 'file_type' => 'image'])->orderBy(['created_at' => SORT_DESC])->all());
             },
             'docs' => function($x) {
                 return array_map(function($img) {
@@ -179,7 +179,7 @@ class Thread extends \yii\db\ActiveRecord
                         'deleted_by' => $img['deleted_by'],
                     ];
 
-                }, \common\models\ThreadMessage::find(['thread_id' => $x->id])->where(['text' => null, 'file_type' => 'docs'])->orderBy(['created_at' => SORT_DESC])->all());
+                }, \common\models\ThreadMessage::find()->where(['thread_id' => $x->id, 'text' => null, 'file_type' => 'docs'])->orderBy(['created_at' => SORT_DESC])->all());
             }
         ];
     }

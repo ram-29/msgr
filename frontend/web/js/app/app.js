@@ -86,7 +86,7 @@ const initUpload = (e, type) => {
                         const sSiofu = new SocketIOFileUpload(SIMPLE)
                         sSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
-                                threadId: mConn.id,
+                                threadId: mConn.cId,
                                 memberId: id,
                                 fileType: file.type,
                                 createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -99,7 +99,7 @@ const initUpload = (e, type) => {
                         const gSiofu = new SocketIOFileUpload(GROUP)
                         gSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
-                                threadId: mConn.id,
+                                threadId: mConn.cId,
                                 memberId: id,
                                 fileType: file.type,
                                 createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -229,52 +229,132 @@ const initConn = (id, name) => {
     })
 }
 
+const renderUI = async (cId) => {
+    if (!contentChatboxList.children.length) {
+
+        const mMsg = await axios.get(`${BK_URL}/api/thread/${cId}?expand=messages`)
+        mMsg.data.messages.map(msg => {
+            
+            let template
+            const src = contentChatboxHeaderImg.getAttribute('src')
+
+            if(msg.text) {
+                // Render text
+                template  = `
+                    <div class="msgr-main-content-chatbox-list-item">
+                        <span>${msg.created_at}</span>
+
+                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                            <img class="img-circle" src="${src}" alt="User image">
+                            <div class="msgr-main-content-chatbox-list-item-details-content">
+                                <p>${message.text()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            } else {
+                // Photo or docs
+                template = `
+                    <div class="msgr-main-content-chatbox-list-item">
+                        <span>${msg.created_at}</span>
+
+                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                            <img class="img-circle" src="${src}" alt="User image">
+                            <div class="msgr-main-content-chatbox-list-item-details-content">
+                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color:#fff !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+
+            contentChatboxList.insertAdjacentHTML('beforeend', template)
+            contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        })
+
+        btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
+        btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
+
+        const tabImage = $('#tab-image')
+        tabImage.nanogallery2('destroy')
+
+        const mImages = await axios.get(`${BK_URL}/api/thread/${cId}?expand=images`)
+        tabImage.nanogallery2({
+            items: mImages.data.images.map(msg => {
+                if(msg.file_path) {
+                    return {
+                        src: msg.file_path,
+                        srct: msg.file_thumb,
+                        title: msg.file_name
+                    }
+                }
+            }),
+            thumbnailWidth: 'auto',
+            thumbnailHeight: 100,
+        })
+
+        const tabDocs = $('#tab-docs')
+        tabDocs.html('')
+
+        const mDocs = await axios.get(`${BK_URL}/api/thread/${cId}?expand=docs`)
+        mDocs.data.docs.map(doc => {
+            tabDocs.append(`
+                <li style="margin: 1rem 0;">
+                    <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
+                    <span class="label label-default">${moment(doc.created_at).format('MMM. DD, YYYY hh:mm a')}</span>
+                </li>
+            `)
+        })
+    }
+}
+
 let mConn = {};
-const connect = async (el, id, type) => {
+const connect = async (el, cId, type) => {
 
     switch(type) {
         case 'SIMPLE':
-            SIMPLE.emit('join-room', { id })
-            mConn = { id, type: 'SIMPLE' }
-            btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
-            btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
+            if(mConn.cId === undefined) {
+                SIMPLE.emit('join-room', { id: cId })
+                mConn = { cId, type: 'SIMPLE' }
+            }
 
-            const tabImage = $('#tab-image')
-            tabImage.nanogallery2('destroy')
+            if(cId !== mConn.cId) {
+                // Reset connection
+                SIMPLE.emit('join-room', { id: cId })
+                mConn = { cId, type: 'SIMPLE' }
 
-            const mImages = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=images`)
-            tabImage.nanogallery2({
-                items: mImages.data.images.map(msg => {
-                    if(msg.file_path) {
-                        return {
-                            src: msg.file_path,
-                            srct: msg.file_thumb,
-                            title: msg.file_name
-                        }
-                    }
-                }),
-                thumbnailWidth: 'auto',
-                thumbnailHeight: 100,
-            })
+                // Clear the message
+                for (const mMsg of $(contentChatboxList).children()) {
+                    $(mMsg).remove()
+                }
 
-            const tabDocs = $('#tab-docs')
-            tabDocs.html('')
+                renderUI(mConn.cId)
+            } else {
 
-            const mDocs = await axios.get(`http://localhost:80/msgr/backend/web/api/thread/${id}?expand=docs`)
-            mDocs.data.docs.map(doc => {
-                tabDocs.append(`
-                    <li style="margin: 1rem 0;">
-                        <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
-                        <span class="label label-default">${moment(doc.created_at).format('MMM. DD, YYYY hh:mm a')}</span>
-                    </li>
-                `)
-            })
+                renderUI(mConn.cId)
+            }
         break;
         case 'GROUP':
-            GROUP.emit('join-room', { id })
-            mConn = { id, type: 'GROUP' }
-            btnChatboxPhoto.setAttribute('data-conn', 'GROUP')
-            btnChatboxFile.setAttribute('data-conn', 'GROUP')
+            if(mConn.cId === undefined) {
+                GROUP.emit('join-room', { id: cId })
+                mConn = { cId, type: 'GROUP' }
+            }
+
+            if(cId !== mConn.cId) {
+                // Reset connection
+                GROUP.emit('join-room', { id: cId })
+                mConn = { cId, type: 'GROUP' }
+
+                // Clear the message
+                for (const mMsg of $(contentChatboxList).children()) {
+                    $(mMsg).remove()
+                }
+
+                renderUI(mConn.cId)
+            } else {
+
+                renderUI(mConn.cId)
+            }
         break;
     }
 
@@ -465,10 +545,10 @@ document.addEventListener('DOMContentLoaded', async _ => {
                     const message = e.target.value
 
                     if(mConn.type == 'GROUP') {
-                        GROUP.emit('chat', { cId: mConn.id, uId: id, message, timestamp })
+                        GROUP.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
                     }
 
-                    SIMPLE.emit('chat', { cId: mConn.id, uId: id, message, timestamp })
+                    SIMPLE.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
 
                     contentChatboxInputBox.value = ''
                 }
