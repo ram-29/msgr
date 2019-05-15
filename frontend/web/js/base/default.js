@@ -2,7 +2,17 @@
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
-    $('.msgr-main-content-chatbox-list').overlayScrollbars({})
+    const mChatboxList = $('.msgr-main-content-chatbox-list').overlayScrollbars({
+        callbacks: {
+            onScroll: e => {
+                const scrollInfo = mChatboxList.scroll()
+
+                if (scrollInfo.ratio.y === 0) {
+                    // TODO: Request new data messages here.
+                }
+            }
+        }
+    }).overlayScrollbars()
 
     $('.msgr-main-content-tools-user-list').overlayScrollbars({})
     $('.tab-pane').overlayScrollbars({})

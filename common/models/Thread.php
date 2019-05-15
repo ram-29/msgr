@@ -125,7 +125,7 @@ class Thread extends \yii\db\ActiveRecord
                             'file_thumb' => $mFileThumb,
                             'file_name' => $thMsg['file_name'],
                             'file_type' => $thMsg['file_type'],
-                            'created_at' => $thMsg['created_at'],
+                            'created_at' => date('M j, Y g:i a', strtotime($thMsg['created_at'])),
                             'deleted_by' => $thMsg['deleted_by'],
                         ];
                     }
@@ -137,11 +137,11 @@ class Thread extends \yii\db\ActiveRecord
                         'file_thumb' => null,
                         'file_name' => null,
                         'file_type' => null,
-                        'created_at' => $thMsg['created_at'],
+                        'created_at' => date('M j, Y g:i a', strtotime($thMsg['created_at'])),
                         'deleted_by' => $thMsg['deleted_by'],
                     ];
                     
-                }, \common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all());
+                }, \array_reverse(\common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all()));
 
                 return $thMsgs;
             },

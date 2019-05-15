@@ -247,7 +247,7 @@ const renderUI = async (cId) => {
                         <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
                             <img class="img-circle" src="${src}" alt="User image">
                             <div class="msgr-main-content-chatbox-list-item-details-content">
-                                <p>${message.text()}</p>
+                                <p>${msg.text}</p>
                             </div>
                         </div>
                     </div>
@@ -270,6 +270,7 @@ const renderUI = async (cId) => {
 
             contentChatboxList.insertAdjacentHTML('beforeend', template)
             contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+
         })
 
         btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
@@ -541,7 +542,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 if(e.keyCode === 13 && !e.shiftKey) {
                     e.preventDefault()
             
-                    const timestamp = moment().format('MMM DD, YYYY, hh:mm a')
+                    const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
                     const message = e.target.value
 
                     if(mConn.type == 'GROUP') {

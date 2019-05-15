@@ -4,6 +4,7 @@ const fs = require('fs-extra')
 const axios = require('axios')
 const uuid = require('uuid/v4')
 const morgan = require('morgan')
+const moment = require('moment')
 const express = require('express')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
@@ -136,7 +137,18 @@ io.of('/simple')
 
     // Chat handler
     simple.on('chat', ({ cId, uId, message, timestamp }) => {
-        io.of('/simple').in(cId).emit('chat', { uId, message, timestamp })
+
+        axios.post(`${BK_URL}/api/thread-message`, {
+            thread_id: cId,
+            member_id: uId,
+            text: message,
+            file: null,
+            file_name: null,
+            file_type: null,
+            created_at: timestamp
+        }).then(mMsg => {
+            io.of('/simple').in(cId).emit('chat', { uId, message, timestamp: moment(timestamp).format('MMM D, YYYY h:mm a') })
+        })
     })
 
     // Disconnect Handler
