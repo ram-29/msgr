@@ -2,13 +2,64 @@
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
+    let offset = 1
     const mChatboxList = $('.msgr-main-content-chatbox-list').overlayScrollbars({
         callbacks: {
-            onScroll: e => {
+            onScrollStop: e => {
                 const scrollInfo = mChatboxList.scroll()
 
                 if (scrollInfo.ratio.y === 0) {
                     // TODO: Request new data messages here.
+                    $('#spinner-container').removeClass('spinner-hide').addClass('spinner-show')
+
+                    axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=messages&offset=${offset}`).then(mMsg => {
+                        mMsg.data.messages.map(msg => {
+
+                            let template
+                            const src = contentChatboxHeaderImg.getAttribute('src')
+
+                            if(msg.text) {
+                                // Render text
+                                template  = `
+                                    <div class="msgr-main-content-chatbox-list-item">
+                                        <span>${msg.created_at}</span>
+
+                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                                            <img class="img-circle" src="${src}" alt="User image">
+                                            <div class="msgr-main-content-chatbox-list-item-details-content">
+                                                <p>${msg.text}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `
+                            } else {
+                                // Photo or docs
+                                template = `
+                                    <div class="msgr-main-content-chatbox-list-item">
+                                        <span>${msg.created_at}</span>
+
+                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                                            <img class="img-circle" src="${src}" alt="User image">
+                                            <div class="msgr-main-content-chatbox-list-item-details-content">
+                                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color:#fff !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `
+                            }
+
+                            $('#spinner-container').after(template)
+
+                        })
+
+                        $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
+                    })
+                    offset++
+
+                   
+
+                } else {
+                    $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
                 }
             }
         }

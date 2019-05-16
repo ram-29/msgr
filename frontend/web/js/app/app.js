@@ -230,7 +230,7 @@ const initConn = (id, name) => {
 }
 
 const renderUI = async (cId) => {
-    if (!contentChatboxList.children.length) {
+    if (contentChatboxList.children.length == 1) {
 
         const mMsg = await axios.get(`${BK_URL}/api/thread/${cId}?expand=messages`)
         mMsg.data.messages.map(msg => {
@@ -325,7 +325,8 @@ const connect = async (el, cId, type) => {
                 mConn = { cId, type: 'SIMPLE' }
 
                 // Clear the message
-                for (const mMsg of $(contentChatboxList).children()) {
+                $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
+                for (const mMsg of $(contentChatboxList).children().splice(1, $(contentChatboxList).children().length)) {
                     $(mMsg).remove()
                 }
 
@@ -347,7 +348,8 @@ const connect = async (el, cId, type) => {
                 mConn = { cId, type: 'GROUP' }
 
                 // Clear the message
-                for (const mMsg of $(contentChatboxList).children()) {
+                $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
+                for (const mMsg of $(contentChatboxList).children().splice(1, $(contentChatboxList).children().length)) {
                     $(mMsg).remove()
                 }
 
