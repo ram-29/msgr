@@ -1,5 +1,7 @@
 (_ => {
+    moment.createFromInputFallback = function(config) { config._d = new Date(config._i); }
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
+
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
     let offset = 1
@@ -9,20 +11,28 @@
                 const scrollInfo = mChatboxList.scroll()
 
                 if (scrollInfo.ratio.y === 0) {
-                    // TODO: Request new data messages here.
                     $('#spinner-container').removeClass('spinner-hide').addClass('spinner-show')
 
                     axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=messages&offset=${offset}`).then(mMsg => {
-                        mMsg.data.messages.map(msg => {
+                        mMsg.data.messages.map((msg, idx) => {
 
                             let template
                             const src = contentChatboxHeaderImg.getAttribute('src')
+
+                            const mDate = moment(msg.created_at).format('MMM DD, YYYY')
+                            const mTime = moment(msg.created_at).format('hh:mm a')
+
+                            const mPrevDate = $('#spinner-container').next()[0].firstElementChild.firstElementChild
+                            const mPrevTime = $('#spinner-container').next()[0].firstElementChild.lastElementChild
 
                             if(msg.text) {
                                 // Render text
                                 template  = `
                                     <div class="msgr-main-content-chatbox-list-item">
-                                        <span>${msg.created_at}</span>
+                                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                                        </span>
 
                                         <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
                                             <img class="img-circle" src="${src}" alt="User image">
@@ -36,7 +46,10 @@
                                 // Photo or docs
                                 template = `
                                     <div class="msgr-main-content-chatbox-list-item">
-                                        <span>${msg.created_at}</span>
+                                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                                        </span>
 
                                         <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
                                             <img class="img-circle" src="${src}" alt="User image">
@@ -56,8 +69,6 @@
                     })
                     offset++
 
-                   
-
                 } else {
                     $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
                 }
@@ -68,6 +79,11 @@
     $('.msgr-main-content-tools-user-list').overlayScrollbars({})
     $('.tab-pane').overlayScrollbars({})
 })()
+
+const strTruncate = (str, len) => {
+    return (str.length > len) ?
+        `${str.substring(0, len)} ...` : str
+}
 
 const brwConfirm = url => _ => {
     if (window.history && history.pushState) {

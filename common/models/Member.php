@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
+use Underscore\Underscore as __;
 
 /**
  * This is the model class for table "member".
@@ -126,8 +128,6 @@ class Member extends \yii\db\ActiveRecord
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
 
-                        // @TODO: Identify if a text or file/images
-                        // This will be used in recent message prompt. 
                         if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
                             $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
                                 'Sent an image.' : 'Sent a document.';

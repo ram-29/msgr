@@ -11,7 +11,8 @@ let btnHeaderSetting,
     btnChatboxPhoto,
     btnChatboxFile,
     btnChatboxEmoji,
-    btnChatboxSend;
+    btnChatboxSend,
+    cMsg;
 
 let id, name, SIMPLE, GROUP
 const fileTypes = [
@@ -133,15 +134,11 @@ const initUI = el => {
     mainHeaderDetailsH4.textContent = cName
     contentChatboxHeaderDetailsH4.textContent = cName
 
+    cMsg = el.firstElementChild.children[1].children[1]
+
     contentChatboxInput.children[0].style.visibility = 'visible'
     contentChatboxInput.children[1].style.visibility = 'visible'
 }
-
-// d49a82aa-a674-454c-8398-2d643403e097 : John Doe
-// 10c020b3-6d57-4535-bbf9-cea3b94199ea : Maria Powell
-
-// b7eb64d0-f568-4e4a-a253-be3ded0d3b1a : John Doe
-// 6786e939-9afd-4da1-a641-d8281368f5c5 : Maria Powell
 
 const initConn = (id, name) => {
     const query = buildURLQuery({ id, name })
@@ -156,9 +153,18 @@ const initConn = (id, name) => {
 
         const src = contentChatboxHeaderImg.getAttribute('src')
 
+        const mDate = moment(timestamp).format('MMM DD, YYYY')
+        const mTime = moment(timestamp).format('hh:mm a')
+
+        const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
+        const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
+
         const template  = `
             <div class="msgr-main-content-chatbox-list-item">
-                <span>${timestamp}</span>
+                <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                    <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                    <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                </span>
 
                 <div class="msgr-main-content-chatbox-list-item-details ${uId === id ? 'owner' : ''}">
                     <img class="img-circle" src="${src}" alt="User image">
@@ -168,6 +174,7 @@ const initConn = (id, name) => {
                 </div>
             </div>
         `
+        cMsg.textContent = strTruncate(message, 10)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
     })
@@ -177,9 +184,18 @@ const initConn = (id, name) => {
 
         const src = contentChatboxHeaderImg.getAttribute('src')
 
+        const mDate = moment(created_at).format('MMM DD, YYYY')
+        const mTime = moment(created_at).format('hh:mm a')
+
+        const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
+        const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
+
         const template = `
             <div class="msgr-main-content-chatbox-list-item">
-                <span>${created_at}</span>
+                <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                    <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span>
+                    <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                </span>
 
                 <div class="msgr-main-content-chatbox-list-item-details ${member_id === id ? 'owner' : ''}">
                     <img class="img-circle" src="${src}" alt="User image">
@@ -238,11 +254,20 @@ const renderUI = async (cId) => {
             let template
             const src = contentChatboxHeaderImg.getAttribute('src')
 
+            const mDate = moment(msg.created_at).format('MMM DD, YYYY')
+            const mTime = moment(msg.created_at).format('hh:mm a')
+
+            const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
+            const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
+
             if(msg.text) {
                 // Render text
                 template  = `
                     <div class="msgr-main-content-chatbox-list-item">
-                        <span>${msg.created_at}</span>
+                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                        </span>
 
                         <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
                             <img class="img-circle" src="${src}" alt="User image">
@@ -256,7 +281,10 @@ const renderUI = async (cId) => {
                 // Photo or docs
                 template = `
                     <div class="msgr-main-content-chatbox-list-item">
-                        <span>${msg.created_at}</span>
+                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                        </span>
 
                         <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
                             <img class="img-circle" src="${src}" alt="User image">
@@ -269,12 +297,13 @@ const renderUI = async (cId) => {
             }
 
             contentChatboxList.insertAdjacentHTML('beforeend', template)
-            contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
-
         })
 
         btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
         btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
+
+        contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
 
         const tabImage = $('#tab-image')
         tabImage.nanogallery2('destroy')
@@ -302,7 +331,7 @@ const renderUI = async (cId) => {
             tabDocs.append(`
                 <li style="margin: 1rem 0;">
                     <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
-                    <span class="label label-default">${moment(doc.created_at).format('MMM. DD, YYYY hh:mm a')}</span>
+                    <span class="label label-default">${moment(doc.created_at).format('MMM DD, YYYY hh:mm a')}</span>
                 </li>
             `)
         })
@@ -522,7 +551,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                                 <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
                                 <div class="msgr-sidebar-list-item-content-details">
                                     <h4>${th.name}</h4>
-                                    <p>${th.message ? th.message.latest : '-'}</p>
+                                    <p>${th.message ? strTruncate(th.message.latest, 10) : '-'}</p>
                                 </div>
                             </div>
             
@@ -547,13 +576,15 @@ document.addEventListener('DOMContentLoaded', async _ => {
                     const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
                     const message = e.target.value
 
-                    if(mConn.type == 'GROUP') {
-                        GROUP.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
+                    if(message) {
+                        if(mConn.type == 'GROUP') {
+                            GROUP.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
+                        }
+    
+                        SIMPLE.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
+    
+                        contentChatboxInputBox.value = ''
                     }
-
-                    SIMPLE.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
-
-                    contentChatboxInputBox.value = ''
                 }
             })
         }

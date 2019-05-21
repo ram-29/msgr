@@ -353,6 +353,11 @@ html, body, .msgr-index {
             animation: rotator 1.4s linear infinite;
 }
 
+/* Timestamp */
+.stamp-hide {
+    display: none
+}
+
 @-webkit-keyframes rotator {
     0% {
         -webkit-transform: rotate(0deg);

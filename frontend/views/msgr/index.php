@@ -105,22 +105,9 @@ $this->title = Yii::$app->name;
                                 'data-conn' => 'null',
                                 'onclick' => new JsExpression('initUpload(this, "FILE")'),
                             ]) ?>
-                            <?= Html::button(FA::icon('smile-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                'class' => 'btn btn-default btn-sm',
-                                'id' => 'btn-chatbox-emoji',
-                            ]) ?>
                         </div>
 
-                        <div class="msgr-main-content-chatbox-input-tools-right">
-                            <?= Html::button(FA::icon('paper-plane')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                'class' => 'btn btn-default btn-sm',
-                                'id' => 'btn-chatbox-send',
-                                'data-toggle' => 'tooltip',
-                                'data-placement' => 'top',
-                                'data-html' => 'true',
-                                'title' => 'Press Enter to send<br/>Press Shift+Enter to add a new paragraph'
-                            ]) ?>
-                        </div>
+                        <div class="msgr-main-content-chatbox-input-tools-right"></div>
                     </div>
                 </div>
             </div>
