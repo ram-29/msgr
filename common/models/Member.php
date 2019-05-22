@@ -6,6 +6,8 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use Underscore\Underscore as __;
 
+use common\helpers\Logger;
+
 /**
  * This is the model class for table "member".
  *
@@ -100,7 +102,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             'threads' => function($x) {
-                return \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
+                $mArr = \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
 
                     $th = \common\models\Thread::findOne($thm['thread_id']);
                     $cfg = \common\models\ThreadGlobalConfig::findOne($thm['thread_id']);
@@ -140,15 +142,27 @@ class Member extends \yii\db\ActiveRecord
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
-                        'message' => $message
+                        'message' => $message,
+                        'created_at' => \strtotime($th->created_at)
                     ] : [
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
                         'sex' => $sex,
-                        'message' => $message
+                        'message' => $message,
+                        'created_at' => \strtotime($th->created_at)
                     ];
                 });
+
+                // Sort by key.
+                \usort($mArr, function($a, $b) {
+                    return $a['created_at'] - $b['created_at'];
+                });
+
+                return \array_reverse(\array_map(function($x){
+                    unset($x['created_at']);
+                    return $x;
+                }, $mArr));
             }
         ];
     }

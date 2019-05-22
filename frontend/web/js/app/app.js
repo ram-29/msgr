@@ -12,7 +12,10 @@ let btnHeaderSetting,
     btnChatboxFile,
     btnChatboxEmoji,
     btnChatboxSend,
-    cMsg;
+    cMsg,
+    btnEmployeeSearch,
+    inputChatSearch,
+    inputEmployeeSearch;
 
 let id, name, SIMPLE, GROUP
 const fileTypes = [
@@ -174,12 +177,12 @@ const initConn = (id, name) => {
                 </div>
             </div>
         `
-        cMsg.textContent = strTruncate(message, 10)
+        cMsg.textContent = strTruncate(message, 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
     })
 
-    SIMPLE.on('file', data => {
+    SIMPLE.on('file', async data => {
         const { member_id, filename, filepath, type, created_at } = data
 
         const src = contentChatboxHeaderImg.getAttribute('src')
@@ -205,7 +208,41 @@ const initConn = (id, name) => {
                 </div>
             </div>
         `
+        if(type === 'image') {
+            const tabImage = $('#tab-image')
+            tabImage.nanogallery2('destroy')
+    
+            const mImages = await axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=images`)
+            tabImage.nanogallery2({
+                items: mImages.data.images.map(msg => {
+                    if(msg.file_path) {
+                        return {
+                            src: msg.file_path,
+                            srct: msg.file_thumb,
+                            title: msg.file_name
+                        }
+                    }
+                }),
+                thumbnailWidth: 'auto',
+                thumbnailHeight: 100,
+            })
 
+        } else {
+            const tabDocs = $('#tab-docs')
+            tabDocs.html('')
+    
+            const mDocs = await axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=docs`)
+            mDocs.data.docs.map(doc => {
+                tabDocs.append(`
+                    <li style="margin: 1rem 0;">
+                        <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
+                        <span class="label label-default">${moment(doc.created_at).format('MMM DD, YYYY hh:mm a')}</span>
+                    </li>
+                `)
+            })
+        }
+
+        cMsg.textContent = strTruncate((type === 'image' ? 'Sent an image.' : 'Sent a document.'), 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
     })
@@ -214,6 +251,8 @@ const initConn = (id, name) => {
         console.log(`Disconnected to PM`)
         SIMPLE.disconnect()
     })
+
+    //-- GROUP --//
 
     GROUP = io(`${SOCKET_URL}/group`, { query })
     GROUP.on('connect', _ => {
@@ -514,6 +553,34 @@ document.addEventListener('DOMContentLoaded', async _ => {
     btnChatboxEmoji = document.querySelector('#btn-chatbox-emoji')
     btnChatboxSend = document.querySelector('#btn-chatbox-send')
 
+    btnEmployeeSearch = document.querySelector('#btn-employee-search')
+    
+    inputChatSearch = document.querySelector('#input-chat-search')
+    inputEmployeeSearch = document.querySelector('#input-employee-search')
+
+    const toolsHeaderContainer = document.querySelector('.msgr-main-content-tools-user-header-container')
+    const chatSearchContainer = document.querySelector('#input-chat-search-container')
+
+    inputChatSearch.addEventListener('input', e => {
+        // @TODO: Filter the ui.
+    })
+
+    inputEmployeeSearch.addEventListener('input', e => {
+        // @TODO: Filter the ui.
+    })
+
+    inputEmployeeSearch.addEventListener('focusout', e => {
+        toolsHeaderContainer.style.display = 'flex';
+        chatSearchContainer.style.display = 'none';
+        inputEmployeeSearch.value = ''
+    })
+    
+    btnEmployeeSearch.addEventListener('click', e => {
+        toolsHeaderContainer.style.display = 'none';
+        chatSearchContainer.style.display = 'flex';
+        inputEmployeeSearch.focus()
+    })
+
     swal.mixin({
         input: 'text',
         confirmButtonText: 'Next &rarr;',
@@ -551,7 +618,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                                 <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
                                 <div class="msgr-sidebar-list-item-content-details">
                                     <h4>${th.name}</h4>
-                                    <p>${th.message ? strTruncate(th.message.latest, 10) : '-'}</p>
+                                    <p>${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
                                 </div>
                             </div>
             

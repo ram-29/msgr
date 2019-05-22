@@ -28,7 +28,8 @@ $this->title = Yii::$app->name;
             <?= Html::button(
                 FA::icon('pencil-square-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
                     'class' => 'btn btn-default btn-sm',
-                    'id' => 'btn-header-write-message'
+                    'id' => 'btn-header-write-message',
+                    'style' => 'visibility:hidden;'
                 ])
             ?>
         </div>
@@ -36,8 +37,9 @@ $this->title = Yii::$app->name;
         <div class="msgr-sidebar-search">
             <div class="input-group" style="width:100%;">
                 <?= Html::input('text', 'sidebar-search', null, [
+                    'id' => 'input-chat-search',
                     'class' => 'form-control',
-                    'placeholder' => 'Search a name ..'
+                    'placeholder' => 'Search chat name / group name ..'
                 ]) ?>
             </div>
         </div>
@@ -115,8 +117,23 @@ $this->title = Yii::$app->name;
             <div class="msgr-main-content-tools">
                 <div class="msgr-main-content-tools-user">
                     <div class="msgr-main-content-tools-user-header">
-                        <?= FA::icon('user')->size(FA::SIZE_LARGE)->fixedWidth() ?>
-                        <h4>Employee List</h4>
+                        <div class="msgr-main-content-tools-user-header-container" style="display:flex; align-items: center;">
+                            <?= FA::icon('user')->size(FA::SIZE_LARGE)->fixedWidth() ?>
+                            <h4 style="margin-right: 1rem;">Employee List</h4>
+                            <?= Html::button(
+                                FA::icon('search')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                    'class' => 'btn btn-default btn-sm',
+                                    'id' => 'btn-employee-search',
+                                ])
+                            ?>
+                        </div>
+                        <div id="input-chat-search-container" class="input-group" style="width:100%; display:none; margin: .3rem 0;">
+                            <?= Html::input('text', 'sidebar-search', null, [
+                                'id' => 'input-employee-search',
+                                'class' => 'form-control',
+                                'placeholder' => 'Search employee name ..'
+                            ]) ?>
+                        </div>
                     </div>
 
                     <div class="msgr-main-content-tools-user-list">
