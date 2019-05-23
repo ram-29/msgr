@@ -16,6 +16,7 @@ use Yii;
 class Thread extends \yii\db\ActiveRecord
 {
     public $globalConfig;
+
     /**
      * {@inheritdoc}
      */
@@ -103,6 +104,27 @@ class Thread extends \yii\db\ActiveRecord
                         $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
                         $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
                         $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+                        'role' => $mem['role'],
+                    ];
+                }, \common\models\ThreadMember::findAll(['thread_id' => $x->id]));
+
+                return $members;
+            },
+            'messages' => function($x) {
+
+                $params = \Yii::$app->request->getQueryParams();
+                $offset = !empty($params['offset']) ? $params['offset'] : 0;
+
+                $mMsgs = \common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all();
+
+                $thMsgs = array_map(function($thMsg) {
+                    if (!empty($thMsg['file'])) {
+                        $mPathInfo = pathinfo($thMsg['file']);
+
+                        $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
+                        $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
+                        $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+
                         return [
                             'member_id' => $thMsg['member_id'],
                             'text' => $thMsg['text'],
@@ -114,6 +136,7 @@ class Thread extends \yii\db\ActiveRecord
                             'deleted_by' => $thMsg['deleted_by'],
                         ];
                     }
+
                     return [
                         'member_id' => $thMsg['member_id'],
                         'text' => $thMsg['text'],
@@ -126,6 +149,12 @@ class Thread extends \yii\db\ActiveRecord
                     ];
                     
                 }, \array_reverse(\common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all()));
+
+                }, $offset >=1 ? 
+                    \array_reverse(\array_reverse($mMsgs)) :
+                    \array_reverse($mMsgs)
+                );
+
                 return $thMsgs;
             },
             'images' => function($x) {
@@ -134,6 +163,13 @@ class Thread extends \yii\db\ActiveRecord
                     $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
                     $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $img['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
                     $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+
+                    $mPathInfo = pathinfo($img['file']);
+
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+                    $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $img['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
+                    $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+
                     return [
                         // 'member_id' => $img['member_id'],
                         'file_path' => $mFilePath,
@@ -146,8 +182,11 @@ class Thread extends \yii\db\ActiveRecord
             },
             'docs' => function($x) {
                 return array_map(function($img) {
+
                     $mPathInfo = pathinfo($img['file']);
+
                     $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+
                     return [
                         // 'member_id' => $img['member_id'],
                         'file_path' => $mFilePath,
@@ -155,6 +194,7 @@ class Thread extends \yii\db\ActiveRecord
                         'created_at' => $img['created_at'],
                         'deleted_by' => $img['deleted_by'],
                     ];
+
                 }, \common\models\ThreadMessage::find()->where(['thread_id' => $x->id, 'text' => null, 'file_type' => 'docs'])->orderBy(['created_at' => SORT_DESC])->all());
             }
         ];

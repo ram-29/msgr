@@ -50,5 +50,7 @@ class AppAsset extends AssetBundle
         'frontend\assets\FilepondFileRenameAsset',
         'frontend\assets\FilepondFileValidateSizeAsset',
         'frontend\assets\FilepondFileValidateTypeAsset',
+
+        'frontend\assets\Nanogallery2Asset',
     ];
 }

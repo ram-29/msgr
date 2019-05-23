@@ -12,6 +12,8 @@ use Yii;
  * @property string $member_id
  * @property string $text
  * @property string $file
+ * @property string $file_name
+ * @property string $file_type
  * @property string $created_at
  * @property string $deleted_by
  *
@@ -35,11 +37,10 @@ class ThreadMessage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'thread_id', 'member_id', 'text'], 'required'],
-            [['text', 'deleted_by'], 'string'],
+            [['id', 'thread_id', 'member_id'], 'required'],
+            [['text', 'file', 'file_name', 'file_type', 'deleted_by'], 'string'],
             [['created_at'], 'safe'],
             [['id', 'thread_id', 'member_id'], 'string', 'max' => 36],
-            [['file'], 'string', 'max' => 200],
             [['id'], 'unique'],
             [['member_id'], 'exist', 'skipOnError' => true, 'targetClass' => Member::className(), 'targetAttribute' => ['member_id' => 'id']],
             [['thread_id'], 'exist', 'skipOnError' => true, 'targetClass' => Thread::className(), 'targetAttribute' => ['thread_id' => 'id']],
@@ -57,6 +58,8 @@ class ThreadMessage extends \yii\db\ActiveRecord
             'member_id' => 'Member ID',
             'text' => 'Text',
             'file' => 'File',
+            'file_name' => 'File Name',
+            'file_type' => 'File Type',
             'created_at' => 'Created At',
             'deleted_by' => 'Deleted By',
         ];
@@ -76,18 +79,18 @@ class ThreadMessage extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    protected function setFlash($event)
+    public function setAttrs()
     {
-        $mName = \common\helpers\Getter::getModelName($event->sender);
-        \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
+        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setAttrs()
+    protected function setFlash($event)
     {
-        $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $mName = \common\helpers\Getter::getModelName($event->sender);
+        \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
     }
 
     /**

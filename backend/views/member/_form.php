@@ -12,15 +12,19 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
     <div class="box-body table-responsive">
 
-        <?php # $form->field($model, 'id')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'id')->textInput(['maxlength' => true]) ?>
+
+        <?= $form->field($model, 'intranet_id')->textInput(['maxlength' => true]) ?>
 
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+        <?= $form->field($model, 'sex')->dropDownList([ 'M' => 'M', 'F' => 'F', ], ['prompt' => '']) ?>
+
         <?= $form->field($model, 'status')->dropDownList([ 'ACTIVE' => 'ACTIVE', 'INACTIVE' => 'INACTIVE', ], ['prompt' => '']) ?>
 
-        <?php # $form->field($model, 'joined_at')->textInput() ?>
+        <?= $form->field($model, 'joined_at')->textInput() ?>
 
-        <?php # $form->field($model, 'logged_at')->textInput() ?>
+        <?= $form->field($model, 'logged_at')->textInput() ?>
 
     </div>
     <div class="box-footer">

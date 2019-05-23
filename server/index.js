@@ -1,12 +1,15 @@
-const fs = require('fs')
+const path = require('path')
 const cors = require('cors')
+const fs = require('fs-extra')
+const axios = require('axios')
 const uuid = require('uuid/v4')
-const multer = require('multer')
 const morgan = require('morgan')
+const moment = require('moment')
 const express = require('express')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
 const siofu = require('socketio-file-upload')
+const thumb = require('node-thumbnail').thumb
 const sharedsession = require('express-socket.io-session')
 
 const session = require('express-session')({ 
@@ -30,7 +33,9 @@ const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
 // Change `BASE_URL` on production.
-const BASE_URL = `http://bk.msgr.io`
+const BK_URL = `http://localhost:80/msgr/backend/web`
+const FR_URL = `http://localhost:80/msgr/frontend/web`
+
 const PORT = process.env.PORT || 1337
 
 server.listen(PORT, _ => { console.log(`Server running on port ${PORT}.`) })
@@ -43,7 +48,7 @@ io.of('/simple')
     // User id & name.
     const { id, name } = simple.handshake.query
 
-    // Upload listener
+    // File Upload listener
     const sUploader = new siofu()
     sUploader.dir = '../frontend/web/files';
     sUploader.listen(simple)
@@ -56,8 +61,67 @@ io.of('/simple')
 	})
 
     sUploader.on('saved', event => {
-        console.log(event.file)
-        // @todo move file to appropriate folder.
+        // Filename.
+        let fName = path.basename(event.file.pathName)
+        let mName = `${uuid() + path.parse(fName).ext}`
+
+        // Create Directory.
+        let mDir = `../frontend/web/files/${event.file.meta.threadId}`
+        !fs.existsSync(mDir) && fs.mkdirSync(mDir)
+
+        mDir = event.file.meta.fileType.includes('image') ?
+            `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
+
+        // Move File.
+        fs.move(event.file.pathName, mDir, err => {
+            if (err) return console.log(err)
+        })
+
+        // Request to yii backend db server.
+        axios.post(`${BK_URL}/api/thread-message`, { 
+            thread_id: event.file.meta.threadId,
+            member_id: event.file.meta.memberId,
+            text: null,
+            file: mDir,
+            file_name: fName,
+            file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
+            created_at: event.file.meta.createdAt
+        })
+        .then(async _ => {
+            if(event.file.meta.fileType.includes('image')) {
+                // Generate thumbnail
+                const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
+                !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
+
+                await thumb({
+                    source: mDir,
+                    destination: mThumb,
+                    quiet: true,
+                    width: 250,
+                    suffix: '-thumb',
+                })
+
+                // Emit back to client : IMAGE
+                const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
+                io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                    member_id: event.file.meta.memberId, 
+                    filename: fName,
+                    filepath: mFilePath,
+                    type: 'image',
+                    created_at: event.file.meta.createdAt,
+                })
+            } else {
+                // Emit back to client = DOCS
+                io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                    member_id: event.file.meta.memberId, 
+                    filename: fName,
+                    filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}`,
+                    type: 'docs',
+                    created_at: event.file.meta.createdAt,
+                })
+            }
+        })
+        .catch(err => console.log(err.response))
 	})
 
     sUploader.on('error', data => {
@@ -73,7 +137,18 @@ io.of('/simple')
 
     // Chat handler
     simple.on('chat', ({ cId, uId, message, timestamp }) => {
-        io.of('/simple').in(cId).emit('chat', { uId, message, timestamp })
+
+        axios.post(`${BK_URL}/api/thread-message`, {
+            thread_id: cId,
+            member_id: uId,
+            text: message,
+            file: null,
+            file_name: null,
+            file_type: null,
+            created_at: timestamp
+        }).then(mMsg => {
+            io.of('/simple').in(cId).emit('chat', { uId, message, timestamp: moment(timestamp).format('MMM D, YYYY h:mm a') })
+        })
     })
 
     // Disconnect Handler
@@ -90,7 +165,7 @@ io.of('/group')
     // User id & name.
     const { id, name } = group.handshake.query
 
-    // Upload listener
+    // File Upload listener
     const gUploader = new siofu()
     gUploader.listen(group)
 

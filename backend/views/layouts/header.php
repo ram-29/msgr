@@ -2,9 +2,20 @@
 
 use yii\helpers\Url;
 use yii\helpers\Html;
+use common\helpers\Getter;
+use common\helpers\Logger;
 
-preg_match_all('/(?<=\s|^)[a-z]/i', Yii::$app->name, $matches);
-$mName = implode('', $matches[0]);
+preg_match_all('/(?<=\s|^)[a-z]/i', Yii::$app->name, $x);
+$mName = implode('', $x[0]);
+
+$mIdentity = Yii::$app->user->identity ?: [];
+if(empty(Yii::$app->user->identity)) {
+    return Yii::$app->response->redirect(['user/login'])->send();
+} else {
+    $mUser = isset($mIdentity->userinfo) ?
+        Getter::getModifiedName(Yii::$app->user->identity->userinfo) :
+        Yii::$app->user->identity->profile->name;
+}
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -30,11 +41,7 @@ $mName = implode('', $matches[0]);
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="<?= Url::to(['/img/user-default.png']) ?>" class="user-image" alt="User Image"/>
                         <span class="hidden-xs">
-                            <?php if(empty(Yii::$app->user->identity)) :?>
-                                <?php return Yii::$app->response->redirect('user/login')->send(); ?>
-                            <?php else :?>
-                                <?= Yii::$app->user->identity->profile->name ?>
-                            <?php endif ?>
+                            <?= $mUser; ?>
                         </span>
                     </a>
                     <ul class="dropdown-menu">
@@ -44,7 +51,7 @@ $mName = implode('', $matches[0]);
 
                             <p class="text-muted">
                                 <?= Yii::$app->user->identity->profile->name ?>
-                                <small><?= Yii::$app->user->identity->username ?></small>
+                                <small><?php // Yii::$app->user->identity->username ?></small>
                             </p>
                         </li>
                         

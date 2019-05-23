@@ -18,7 +18,7 @@ class ThreadMessageSearch extends ThreadMessage
     public function rules()
     {
         return [
-            [['id', 'thread_id', 'member_id', 'text', 'file', 'created_at', 'deleted_by'], 'safe'],
+            [['id', 'thread_id', 'member_id', 'text', 'file', 'file_name', 'file_type', 'created_at', 'deleted_by'], 'safe'],
         ];
     }
 
@@ -67,6 +67,8 @@ class ThreadMessageSearch extends ThreadMessage
             ->andFilterWhere(['like', 'member_id', $this->member_id])
             ->andFilterWhere(['like', 'text', $this->text])
             ->andFilterWhere(['like', 'file', $this->file])
+            ->andFilterWhere(['like', 'file_name', $this->file_name])
+            ->andFilterWhere(['like', 'file_type', $this->file_type])
             ->andFilterWhere(['like', 'deleted_by', $this->deleted_by]);
 
         return $dataProvider;

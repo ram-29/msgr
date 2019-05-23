@@ -18,7 +18,7 @@ class MemberSearch extends Member
     public function rules()
     {
         return [
-            [['id', 'name', 'sex', 'status', 'joined_at', 'logged_at'], 'safe'],
+            [['id', 'intranet_id', 'name', 'sex', 'status', 'joined_at', 'logged_at'], 'safe'],
         ];
     }
 
@@ -64,6 +64,7 @@ class MemberSearch extends Member
         ]);
 
         $query->andFilterWhere(['like', 'id', $this->id])
+            ->andFilterWhere(['like', 'intranet_id', $this->intranet_id])
             ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'sex', $this->sex])
             ->andFilterWhere(['like', 'status', $this->status]);

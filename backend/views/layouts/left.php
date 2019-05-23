@@ -1,8 +1,20 @@
 <?php
 
-use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use common\helpers\Getter;
+use yii\helpers\ArrayHelper;
 
+$mIdentity = Yii::$app->user->identity ?: [];
+if(empty(Yii::$app->user->identity)) {
+    return Yii::$app->response->redirect(['user/login'])->send();
+} else {
+    $mUser = isset($mIdentity->userinfo) ?
+        Getter::getModifiedName(Yii::$app->user->identity->userinfo) :
+        Yii::$app->user->identity->profile->name;
+}
+
+/* @var $this \yii\web\View */
+/* @var $content string */
 ?>
 <aside class="main-sidebar">
 
@@ -14,8 +26,7 @@ use yii\helpers\Url;
                 <img src="<?= Url::to(['/img/user-default.png']) ?>" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
-                <p><?= Yii::$app->user->identity->profile->name ?></p>
-
+                <p><?= $mUser; ?></p>
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>

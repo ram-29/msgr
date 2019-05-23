@@ -9,8 +9,15 @@ use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
 use dominus77\sweetalert2\Alert;
+use common\helpers\Getter;
 
 AppAsset::register($this);
+
+$BK_URL = Getter::getUrl();
+$FR_URL = Getter::getUrl(false);
+
+$this->registerJs("const BK_URL = '{$BK_URL}';", View::POS_HEAD);
+$this->registerJs("const FR_URL = '{$FR_URL}';", View::POS_HEAD);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

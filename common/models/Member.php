@@ -4,6 +4,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use Underscore\Underscore as __;
 use common\helpers\Logger;
+
 /**
  * This is the model class for table "member".
  *
@@ -113,10 +114,12 @@ class Member extends \yii\db\ActiveRecord
                     if(!empty($mMsgs = $th->getThreadMessages()->orderBy(['created_at' => SORT_DESC])->all())) {
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
+
                         if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
                             $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
                                 'Sent an image.' : 'Sent a document.';
                         }
+
                         $message = compact("latest", "time");
                     }
                     return $th->type == 'GROUP' ? [
@@ -134,10 +137,12 @@ class Member extends \yii\db\ActiveRecord
                         'created_at' => \strtotime($th->created_at)
                     ];
                 });
+
                 // Sort by key.
                 \usort($mArr, function($a, $b) {
                     return $a['created_at'] - $b['created_at'];
                 });
+
                 return \array_reverse(\array_map(function($x){
                     unset($x['created_at']);
                     return $x;

@@ -28,7 +28,8 @@ $this->title = Yii::$app->name;
             <?= Html::button(
                 FA::icon('pencil-square-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
                     'class' => 'btn btn-default btn-sm',
-                    'id' => 'btn-header-write-message'
+                    'id' => 'btn-header-write-message',
+                    'style' => 'visibility:hidden;'
                 ])
             ?>
         </div>
@@ -36,8 +37,9 @@ $this->title = Yii::$app->name;
         <div class="msgr-sidebar-search">
             <div class="input-group" style="width:100%;">
                 <?= Html::input('text', 'sidebar-search', null, [
+                    'id' => 'input-chat-search',
                     'class' => 'form-control',
-                    'placeholder' => 'Search a name ..'
+                    'placeholder' => 'Search chat name / group name ..'
                 ]) ?>
             </div>
         </div>
@@ -68,7 +70,13 @@ $this->title = Yii::$app->name;
                     </div>
                 </div>
 
-                <div class="msgr-main-content-chatbox-list"></div>
+                <div class="msgr-main-content-chatbox-list">
+                    <div id="spinner-container" class="spinner-hide">
+                        <svg class="spinner" width="50px" height="50px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                        </svg>
+                    </div>
+                </div>
                 
                 <div class="msgr-main-content-chatbox-input">
                     <div class="input-group" style="width:100%; visibility:hidden;">
@@ -87,7 +95,7 @@ $this->title = Yii::$app->name;
                                 'data-html' => 'true',
                                 'title' => 'Attach a photo',
                                 'data-conn' => 'null',
-                                'onclick' => new JsExpression('initUpload(this)'),
+                                'onclick' => new JsExpression('initUpload(this, "IMG")'),
                             ]) ?>
                             <?= Html::button(FA::icon('paperclip')->size(FA::SIZE_LARGE)->fixedWidth(), [
                                 'class' => 'btn btn-default btn-sm',
@@ -95,24 +103,13 @@ $this->title = Yii::$app->name;
                                 'data-toggle' => 'tooltip',
                                 'data-placement' => 'top',
                                 'data-html' => 'true',
-                                'title' => 'Attach a file'
-                            ]) ?>
-                            <?= Html::button(FA::icon('smile-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                'class' => 'btn btn-default btn-sm',
-                                'id' => 'btn-chatbox-emoji',
+                                'title' => 'Attach a file',
+                                'data-conn' => 'null',
+                                'onclick' => new JsExpression('initUpload(this, "FILE")'),
                             ]) ?>
                         </div>
 
-                        <div class="msgr-main-content-chatbox-input-tools-right">
-                            <?= Html::button(FA::icon('paper-plane')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                'class' => 'btn btn-default btn-sm',
-                                'id' => 'btn-chatbox-send',
-                                'data-toggle' => 'tooltip',
-                                'data-placement' => 'top',
-                                'data-html' => 'true',
-                                'title' => 'Press Enter to send<br/>Press Shift+Enter to add a new paragraph'
-                            ]) ?>
-                        </div>
+                        <div class="msgr-main-content-chatbox-input-tools-right"></div>
                     </div>
                 </div>
             </div>
@@ -120,25 +117,39 @@ $this->title = Yii::$app->name;
             <div class="msgr-main-content-tools">
                 <div class="msgr-main-content-tools-user">
                     <div class="msgr-main-content-tools-user-header">
-                        <?= FA::icon('user')->size(FA::SIZE_LARGE)->fixedWidth() ?>
-                        <h4>Employee List</h4>
+                        <div class="msgr-main-content-tools-user-header-container" style="display:flex; align-items: center;">
+                            <?= FA::icon('user')->size(FA::SIZE_LARGE)->fixedWidth() ?>
+                            <h4 style="margin-right: 1rem;">Employee List</h4>
+                            <?= Html::button(
+                                FA::icon('search')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                    'class' => 'btn btn-default btn-sm',
+                                    'id' => 'btn-employee-search',
+                                ])
+                            ?>
+                        </div>
+                        <div id="input-chat-search-container" class="input-group" style="width:100%; display:none; margin: .3rem 0;">
+                            <?= Html::input('text', 'sidebar-search', null, [
+                                'id' => 'input-employee-search',
+                                'class' => 'form-control',
+                                'placeholder' => 'Search employee name ..'
+                            ]) ?>
+                        </div>
                     </div>
 
                     <div class="msgr-main-content-tools-user-list">
-                        <?php foreach(range(0, 15) as $i) :?>
-
-                            <?php $idx = array_rand([1, 2, 3]) + 1 ?>
+                        <?php foreach($members as $i => $member) :?>
+                            <?php $img = $member['sex'] == 'M' ? "1" : "2"; ?>
 
                             <div class="msgr-main-content-tools-user-list-item">
                                 <div class="msgr-main-content-tools-user-list-item-content">
-                                    <?= Html::img("@web/img/{$idx}.png", [
-                                        'class' => 'img-circle', 
+                                    <?= Html::img("@web/img/{$img}.png", [
+                                        'class' => 'img-circle',
                                         'alt' => 'User image'
                                     ]) ?>
 
                                     <div class="msgr-main-content-tools-user-list-item-content-details">
-                                        <h4>John Doe</h4>
-                                        <p>Associate Software Engineer</p>
+                                        <h4 data-id="<?= $member['id'] ?>"><?= $member['name'] ?></h4>
+                                        <!-- <p>Associate Software Engineer</p> -->
                                     </div>
                                 </div>
 
@@ -157,7 +168,8 @@ $this->title = Yii::$app->name;
                                         'data-toggle' => 'tooltip',
                                         'data-placement' => 'left',
                                         'data-html' => 'true',
-                                        'title' => 'Add this person to a group'
+                                        'title' => 'Add this person to a group',
+                                        'onclick' => new JsExpression("groupConfirm(this)")
                                     ]) ?>
                                 </div>
                             </div>
@@ -170,13 +182,17 @@ $this->title = Yii::$app->name;
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
                         <li role="presentation"><a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a></li>
-                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+                        <!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
                     </ul>
                     
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade in active" id="images">Images</div>
-                        <div role="tabpanel" class="tab-pane fade" id="files">Files</div>
-                        <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div>
+                        <div role="tabpanel" class="tab-pane fade in active" id="images">
+                            <div id="tab-image"></div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="files">
+                            <ul id="tab-docs"></ul>
+                        </div>
+                        <!-- <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div> -->
                     </div>
                 </div>
             </div>

@@ -20,13 +20,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
+    <?= $form->field($model, 'intranet_id') ?>
+
     <?= $form->field($model, 'name') ?>
+
+    <?= $form->field($model, 'sex') ?>
 
     <?= $form->field($model, 'status') ?>
 
-    <?= $form->field($model, 'joined_at') ?>
+    <?php // echo $form->field($model, 'joined_at') ?>
 
-    <?= $form->field($model, 'logged_at') ?>
+    <?php // echo $form->field($model, 'logged_at') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

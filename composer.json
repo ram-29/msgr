@@ -33,7 +33,7 @@
         "openlss/lib-array2xml": "^0.5.1",
         "paragonie/random_compat": ">=1 <9.99",
         "ramsey/uuid": "^3.7.3",
-        
+        "ramsey/uuid": "~3.7.3",
         "kartik-v/yii2-grid": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-datepicker": "@dev",
@@ -73,7 +73,9 @@
         "npm-asset/filepond-plugin-file-metadata": "~1.0.6",
         "npm-asset/filepond-plugin-file-poster": "~2.0.2",
         "npm-asset/filepond-plugin-file-rename": "~1.1.4",
-        "npm-asset/filepond-plugin-file-validate-size": "@dev"
+        "npm-asset/filepond-plugin-file-validate-size": "@dev",
+
+        "npm-asset/nanogallery2": "~2.4.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

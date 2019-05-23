@@ -1,6 +1,7 @@
 <?php
 namespace backend\modules\api\controllers;
 use common\helpers\Logger;
+
 /**
  * Thread controller for the `Api` module
  */
@@ -54,6 +55,10 @@ class ThreadController extends \yii\rest\ActiveController
                 return $hasThread;
             }          
         }   
+      
+        // Create Thread.
+        $model->setAttrs();
+        $model->save();
 
         // Create Thread.
         $model->setAttrs();
@@ -78,6 +83,19 @@ class ThreadController extends \yii\rest\ActiveController
 
         //Thread name 
         $model['name'] = $thGlobCfg->name;
+
+        // Create ThreadMembers
+        if(\array_key_exists('members', $params)) {
+            foreach ($params['members'] as $member) {
+                $thMember = new \common\models\ThreadMember();
+                $thMember->setAttrs();
+                $thMember->thread_id = $model->id;
+                $thMember->member_id = $member['member_id'];
+                $thMember->role = $member['role'];
+                $thMember->save();
+            }
+        }
+
         // Return Thread.
         return $model;
     }

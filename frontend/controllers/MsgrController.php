@@ -8,6 +8,10 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\httpclient\Client;
+
+use common\helpers\Logger;
+use common\helpers\Getter;
 
 /**
  * Msgr controller
@@ -48,7 +52,14 @@ class MsgrController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $BK_URL = Getter::getUrl();
+
+        // Get messenger members.
+        $members = (new Client())
+            ->get("{$BK_URL}/api/member")
+            ->send()->getData();
+
+        return $this->render('index', compact("members"));
     }
 
 }

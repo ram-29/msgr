@@ -19,6 +19,23 @@ use common\helpers\Logger;
  */
 class Getter {
 
+    public static function getUrl($isBackend = true, $isSecure = false) 
+    {
+        $url = "%s://localhost:%s/%s/%s/web";
+
+        $protocol = !$isSecure ? 'http' : 'https';
+        
+        $port = !$isSecure ?
+            Yii::$app->request->port :
+            Yii::$app->request->securePort;
+
+        $dirName = basename(dirname(Yii::getAlias('@backend')));
+
+        $dirLoc = $isBackend ? 'backend' : 'frontend';
+
+        return sprintf($url, $protocol, $port, $dirName, $dirLoc);
+    }
+
     public static function getModelName($model)
     {
         return ucwords(strtolower(StringHelper::basename(get_class($model))));
