@@ -1,15 +1,15 @@
 <?php
-
 namespace common\models;
-
 use Yii;
-
+use yii\helpers\ArrayHelper;
+use Underscore\Underscore as __;
+use common\helpers\Logger;
 /**
  * This is the model class for table "member".
  *
  * @property string $id
+ * @property string $intranet_id
  * @property string $name
- * @property string $username
  * @property string $sex
  * @property string $status
  * @property string $joined_at
@@ -29,22 +29,20 @@ class Member extends \yii\db\ActiveRecord
     {
         return 'member';
     }
-
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'username'], 'required'],
+            [['id', 'name'], 'required'],
             [['sex', 'status'], 'string'],
             [['joined_at', 'logged_at'], 'safe'],
             [['id'], 'string', 'max' => 36],
-            [['name'], 'string', 'max' => 200],
+            [['intranet_id', 'name'], 'string', 'max' => 200],
             [['id'], 'unique'],
         ];
     }
-
     /**
      * {@inheritdoc}
      */
@@ -52,10 +50,8 @@ class Member extends \yii\db\ActiveRecord
     {
         $this->on(self::EVENT_AFTER_INSERT, [ $this, 'setFlash' ]);
         $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
-
         parent::init();
     }
-
     /**
      * {@inheritdoc}
      */
@@ -64,7 +60,6 @@ class Member extends \yii\db\ActiveRecord
         $mName = \common\helpers\Getter::getModelName($event->sender);
         \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
     }
-
     /**
      * {@inheritdoc}
      */
@@ -74,7 +69,6 @@ class Member extends \yii\db\ActiveRecord
         $this->joined_at = date("Y-m-d H:i:s", time());
         $this->logged_at = null;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -82,6 +76,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'intranet_id' => 'Intranet ID',
             'name' => 'Name',
             'sex' => 'Sex',
             'status' => 'Status',
@@ -89,7 +84,6 @@ class Member extends \yii\db\ActiveRecord
             'logged_at' => 'Logged At',
         ];
     }
-
     /**
      * {@inheritdoc}
      */
@@ -97,11 +91,9 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             'threads' => function($x) {
-                return \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
-
+                $mArr = \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
                     $th = \common\models\Thread::findOne($thm['thread_id']);
                     $cfg = \common\models\ThreadGlobalConfig::findOne($thm['thread_id']);
-
                     // Get thread name.
                     $name = null;
                     $sex = null;
@@ -109,42 +101,50 @@ class Member extends \yii\db\ActiveRecord
                         $name = $cfg->name;
                     } else {
                         $mMember = \yii\helpers\ArrayHelper::getColumn($th->threadMembers, 'member_id');
-
                         if (($key = array_search($thm['member_id'], $mMember)) !== false) {
                             unset($mMember[$key]);
                             $mmMember = \common\models\Member::findOne(array_values($mMember));
-
                             $name = $mmMember->name;
                             $sex = $mmMember->sex;
                         }
                     }
-
                     // Get recent message.
                     $message = null;
                     if(!empty($mMsgs = $th->getThreadMessages()->orderBy(['created_at' => SORT_DESC])->all())) {
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
-
+                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
+                            $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
+                                'Sent an image.' : 'Sent a document.';
+                        }
                         $message = compact("latest", "time");
                     }
-
                     return $th->type == 'GROUP' ? [
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
-                        'message' => $message
+                        'message' => $message,
+                        'created_at' => \strtotime($th->created_at)
                     ] : [
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
                         'sex' => $sex,
-                        'message' => $message
+                        'message' => $message,
+                        'created_at' => \strtotime($th->created_at)
                     ];
                 });
+                // Sort by key.
+                \usort($mArr, function($a, $b) {
+                    return $a['created_at'] - $b['created_at'];
+                });
+                return \array_reverse(\array_map(function($x){
+                    unset($x['created_at']);
+                    return $x;
+                }, $mArr));
             }
         ];
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -152,7 +152,6 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMember::className(), ['member_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -160,7 +159,6 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMemberConfig::className(), ['member_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -168,7 +166,6 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMessage::className(), ['member_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -176,16 +173,5 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMessageSeen::className(), ['member_id' => 'id']);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */    
-    public static function findByMemberUsername($username) {
-        $user = self::find()->where(["username" => $username])->one();
-        if (!count($user)) {
-            return null;
-        }
-        
-        return $user;
-    }    
 }
+
