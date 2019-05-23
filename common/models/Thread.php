@@ -96,21 +96,6 @@ class Thread extends \yii\db\ActiveRecord
                 return $members;
             },
             'messages' => function($x) {
-                $params = \Yii::$app->request->getQueryParams();
-                $offset = !empty($params['offset']) ? $params['offset'] : 0;
-                $thMsgs = array_map(function($thMsg) {
-                    if (!empty($thMsg['file'])) {
-                        $mPathInfo = pathinfo($thMsg['file']);
-                        $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
-                        $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
-                        $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
-                        'role' => $mem['role'],
-                    ];
-                }, \common\models\ThreadMember::findAll(['thread_id' => $x->id]));
-
-                return $members;
-            },
-            'messages' => function($x) {
 
                 $params = \Yii::$app->request->getQueryParams();
                 $offset = !empty($params['offset']) ? $params['offset'] : 0;
@@ -148,8 +133,6 @@ class Thread extends \yii\db\ActiveRecord
                         'deleted_by' => $thMsg['deleted_by'],
                     ];
                     
-                }, \array_reverse(\common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all()));
-
                 }, $offset >=1 ? 
                     \array_reverse(\array_reverse($mMsgs)) :
                     \array_reverse($mMsgs)
