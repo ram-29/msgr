@@ -6,11 +6,17 @@ const uuid = require('uuid/v4')
 const morgan = require('morgan')
 const moment = require('moment')
 const express = require('express')
+const webPush = require('web-push')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
 const siofu = require('socketio-file-upload')
 const thumb = require('node-thumbnail').thumb
 const sharedsession = require('express-socket.io-session')
+
+const pubVapidKey = 'BJEwuKSfuPqPqre3WU4mebqobg51_7RGH33f3wPSrjm1VOUzIHAS5op9Ia2usNrK8hmGm_f1klXIl-JJd3cClO0'
+const priVapidKey = 'UbzsbwwqAsKbUloLj3Ym5TbQLGp_qS3sE791ba0ublY'
+
+webPush.setVapidDetails('mailto:admin@msgr.io', pubVapidKey, priVapidKey)
 
 const session = require('express-session')({ 
     secret: '$2a$07$sXmjRkhWZxKDsudVk281X.Y.RLqgzlfysiBOfXizwLLzea7IbUGWG', 
@@ -147,7 +153,17 @@ io.of('/simple')
             file_type: null,
             created_at: timestamp
         }).then(mMsg => {
-            io.of('/simple').in(cId).emit('chat', { uId, message, timestamp: moment(timestamp).format('MMM D, YYYY h:mm a') })
+
+            const payload = JSON.stringify({
+                uId,
+                message,
+                timestamp: moment(timestamp).format('MMM D, YYYY h:mm a')
+            })
+
+            io.of('/simple').in(cId).emit('chat', payload)
+
+            // @TODO: Send to notif to browser.
+            webPush.sendNotification('', payload).catch(err => console.log(err))
         })
     })
 

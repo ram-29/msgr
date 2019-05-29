@@ -143,26 +143,23 @@ class Member extends \yii\db\ActiveRecord
                         'type' => $th->type,
                         'name' => $name,
                         'message' => $message,
-                        'created_at' => \strtotime($th->created_at)
                     ] : [
                         'id' => $th->id,
                         'type' => $th->type,
                         'name' => $name,
                         'sex' => $sex,
                         'message' => $message,
-                        'created_at' => \strtotime($th->created_at)
                     ];
                 });
 
                 // Sort by key.
                 \usort($mArr, function($a, $b) {
-                    return $a['created_at'] - $b['created_at'];
+                    if((!empty($a['message']))) {
+                        return $a['message']['time'] + $b['message']['time'];
+                    }
                 });
 
-                return \array_reverse(\array_map(function($x){
-                    unset($x['created_at']);
-                    return $x;
-                }, $mArr));
+                return \array_reverse($mArr);
             }
         ];
     }

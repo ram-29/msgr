@@ -13,6 +13,7 @@ let btnHeaderSetting,
     btnChatboxEmoji,
     btnChatboxSend,
     cMsg,
+    btnDetailsHamburg,
     btnEmployeeSearch,
     inputChatSearch,
     inputEmployeeSearch;
@@ -316,6 +317,10 @@ const renderUI = async (cId) => {
                         </div>
                     </div>
                 `
+
+                contentChatboxList.insertAdjacentHTML('beforeend', template)
+                contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollTop + contentChatboxList.parentNode.scrollHeight*10
+                // $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '240px' })
             } else {
                 // Photo or docs
                 template = `
@@ -333,16 +338,15 @@ const renderUI = async (cId) => {
                         </div>
                     </div>
                 `
+
+                contentChatboxList.insertAdjacentHTML('beforeend', template)
+                $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
             }
 
-            contentChatboxList.insertAdjacentHTML('beforeend', template)
         })
 
         btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
         btnChatboxFile.setAttribute('data-conn', 'SIMPLE')
-
-        contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
-        $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
 
         const tabImage = $('#tab-image')
         tabImage.nanogallery2('destroy')
@@ -553,13 +557,27 @@ document.addEventListener('DOMContentLoaded', async _ => {
     btnChatboxEmoji = document.querySelector('#btn-chatbox-emoji')
     btnChatboxSend = document.querySelector('#btn-chatbox-send')
 
+    btnDetailsHamburg = document.querySelector('#btn-details-hamburg')
     btnEmployeeSearch = document.querySelector('#btn-employee-search')
-    
+
     inputChatSearch = document.querySelector('#input-chat-search')
     inputEmployeeSearch = document.querySelector('#input-employee-search')
 
     const toolsHeaderContainer = document.querySelector('.msgr-main-content-tools-user-header-container')
     const chatSearchContainer = document.querySelector('#input-chat-search-container')
+
+    let isOpen = false
+    btnDetailsHamburg.addEventListener('click', e => {
+        if(isOpen) {
+            isOpen = false
+            $('.msgr-main-content-chatbox').css('width', '75%')
+            $('.msgr-main-content-tools').css('display', 'block')
+        } else {
+            isOpen = true
+            $('.msgr-main-content-chatbox').css('width', '100%')
+            $('.msgr-main-content-tools').css('display', 'none')
+        }
+    })
 
     inputChatSearch.addEventListener('input', e => {
         // @TODO: Filter the ui.

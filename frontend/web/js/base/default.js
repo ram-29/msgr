@@ -1,7 +1,6 @@
 (_ => {
     moment.createFromInputFallback = function(config) { config._d = new Date(config._i); }
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
-
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
     let offset = 1

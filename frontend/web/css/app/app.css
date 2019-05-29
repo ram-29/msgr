@@ -114,8 +114,15 @@ html, body, .msgr-index {
 /* Main Content */
 .msgr-main-content {
     height: 100vh;
-    display: grid;
-    grid-template-columns: 3fr 1fr;
+    display: flex;
+}
+
+.msgr-main-content-chatbox {
+    width: 75%;
+}
+
+.msgr-main-content-tools {
+    width: 25%;
 }
 
 /* Main Content Chatbox Header */

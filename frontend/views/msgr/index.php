@@ -55,7 +55,8 @@ $this->title = Yii::$app->name;
                 <h4></h4>
                 <!-- <p>Active 2m ago</p> -->
             </div>
-            <?= Html::button(FA::icon('info')->size(FA::SIZE_LARGE)->fixedWidth(), [
+            <?= Html::button(FA::icon('bars')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                'id' => 'btn-details-hamburg',
                 'class' => 'btn btn-default btn-sm'
             ]) ?>
         </div>
@@ -182,7 +183,7 @@ $this->title = Yii::$app->name;
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
                         <li role="presentation"><a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a></li>
-                        <!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
+                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
                     </ul>
                     
                     <div class="tab-content">
@@ -192,7 +193,7 @@ $this->title = Yii::$app->name;
                         <div role="tabpanel" class="tab-pane fade" id="files">
                             <ul id="tab-docs"></ul>
                         </div>
-                        <!-- <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div> -->
+                        <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div>
                     </div>
                 </div>
             </div>
