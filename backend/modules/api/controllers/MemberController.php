@@ -22,8 +22,14 @@ class MemberController extends \yii\rest\ActiveController
             ],
         ];
 
+        // add CORS filter
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
+            'class' => '\yii\filters\Cors',
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                'Access-Control-Request-Headers' => ['*'],
+            ],
         ];
 
 		return $behaviors;
@@ -37,6 +43,7 @@ class MemberController extends \yii\rest\ActiveController
         $actions = parent::actions();
         unset($actions['create']);
         unset($actions['update']);
+        unset($actions['check']);
         
         return $actions;
     }
@@ -77,5 +84,24 @@ class MemberController extends \yii\rest\ActiveController
         }
 
         return $model;
+    }
+
+    public function actionId()
+    {
+
+        $model = new \common\models\Member();
+        $model->load(\Yii::$app->request->post(), '');
+        $username = \Yii::$app->request->getBodyParam('username');
+
+        $details = $model->findByMemberUsername($username);
+
+        //Check if account is existing
+        if($details == null) {
+            $model->setAttrs();
+            $model->save();
+            return $model;
+        } else {
+            return $details;
+        }   
     }
 }

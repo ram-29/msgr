@@ -1,130 +1,69 @@
 <?php
-
-namespace backend\controllers;
-
-use Yii;
-use common\models\Member;
-use common\models\MemberSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-
+namespace backend\modules\api\controllers;
 /**
- * MemberController implements the CRUD actions for Member model.
+ * Member controller for the `Api` module
  */
-class MemberController extends Controller
+class MemberController extends \yii\rest\ActiveController
 {
+    public $modelClass = 'common\models\Member';
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
+        $behaviors = parent::behaviors();
+        $behaviors['bootstrap'] = [
+            'class' => \yii\filters\ContentNegotiator::className(),
+            'formats' => [
+                'application/json' => \yii\web\Response::FORMAT_JSON,
             ],
         ];
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+        ];
+        return $behaviors;
     }
-
     /**
-     * Lists all Member models.
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function actionIndex()
+    public function actions()
     {
-        $searchModel = new MemberSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        $actions = parent::actions();
+        unset($actions['create']);
+        unset($actions['update']);
+        
+        return $actions;
     }
-
     /**
-     * Displays a single Member model.
-     * @param string $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new Member model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * {@inheritdoc}
      */
     public function actionCreate()
     {
-        $model = new Member();
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            // Set attributes.
-            $model->setAttrs();
-
-            return $model->save() ?
-                $this->redirect(['view', 'id' => $model->id]) :
-                \common\helpers\Logger::log($model->getErrors());
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
+        // Initalize a model.
+        $model = new \common\models\Member();
+        $model->load(\Yii::$app->request->post(), '');
+        // Set attributes.
+        $model->setAttrs();
+        // Save & return.
+        $model->save();
+        return $model;
     }
-
     /**
-     * Updates an existing Member model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
+     * {@inheritdoc}
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model = \common\models\Member::findOne($id);
+        $params = \Yii::$app->request->getBodyParams();
+        $model->load($params, '');
+        if($params['type'] == 'CONNECT') {
+            $model->status = 'ACTIVE';
+            $model->logged_at = date("Y-m-d H:i:s", time());
+            $model->save();
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            $model->status = 'INACTIVE';
+            $model->save();
         }
-    }
-
-    /**
-     * Deletes an existing Member model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Member model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return Member the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Member::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
+        return $model;
     }
 }

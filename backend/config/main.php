@@ -57,7 +57,11 @@ return [
             'showScriptName' => false,
             'rules' => [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member', 'pluralize' => false,
+                    'extraPatterns' => [
+                        'POST id' => 'id',
+                    ],
+                 'tokens' => ['{id}' => '<id:[\w-]+>']],
 
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
 

@@ -1,65 +1,40 @@
 <?php
-
-namespace backend\controllers;
-
-use Yii;
-use common\models\ThreadMessage;
-use common\models\ThreadMessageSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-
+namespace backend\modules\api\controllers;
 /**
- * ThreadMessageController implements the CRUD actions for ThreadMessage model.
+ * ThreadMessage controller for the `Api` module
  */
-class ThreadMessageController extends Controller
+class ThreadMessageController extends \yii\rest\ActiveController
 {
+    public $modelClass = 'common\models\ThreadMessage';
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
+        $behaviors = parent::behaviors();
+        $behaviors['bootstrap'] = [
+            'class' => \yii\filters\ContentNegotiator::className(),
+            'formats' => [
+                'application/json' => \yii\web\Response::FORMAT_JSON,
             ],
         ];
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+        ];
+        return $behaviors;
     }
-
     /**
-     * Lists all ThreadMessage models.
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function actionIndex()
+    public function actions()
     {
-        $searchModel = new ThreadMessageSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        $actions = parent::actions();
+        unset($actions['create']);
+        
+        return $actions;
     }
-
     /**
-     * Displays a single ThreadMessage model.
-     * @param string $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new ThreadMessage model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * {@inheritdoc}
      */
     public function actionCreate()
     {
