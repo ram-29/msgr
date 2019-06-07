@@ -50,8 +50,11 @@ class MsgrController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($u = 123)
     {
+        $M_ID = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf';
+        $M_NAME = 'Maria Powell';
+
         $BK_URL = Getter::getUrl();
 
         // Get messenger members.
@@ -59,7 +62,7 @@ class MsgrController extends Controller
             ->get("{$BK_URL}/api/member")
             ->send()->getData();
 
-        return $this->render('index', compact("members"));
+        return $this->render('index', compact("members", "M_ID", "M_NAME"));
     }
 
 }

@@ -2,6 +2,7 @@
 
 /* @var $this \yii\web\View */
 
+use yii\web\View;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\JsExpression;
@@ -10,6 +11,8 @@ use rmrevin\yii\fontawesome\FA;
 use common\helpers\Getter;
 
 $this->title = Yii::$app->name;
+
+$this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_HEAD);
 ?>
 <div class="msgr-index">
 

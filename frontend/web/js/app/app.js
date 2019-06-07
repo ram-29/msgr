@@ -18,7 +18,7 @@ let btnHeaderSetting,
     inputChatSearch,
     inputEmployeeSearch;
 
-let id, name, SIMPLE, GROUP
+let SIMPLE, GROUP
 const fileTypes = [
     // Office
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -92,7 +92,7 @@ const initUpload = (e, type) => {
                         sSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
                                 threadId: mConn.cId,
-                                memberId: id,
+                                memberId: M_ID,
                                 fileType: file.type,
                                 createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
                             }
@@ -105,7 +105,7 @@ const initUpload = (e, type) => {
                         gSiofu.addEventListener('start', function(evt){
                             evt.file.meta = { 
                                 threadId: mConn.cId,
-                                memberId: id,
+                                memberId: M_ID,
                                 fileType: file.type,
                                 createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
                             }
@@ -144,8 +144,8 @@ const initUI = el => {
     contentChatboxInput.children[1].style.visibility = 'visible'
 }
 
-const initConn = (id, name) => {
-    const query = buildURLQuery({ id, name })
+const initConn = (M_ID, M_NAME) => {
+    const query = buildURLQuery({ M_ID, M_NAME })
 
     SIMPLE = io(`${SOCKET_URL}/simple`, { query })
     SIMPLE.on('connect', _ => {
@@ -170,7 +170,7 @@ const initConn = (id, name) => {
                     <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                 </span>
 
-                <div class="msgr-main-content-chatbox-list-item-details ${uId === id ? 'owner' : ''}">
+                <div class="msgr-main-content-chatbox-list-item-details ${uId === M_ID ? 'owner' : ''}">
                     <img class="img-circle" src="${src}" alt="User image">
                     <div class="msgr-main-content-chatbox-list-item-details-content">
                         <p>${message.trim()}</p>
@@ -201,7 +201,7 @@ const initConn = (id, name) => {
                     <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                 </span>
 
-                <div class="msgr-main-content-chatbox-list-item-details ${member_id === id ? 'owner' : ''}">
+                <div class="msgr-main-content-chatbox-list-item-details ${member_id === M_ID ? 'owner' : ''}">
                     <img class="img-circle" src="${src}" alt="User image">
                     <div class="msgr-main-content-chatbox-list-item-details-content">
                         ${type === 'image' ? `<img src="${filepath}" alt="${filename}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${filepath}" target="_blank" style="color:#fff !important; text-decoration:underline;">${filename}</a></p>`}
@@ -267,7 +267,7 @@ const initConn = (id, name) => {
             <div class="msgr-main-content-chatbox-list-item">
                 <span>${timestamp}</span>
 
-                <div class="msgr-main-content-chatbox-list-item-details ${uId === id ? 'owner' : ''}">
+                <div class="msgr-main-content-chatbox-list-item-details ${uId === M_ID ? 'owner' : ''}">
                     <img class="img-circle" src="/img/1.png" alt="User image">
                     <div class="msgr-main-content-chatbox-list-item-details-content">
                         <p>${message.trim()}</p>
@@ -309,7 +309,7 @@ const renderUI = async (cId) => {
                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                         </span>
 
-                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
                             <img class="img-circle" src="${src}" alt="User image">
                             <div class="msgr-main-content-chatbox-list-item-details-content">
                                 <p>${msg.text}</p>
@@ -330,7 +330,7 @@ const renderUI = async (cId) => {
                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                         </span>
 
-                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
                             <img class="img-circle" src="${src}" alt="User image">
                             <div class="msgr-main-content-chatbox-list-item-details-content">
                                 ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color:#fff !important; text-decoration:underline;">${msg.file_name}</a></p>`}
@@ -444,7 +444,7 @@ const groupConfirm = params => {
     const mId = h4.dataset.id
     const mName = h4.textContent
     const mMembers = [
-        { member_id: id, role: 'ADMIN' },
+        { member_id: M_ID, role: 'ADMIN' },
         { member_id: mId, role: 'MEMBER' }
     ]
 
@@ -579,8 +579,9 @@ document.addEventListener('DOMContentLoaded', async _ => {
         }
     })
 
-    inputChatSearch.addEventListener('input', e => {
+    inputChatSearch.addEventListener('keyup', e => {
         // @TODO: Filter the ui.
+        console.log('SKRRR')
     })
 
     inputEmployeeSearch.addEventListener('input', e => {
@@ -599,79 +600,77 @@ document.addEventListener('DOMContentLoaded', async _ => {
         inputEmployeeSearch.focus()
     })
 
-    swal.mixin({
-        input: 'text',
-        confirmButtonText: 'Next &rarr;',
-        progressSteps: ['1', '2'],
-        showCloseButton: false,
-        allowOutsideClick: false,
-        showCancelButton: false,
-    }).queue([
-        'Enter ID',
-        'Enter Name',
-    ]).then(async result => {
-
-        const x = result.value.filter(x => x)
-        if (!(x === undefined || x.length == 0)) {
-
-            // id = result.value[0]
-            // name = result.value[1]
-
-            id = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf'
-            name = 'Maria Powell'
-
-            // 312615cc-96f1-4e0f-9da5-ef482e72d889
-
-            axios.get(`${BK_URL}/api/member/${id}?expand=threads`).then(resp => {
-                const template = resp.data.threads.map(th => {
-                    const mBtn = `
-                        <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm">
-                            <i class="fa fa-cog fa-fw"></i>
-                        </button>
-                    `
-
-                    return `
-                        <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
-                            <div class="msgr-sidebar-list-item-content">
-                                <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
-                                <div class="msgr-sidebar-list-item-content-details">
-                                    <h4>${th.name}</h4>
-                                    <p>${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
-                                </div>
-                            </div>
-            
-                            <div class="msgr-sidebar-list-item-settings">
-                                <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
+    if(M_ID && M_NAME) {
+        axios.get(`${BK_URL}/api/member/${M_ID}?expand=threads`).then(resp => {
+            const template = resp.data.threads.map(th => {
+                const mBtn = `
+                    <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm">
+                        <i class="fa fa-cog fa-fw"></i>
+                    </button>
+                `
+    
+                return `
+                    <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
+                        <div class="msgr-sidebar-list-item-content">
+                            <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
+                            <div class="msgr-sidebar-list-item-content-details">
+                                <h4>${th.name}</h4>
+                                <p>${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
                             </div>
                         </div>
-                    `
-                }).join('')
         
-                sidebarList.innerHTML = template
+                        <div class="msgr-sidebar-list-item-settings">
+                            <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
+                        </div>
+                    </div>
+                `
+            }).join('')
+    
+            sidebarList.innerHTML = template
+    
+            OverlayScrollbars(sidebarList, {})
+        })
+    
+        initConn(M_ID, M_NAME)
+    
+        contentChatboxInputBox.addEventListener('keydown', e => {
+            if(e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault()
         
-                OverlayScrollbars(sidebarList, {})
-            })
-
-            initConn(id, name)
-
-            contentChatboxInputBox.addEventListener('keydown', e => {
-                if(e.keyCode === 13 && !e.shiftKey) {
-                    e.preventDefault()
-            
-                    const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
-                    const message = e.target.value
-
-                    if(message) {
-                        if(mConn.type == 'GROUP') {
-                            GROUP.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
-                        }
+                const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
+                const message = e.target.value
     
-                        SIMPLE.emit('chat', { cId: mConn.cId, uId: id, message, timestamp })
-    
-                        contentChatboxInputBox.value = ''
+                if(message) {
+                    if(mConn.type == 'GROUP') {
+                        GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
                     }
+    
+                    SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+    
+                    contentChatboxInputBox.value = ''
                 }
-            })
-        }
-    })
+            }
+        })
+    }
+
+    // swal.mixin({
+    //     input: 'text',
+    //     confirmButtonText: 'Next &rarr;',
+    //     progressSteps: ['1', '2'],
+    //     showCloseButton: false,
+    //     allowOutsideClick: false,
+    //     showCancelButton: false,
+    // }).queue([
+    //     'Enter ID',
+    //     'Enter Name',
+    // ]).then(async result => {
+    //     const x = result.value.filter(x => x)
+    //     if (!(x === undefined || x.length == 0)) {
+
+    //         id = result.value[0]
+    //         name = result.value[1]
+
+    //         // 312615cc-96f1-4e0f-9da5-ef482e72d889
+    //     }
+    // })
 })
