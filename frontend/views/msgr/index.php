@@ -189,7 +189,7 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
                         <li role="presentation"><a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a></li>
-                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+                        <!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
                     </ul>
                     
                     <div class="tab-content">
@@ -199,7 +199,7 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                         <div role="tabpanel" class="tab-pane fade" id="files">
                             <ul id="tab-docs"></ul>
                         </div>
-                        <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div>
+                        <!-- <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div> -->
                     </div>
                 </div>
             </div>
