@@ -9,6 +9,7 @@ use yii\web\JsExpression;
 use rmrevin\yii\fontawesome\FA;
 
 use common\helpers\Getter;
+use common\helpers\Logger;
 
 $this->title = Yii::$app->name;
 
@@ -144,40 +145,42 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                         <?php foreach($members as $i => $member) :?>
                             <?php $img = $member['sex'] == 'M' ? "1" : "2"; ?>
 
-                            <div class="msgr-main-content-tools-user-list-item">
-                                <div class="msgr-main-content-tools-user-list-item-content">
-                                    <?= Html::img("@web/img/{$img}.png", [
-                                        'class' => 'img-circle',
-                                        'alt' => 'User image'
-                                    ]) ?>
+                            <?php if(!($member['id'] == $M_ID)) :?>
+                                <div class="msgr-main-content-tools-user-list-item">
+                                    <div class="msgr-main-content-tools-user-list-item-content">
+                                        <?= Html::img("@web/img/{$img}.png", [
+                                            'class' => 'img-circle',
+                                            'alt' => 'User image'
+                                        ]) ?>
 
-                                    <div class="msgr-main-content-tools-user-list-item-content-details">
-                                        <h4 data-id="<?= $member['id'] ?>"><?= $member['name'] ?></h4>
-                                        <!-- <p>Associate Software Engineer</p> -->
+                                        <div class="msgr-main-content-tools-user-list-item-content-details">
+                                            <h4 data-id="<?= $member['id'] ?>"><?= $member['name'] ?></h4>
+                                            <!-- <p>Associate Software Engineer</p> -->
+                                        </div>
+                                    </div>
+
+                                    <div class="msgr-main-content-tools-user-list-item-tools-right">
+                                        <?= Html::button(FA::icon('comments-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                            'class' => 'btn btn-default btn-sm',
+                                            'id' => 'btn-user-chat',
+                                            'data-toggle' => 'tooltip',
+                                            'data-placement' => 'left',
+                                            'data-html' => 'true',
+                                            'title' => 'Chat this person'
+                                        ]) ?>
+                                        <?= Html::button(FA::icon('user-plus')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                            'class' => 'btn btn-default btn-sm',
+                                            'id' => 'btn-user-group',
+                                            'data-toggle' => 'tooltip',
+                                            'data-placement' => 'left',
+                                            'data-html' => 'true',
+                                            'title' => 'Add this person to a group',
+                                            'onclick' => new JsExpression("groupConfirm(this)")
+                                        ]) ?>
                                     </div>
                                 </div>
-
-                                <div class="msgr-main-content-tools-user-list-item-tools-right">
-                                    <?= Html::button(FA::icon('comments-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                        'class' => 'btn btn-default btn-sm',
-                                        'id' => 'btn-user-chat',
-                                        'data-toggle' => 'tooltip',
-                                        'data-placement' => 'left',
-                                        'data-html' => 'true',
-                                        'title' => 'Chat this person'
-                                    ]) ?>
-                                    <?= Html::button(FA::icon('user-plus')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                        'class' => 'btn btn-default btn-sm',
-                                        'id' => 'btn-user-group',
-                                        'data-toggle' => 'tooltip',
-                                        'data-placement' => 'left',
-                                        'data-html' => 'true',
-                                        'title' => 'Add this person to a group',
-                                        'onclick' => new JsExpression("groupConfirm(this)")
-                                    ]) ?>
-                                </div>
-                            </div>
-
+                            <?php endif ?>
+                            
                         <?php endforeach ?>
                     </div>
                 </div>

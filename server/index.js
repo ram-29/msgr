@@ -184,7 +184,7 @@ io.of('/group')
     // File Upload listener
     const gUploader = new siofu()
     gUploader.dir = '../frontend/web/files';
-    gUploader.listen(simple)
+    gUploader.listen(group)
 
     gUploader.on('start', event => {
 		if (/\.exe$/.test(event.file.name)) {

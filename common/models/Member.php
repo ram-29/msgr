@@ -92,9 +92,10 @@ class Member extends \yii\db\ActiveRecord
     {
         return [
             'threads' => function($x) {
-                $mArr = \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
+                $mArr = \yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) use ($x) {
                     $th = \common\models\Thread::findOne($thm['thread_id']);
                     $cfg = \common\models\ThreadGlobalConfig::findOne($thm['thread_id']);
+
                     // Get thread name.
                     $name = null;
                     $sex = null;
@@ -109,19 +110,31 @@ class Member extends \yii\db\ActiveRecord
                             $sex = $mmMember->sex;
                         }
                     }
+
                     // Get recent message.
                     $message = null;
                     if(!empty($mMsgs = $th->getThreadMessages()->orderBy(['created_at' => SORT_DESC])->all())) {
+
+                        $mId = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'id');
+                        $mMsgSeen = \common\models\ThreadMessageSeen::findOne(['thread_message_id' => $mId]);
+                        
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
+                        $member_id = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'member_id');
 
-                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))) {
+                        $unread = empty($mMsgSeen->seen_at) ? true : false;
+
+                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file')) && ($x->id === $member_id)) {
+                            $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
+                                'You sent an image.' : 'You sent a document.';
+                        } else if (!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))){
                             $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
                                 'Sent an image.' : 'Sent a document.';
                         }
 
-                        $message = compact("latest", "time");
+                        $message = compact("latest", "time", "unread");
                     }
+
                     return $th->type == 'GROUP' ? [
                         'id' => $th->id,
                         'type' => $th->type,
@@ -144,6 +157,22 @@ class Member extends \yii\db\ActiveRecord
                 });
 
                 return \array_reverse($mArr);
+            },
+            'unread_count' => function($x) {
+                return array_sum(\yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
+                    $th = \common\models\Thread::findOne($thm['thread_id']);
+
+                    // Get recent message.
+                    if(!empty($mMsgs = $th->getThreadMessages()->orderBy(['created_at' => SORT_DESC])->all())) {
+
+                        $mId = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'id');
+                        $mMsgSeen = \common\models\ThreadMessageSeen::findOne(['thread_message_id' => $mId]);
+                        
+                        return empty($mMsgSeen->seen_at) ? 1 : 0;
+                    }
+
+                    return 0;
+                }));
             }
         ];
     }
