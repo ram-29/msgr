@@ -31,7 +31,7 @@ class ThreadMessageSeen extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'thread_message_id', 'member_id', 'seen_at'], 'required'],
+            [['id', 'thread_message_id', 'member_id'], 'required'],
             [['seen_at'], 'safe'],
             [['id', 'thread_message_id', 'member_id'], 'string', 'max' => 36],
             [['id'], 'unique'],
