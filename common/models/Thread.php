@@ -16,6 +16,7 @@ use Yii;
 class Thread extends \yii\db\ActiveRecord
 {
     public $globalConfig;
+    public $name;
 
     /**
      * {@inheritdoc}
@@ -96,13 +97,15 @@ class Thread extends \yii\db\ActiveRecord
                 return $members;
             },
             'messages' => function($x) {
-
                 $params = \Yii::$app->request->getQueryParams();
                 $offset = !empty($params['offset']) ? $params['offset'] : 0;
 
                 $mMsgs = \common\models\ThreadMessage::find()->where(['thread_id' => $x->id])->orderBy(['created_at' => SORT_DESC])->limit(10)->offset(10 * $offset)->all();
 
+                $name = null;
                 $thMsgs = array_map(function($thMsg) {
+                    $member = \common\models\Member::findOne($thMsg['member_id']);
+                    
                     if (!empty($thMsg['file'])) {
                         $mPathInfo = pathinfo($thMsg['file']);
 
@@ -112,6 +115,7 @@ class Thread extends \yii\db\ActiveRecord
 
                         return [
                             'member_id' => $thMsg['member_id'],
+                            'name' =>  $member->name,
                             'text' => $thMsg['text'],
                             'file_path' => $mFile,
                             'file_thumb' => $mFileThumb,
@@ -124,6 +128,7 @@ class Thread extends \yii\db\ActiveRecord
 
                     return [
                         'member_id' => $thMsg['member_id'],
+                        'name' => $member->name,
                         'text' => $thMsg['text'],
                         'file_path' => null,
                         'file_thumb' => null,

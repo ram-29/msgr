@@ -104,25 +104,20 @@ class ThreadMember extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */    
-    public static function findThreadByMember($sender,$recipient) {
-        $thread = self::find()->select(['thread_id', 'type', 'member_id', 'nickname'])->joinWith(['thread'])->where(['member_id' => $sender , 'member_id' => $recipient])->one();
+    public static function findThreadByMember($members) {
+        
+        $thread = self::find()->select(['thread_id', 'member_id', 'nickname', 'thread.type'])->joinWith(['thread', 'member'])->where(['in', 'member_id', $members])->andWhere(['role' => 'MEMBER'])->andWhere(['type' => 'SIMPLE'])->one();
 
-        if($thread->nickname == null) {
-            $member = Member::find()->select(['name'])->joinWith(['threadMembers'])->where(['member_id' => $recipient])->one();
-            $nName = $member->name;
+        if (!empty($thread)) {
+            $data = [
+                'id' => $thread->thread_id,
+                'name' => ($thread->nickname == null) ? $thread->member->name : $thread->nickname,
+                'type' => $thread->thread->type
+            ];
+
+            return $data;
         } else {
-            $nName = $thread->nickname;
-        }
-       
-
-        if (!count($thread)) {
             return null;
         }
-                
-        return [
-            'type' =>  $thread->thread->type,
-            'id' => $thread->thread_id,
-            'name' => $nName
-        ];
     }      
 }

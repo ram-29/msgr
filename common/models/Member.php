@@ -140,13 +140,12 @@ class Member extends \yii\db\ActiveRecord
 
                 // Sort by key.
                 \usort($mArr, function($a, $b) {
-                    return $a['created_at'] - $b['created_at'];
+                    if((!empty($a['message']))) {
+                        return $a['message']['time'] + $b['message']['time'];
+                    }
                 });
 
-                return \array_reverse(\array_map(function($x){
-                    unset($x['created_at']);
-                    return $x;
-                }, $mArr));
+                return \array_reverse($mArr);
             }
         ];
     }
@@ -178,5 +177,16 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMessageSeen::className(), ['member_id' => 'id']);
     }
+    /**
+     * @return \yii\db\ActiveQuery
+     */    
+    public static function findByMemberUsername($username) {
+        $user = self::find()->where(["username" => $username])->one();
+        if (!count($user)) {
+            return null;
+        }
+        
+        return $user;
+    }    
 }
 
