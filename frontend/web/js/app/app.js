@@ -16,7 +16,8 @@ let btnHeaderSetting,
     btnDetailsHamburg,
     btnEmployeeSearch,
     inputChatSearch,
-    inputEmployeeSearch;
+    inputEmployeeSearch,
+    userList;
 
 let SIMPLE, GROUP
 const fileTypes = [
@@ -46,6 +47,19 @@ const fileTypes = [
     // Others
     'text/plain'
 ];
+
+const initSearch = (pElem, cName, sTerm) => {
+    Array.from(pElem.getElementsByClassName(cName))
+    .forEach(mItem => {
+        if(mItem.children[0].children[1].children[0].textContent
+            .toLowerCase().indexOf(sTerm.toLowerCase()) != -1
+        ) {
+            mItem.style.display = 'flex'
+        } else {
+            mItem.style.display = 'none'
+        }
+    })
+}
 
 const initUpload = (e, type) => {
     const mFilePond = `filepond-${type.toLowerCase()}`
@@ -563,6 +577,8 @@ document.addEventListener('DOMContentLoaded', async _ => {
     inputChatSearch = document.querySelector('#input-chat-search')
     inputEmployeeSearch = document.querySelector('#input-employee-search')
 
+    userList = document.querySelector('.msgr-main-content-tools-user-list')
+
     const toolsHeaderContainer = document.querySelector('.msgr-main-content-tools-user-header-container')
     const chatSearchContainer = document.querySelector('#input-chat-search-container')
 
@@ -579,19 +595,14 @@ document.addEventListener('DOMContentLoaded', async _ => {
         }
     })
 
-    inputChatSearch.addEventListener('keyup', e => {
-        // @TODO: Filter the ui.
-        console.log('SKRRR')
-    })
-
-    inputEmployeeSearch.addEventListener('input', e => {
-        // @TODO: Filter the ui.
-    })
+    //Search Filters
+    inputChatSearch.addEventListener('keyup', e => initSearch(sidebarList, 'msgr-sidebar-list-item', e.target.value))
+    inputEmployeeSearch.addEventListener('keyup', e => initSearch(userList, 'msgr-main-content-tools-user-list-item', e.target.value))
 
     inputEmployeeSearch.addEventListener('focusout', e => {
         toolsHeaderContainer.style.display = 'flex';
         chatSearchContainer.style.display = 'none';
-        inputEmployeeSearch.value = ''
+        // inputEmployeeSearch.value = ''
     })
     
     btnEmployeeSearch.addEventListener('click', e => {
@@ -608,14 +619,25 @@ document.addEventListener('DOMContentLoaded', async _ => {
                         <i class="fa fa-cog fa-fw"></i>
                     </button>
                 `
-    
+
+                // Filter user list.
+                Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
+                .forEach(mItem => {
+                    if(mItem.children[0].children[1].children[0]
+                        .textContent.toLowerCase() == th.name.toLowerCase()
+                    ) {
+                        mItem.children[1].children[0].style.display = 'none'
+                    }
+                })
+
+                // Render list
                 return `
                     <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
                         <div class="msgr-sidebar-list-item-content">
                             <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
                             <div class="msgr-sidebar-list-item-content-details">
-                                <h4>${th.name}</h4>
-                                <p>${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
+                                <h4 style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold;' : 'normal;'}">${th.name}</h4>
+                                <p style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold; color:#000;' : 'normal;'}">${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
                             </div>
                         </div>
         

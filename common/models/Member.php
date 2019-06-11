@@ -120,11 +120,11 @@ class Member extends \yii\db\ActiveRecord
                         
                         $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'text');
                         $time = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'created_at');
-                        $member_id = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'member_id');
+                        $sent_by = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'member_id');
 
                         $unread = empty($mMsgSeen->seen_at) ? true : false;
 
-                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file')) && ($x->id === $member_id)) {
+                        if(!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file')) && ($x->id === $sent_by)) {
                             $latest = \yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file_type') == 'image' ?
                                 'You sent an image.' : 'You sent a document.';
                         } else if (!empty(\yii\helpers\ArrayHelper::getValue($mMsgs[0], 'file'))){
@@ -132,7 +132,7 @@ class Member extends \yii\db\ActiveRecord
                                 'Sent an image.' : 'Sent a document.';
                         }
 
-                        $message = compact("latest", "time", "unread");
+                        $message = compact("latest", "time", "sent_by", "unread");
                     }
 
                     return $th->type == 'GROUP' ? [

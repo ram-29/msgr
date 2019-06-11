@@ -43,7 +43,7 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                 <?= Html::input('text', 'sidebar-search', null, [
                     'id' => 'input-chat-search',
                     'class' => 'form-control',
-                    'placeholder' => 'Search chat name / group name ..'
+                    'placeholder' => 'Search a chat name / group name ..'
                 ]) ?>
             </div>
         </div>
@@ -136,7 +136,7 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                             <?= Html::input('text', 'sidebar-search', null, [
                                 'id' => 'input-employee-search',
                                 'class' => 'form-control',
-                                'placeholder' => 'Search employee name ..'
+                                'placeholder' => 'Search an employee ..'
                             ]) ?>
                         </div>
                     </div>
