@@ -166,7 +166,8 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
                                             'data-toggle' => 'tooltip',
                                             'data-placement' => 'left',
                                             'data-html' => 'true',
-                                            'title' => 'Chat this person'
+                                            'title' => 'Chat this person',
+                                            'onclick' => new JsExpression("chatConfirm(this)")
                                         ]) ?>
                                         <?= Html::button(FA::icon('user-plus')->size(FA::SIZE_LARGE)->fixedWidth(), [
                                             'class' => 'btn btn-default btn-sm',

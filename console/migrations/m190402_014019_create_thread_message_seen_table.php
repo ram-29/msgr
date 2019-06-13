@@ -28,7 +28,7 @@ class m190402_014019_create_thread_message_seen_table extends Migration
                 0 => 'PRIMARY KEY (`id`)',
                 'thread_message_id' => 'CHAR(36) NOT NULL',
                 'member_id' => 'CHAR(36) NOT NULL',
-                'seen_at' => 'DATETIME NOT NULL',
+                'seen_at' => 'DATETIME NULL',
             ], $tableOptions_mysql);
         }
         }

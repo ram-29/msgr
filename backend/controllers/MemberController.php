@@ -1,11 +1,14 @@
 <?php
+
 namespace backend\modules\api\controllers;
+
 /**
  * Member controller for the `Api` module
  */
 class MemberController extends \yii\rest\ActiveController
 {
     public $modelClass = 'common\models\Member';
+
     /**
      * {@inheritdoc}
      */
@@ -23,6 +26,7 @@ class MemberController extends \yii\rest\ActiveController
         ];
         return $behaviors;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -34,6 +38,7 @@ class MemberController extends \yii\rest\ActiveController
         
         return $actions;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -48,6 +53,7 @@ class MemberController extends \yii\rest\ActiveController
         $model->save();
         return $model;
     }
+
     /**
      * {@inheritdoc}
      */

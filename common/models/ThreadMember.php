@@ -100,11 +100,10 @@ class ThreadMember extends \yii\db\ActiveRecord
         return $this->hasOne(Thread::className(), ['id' => 'thread_id']);
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */    
-    public static function findThreadByMember($sender,$recipient) {
+    public static function findThreadByMember($sender, $recipient) {
         $thread = self::find()->select(['thread_id', 'type', 'member_id', 'nickname'])->joinWith(['thread'])->where(['member_id' => $sender , 'member_id' => $recipient])->one();
 
         if($thread->nickname == null) {

@@ -450,6 +450,45 @@ const connect = async (el, cId, type) => {
     initUI(el)
 }
 
+const chatConfirm = params => {
+
+    // Hide chat button
+    params.style.display = 'none'
+
+    // Get refs.
+    const h4 = params.parentElement
+        .previousElementSibling.children[1].children[0]
+
+    const mId = h4.dataset.id
+    const mName = h4.textContent
+
+    const mMembers = [
+        { member_id: M_ID, role: 'ADMIN' },
+        { member_id: mId, role: 'MEMBER' }
+    ]
+
+    // Send request
+    fetch(`${BK_URL}/api/thread`, {
+        method: 'POST',
+        body: JSON.stringify({ 
+            type: 'SIMPLE',
+            name: grpName,
+            members: mMembers
+        }),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(resp => {
+        if (!resp.ok) {
+            throw new Error(resp.statusText)
+        }
+
+        console.log(resp.json())
+
+    }).catch(err => console.error(err))
+}
+
 const groupConfirm = params => {
 
     const h4 = params.parentElement

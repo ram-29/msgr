@@ -55,34 +55,17 @@ class ThreadController extends \yii\rest\ActiveController
                 return $hasThread;
             }
         }
-      
-        // Create Thread.
-        $model->setAttrs();
-        $model->save();
 
         // Create Thread.
         $model->setAttrs();
         $model->save();
+
         // Create ThreadGlobalConfig.
         $thGlobCfg = new \common\models\ThreadGlobalConfig();
         $thGlobCfg->id = $model->id;
         $thGlobCfg->name = \array_key_exists('name', $params) ? 
             $params['name'] : 'new Group()';
         $thGlobCfg->save();
-        // Create ThreadMembers
-        if(\array_key_exists('members', $params)) {
-            foreach ($params['members'] as $member) {
-                $thMember = new \common\models\ThreadMember();
-                $thMember->setAttrs();
-                $thMember->thread_id = $model->id;
-                $thMember->member_id = $member['member_id'];
-                $thMember->role = $member['role'];
-                $thMember->save();
-            }
-        }
-
-        //Thread name 
-        $model['name'] = $thGlobCfg->name;
 
         // Create ThreadMembers
         if(\array_key_exists('members', $params)) {
