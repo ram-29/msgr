@@ -111,8 +111,14 @@ class Thread extends \yii\db\ActiveRecord
                         $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
                         $mFileThumb = $thMsg['file_type'] == 'image' ? $mFileThumb : null;
 
+                        $mMember = \common\models\Member::findOne($thMsg['member_id']);
+                        unset($mMember['joined_at']); unset($mMember['logged_at']); 
+                        unset($mMember['intranet_id']); unset($mMember['status']);
+
                         return [
-                            'member_id' => $thMsg['member_id'],
+                            // 'member_id' => $thMsg['member_id'],
+                            'member' => $mMember,
+
                             'text' => $thMsg['text'],
                             'file_path' => $mFile,
                             'file_thumb' => $mFileThumb,
@@ -123,8 +129,13 @@ class Thread extends \yii\db\ActiveRecord
                         ];
                     }
 
+                    $mMember = \common\models\Member::findOne($thMsg['member_id']);
+                    unset($mMember['joined_at']); unset($mMember['logged_at']); 
+                    unset($mMember['intranet_id']); unset($mMember['status']);
                     return [
-                        'member_id' => $thMsg['member_id'],
+                        // 'member_id' => $thMsg['member_id'],
+                        'member' => $mMember,
+
                         'text' => $thMsg['text'],
                         'file_path' => null,
                         'file_thumb' => null,

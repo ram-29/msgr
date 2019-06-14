@@ -167,7 +167,7 @@ const initConn = (M_ID, M_NAME) => {
     })
 
     SIMPLE.on('chat', data => {
-        const { uId, message, timestamp } = data
+        const { uId, message, timestamp } = JSON.parse(data)
 
         const src = contentChatboxHeaderImg.getAttribute('src')
 
@@ -192,6 +192,7 @@ const initConn = (M_ID, M_NAME) => {
                 </div>
             </div>
         `
+
         cMsg.textContent = strTruncate(message, 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
@@ -257,7 +258,7 @@ const initConn = (M_ID, M_NAME) => {
             })
         }
 
-        cMsg.textContent = strTruncate((type === 'image' ? 'Sent an image.' : 'Sent a document.'), 20)
+        cMsg.textContent = strTruncate((type === 'image' ? 'You sent an image.' : 'You sent a document.'), 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
     })
@@ -267,7 +268,7 @@ const initConn = (M_ID, M_NAME) => {
         SIMPLE.disconnect()
     })
 
-    //-- GROUP --//
+    /////------- GROUP -------/////
 
     GROUP = io(`${SOCKET_URL}/group`, { query })
     GROUP.on('connect', _ => {
@@ -275,7 +276,7 @@ const initConn = (M_ID, M_NAME) => {
     })
 
     GROUP.on('chat', data => {
-        const { uId, message, timestamp } = data
+        const { uId, message, timestamp } = JSON.parse(data)
 
         const template  = `
             <div class="msgr-main-content-chatbox-list-item">
@@ -314,6 +315,8 @@ const renderUI = async (cId) => {
             const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
             const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
 
+            const { id, name, sex } = msg.member
+
             if(msg.text) {
                 // Render text
                 template  = `
@@ -323,8 +326,9 @@ const renderUI = async (cId) => {
                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                         </span>
 
-                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
-                            <img class="img-circle" src="${src}" alt="User image">
+                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
                             <div class="msgr-main-content-chatbox-list-item-details-content">
                                 <p>${msg.text}</p>
                             </div>
@@ -333,8 +337,7 @@ const renderUI = async (cId) => {
                 `
 
                 contentChatboxList.insertAdjacentHTML('beforeend', template)
-                contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollTop + contentChatboxList.parentNode.scrollHeight*10
-                // $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '240px' })
+                $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
             } else {
                 // Photo or docs
                 template = `
@@ -344,10 +347,11 @@ const renderUI = async (cId) => {
                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                         </span>
 
-                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
-                            <img class="img-circle" src="${src}" alt="User image">
+                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
                             <div class="msgr-main-content-chatbox-list-item-details-content">
-                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${msg.member_id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
                             </div>
                         </div>
                     </div>
@@ -451,16 +455,19 @@ const connect = async (el, cId, type) => {
 }
 
 const chatConfirm = params => {
-
     // Hide chat button
     params.style.display = 'none'
 
     // Get refs.
     const h4 = params.parentElement
         .previousElementSibling.children[1].children[0]
+    const img = params.parentElement
+    .previousElementSibling.children[0]
+    
 
     const mId = h4.dataset.id
     const mName = h4.textContent
+    const mImg = img.src
 
     const mMembers = [
         { member_id: M_ID, role: 'ADMIN' },
@@ -468,23 +475,29 @@ const chatConfirm = params => {
     ]
 
     // Send request
-    fetch(`${BK_URL}/api/thread`, {
-        method: 'POST',
-        body: JSON.stringify({ 
-            type: 'SIMPLE',
-            name: grpName,
-            members: mMembers
-        }),
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
+    axios.post(`${BK_URL}/api/thread`, {
+        type: 'SIMPLE',
+        name: `${M_NAME}:${mName}`,
+        members: mMembers
     }).then(resp => {
-        if (!resp.ok) {
-            throw new Error(resp.statusText)
-        }
 
-        console.log(resp.json())
+        // Render template
+        const template = `
+            <div class="msgr-sidebar-list-item" onclick="connect(this, '${resp.data.id}', 'SIMPLE')">
+                <div class="msgr-sidebar-list-item-content">
+                    <img class="img-circle" src="${mImg}" alt="User image">                        
+                    <div class="msgr-sidebar-list-item-content-details">
+                        <h4>${mName}</h4>
+                        <p>-</p>
+                    </div>
+                </div>
+
+                <div class="msgr-sidebar-list-item-settings">
+                    <span>-</span>
+                </div>
+            </div>
+        `
+        $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
 
     }).catch(err => console.error(err))
 }
@@ -653,12 +666,6 @@ document.addEventListener('DOMContentLoaded', async _ => {
     if(M_ID && M_NAME) {
         axios.get(`${BK_URL}/api/member/${M_ID}?expand=threads`).then(resp => {
             const template = resp.data.threads.map(th => {
-                const mBtn = `
-                    <button type="button" id="btn-list-item-setting" class="btn btn-default btn-sm">
-                        <i class="fa fa-cog fa-fw"></i>
-                    </button>
-                `
-
                 // Filter user list.
                 Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
                 .forEach(mItem => {
@@ -704,34 +711,13 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 if(message) {
                     if(mConn.type == 'GROUP') {
                         GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+                    } else {
+                        SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
                     }
-    
-                    SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
-    
+
                     contentChatboxInputBox.value = ''
                 }
             }
         })
     }
-
-    // swal.mixin({
-    //     input: 'text',
-    //     confirmButtonText: 'Next &rarr;',
-    //     progressSteps: ['1', '2'],
-    //     showCloseButton: false,
-    //     allowOutsideClick: false,
-    //     showCancelButton: false,
-    // }).queue([
-    //     'Enter ID',
-    //     'Enter Name',
-    // ]).then(async result => {
-    //     const x = result.value.filter(x => x)
-    //     if (!(x === undefined || x.length == 0)) {
-
-    //         id = result.value[0]
-    //         name = result.value[1]
-
-    //         // 312615cc-96f1-4e0f-9da5-ef482e72d889
-    //     }
-    // })
 })

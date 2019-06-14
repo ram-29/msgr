@@ -54,15 +54,14 @@ class MsgrController extends Controller
     public function actionIndex($u = 123)
     {
         // 312615cc-96f1-4e0f-9da5-ef482e72d889 : Patricia Lesback
-        // 'f9c159af-6f58-441d-b26f-a6ab4b497eaf' : Maria Powell
+        // f9c159af-6f58-441d-b26f-a6ab4b497eaf : Maria Powell
+        // 4f0da359-0f14-4913-93af-0a648cdf3cf9 : Nicholas Runolfsdottir
         
-
-
         // 0bc08464-87b4-4c6a-afea-6960bf90b02b : Weissnat Kurtis
         // 17626558-9d93-420d-9b3e-4234a80859dc : Howell Ervin
 
-        $M_ID = '0bc08464-87b4-4c6a-afea-6960bf90b02b';
-        $M_NAME = 'Weissnat Kurtis';
+        $M_ID = '4f0da359-0f14-4913-93af-0a648cdf3cf9';
+        $M_NAME = 'Nicholas Runolfsdottir';
 
         $BK_URL = Getter::getUrl();
 

@@ -23,7 +23,8 @@ $this->registerJs("let M_ID = '{$M_ID}'; let M_NAME = '{$M_NAME}';", View::POS_H
             <?= Html::button(
                 FA::icon('cog')->size(FA::SIZE_LARGE)->fixedWidth(), [
                     'class' => 'btn btn-default btn-sm',
-                    'id' => 'btn-header-setting'
+                    'id' => 'btn-header-setting',
+                    'style' => 'visibility:hidden;'
                 ])
             ?>
 

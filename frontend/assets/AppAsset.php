@@ -52,5 +52,6 @@ class AppAsset extends AssetBundle
         'frontend\assets\FilepondFileValidateTypeAsset',
 
         'frontend\assets\Nanogallery2Asset',
+        'frontend\assets\HowlerAsset',
     ];
 }

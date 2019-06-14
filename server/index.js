@@ -163,7 +163,7 @@ io.of('/simple')
             io.of('/simple').in(cId).emit('chat', payload)
 
             // @TODO: Send to notif to browser.
-            webPush.sendNotification('', payload).catch(err => console.log(err))
+            // webPush.sendNotification('', payload).catch(err => console.log(err))
         })
     })
 
@@ -295,7 +295,7 @@ io.of('/group')
             io.of('/group').in(cId).emit('chat', payload)
 
             // @TODO: Send to notif to browser.
-            webPush.sendNotification('', payload).catch(err => console.log(err))
+            // webPush.sendNotification('', payload).catch(err => console.log(err))
         })
     })
 

@@ -74,7 +74,8 @@
         "npm-asset/filepond-plugin-file-rename": "~1.1.4",
         "npm-asset/filepond-plugin-file-validate-size": "@dev",
 
-        "npm-asset/nanogallery2": "~2.4.2"
+        "npm-asset/nanogallery2": "~2.4.2",
+        "npm-asset/howler": "~2.1.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

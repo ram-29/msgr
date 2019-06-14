@@ -47,14 +47,14 @@ class ThreadController extends \yii\rest\ActiveController
         $model->load($params, '');
 
         // Check if has thread for type "simple";
-        if($params['type'] == 'SIMPLE') {
-            if(\array_key_exists('members', $params)) {
-                $threadMember = new \common\models\ThreadMember();    
-                $hasThread = $threadMember->findThreadByMember($params['members'][0], $params['members'][1]);
+        // if($params['type'] == 'SIMPLE') {
+        //     if(\array_key_exists('members', $params)) {
+        //         $threadMember = new \common\models\ThreadMember();    
+        //         $hasThread = $threadMember->findThreadByMember($params['members'][0], $params['members'][1]);
 
-                return $hasThread;
-            }
-        }
+        //         return $hasThread;
+        //     }
+        // }
 
         // Create Thread.
         $model->setAttrs();
