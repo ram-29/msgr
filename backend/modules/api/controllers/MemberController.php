@@ -21,18 +21,12 @@ class MemberController extends \yii\rest\ActiveController
                 'application/json' => \yii\web\Response::FORMAT_JSON,
             ],
         ];
-
-        // add CORS filter
+        
         $behaviors['corsFilter'] = [
-            'class' => '\yii\filters\Cors',
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-            ],
+            'class' => \yii\filters\Cors::className(),
         ];
 
-		return $behaviors;
+        return $behaviors;
     }
 
     /**

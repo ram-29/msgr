@@ -8,6 +8,7 @@ use common\helpers\Logger;
 class ThreadController extends \yii\rest\ActiveController
 {
     public $modelClass = 'common\models\Thread';
+    
     /**
      * {@inheritdoc}
      */
@@ -20,11 +21,14 @@ class ThreadController extends \yii\rest\ActiveController
                 'application/json' => \yii\web\Response::FORMAT_JSON,
             ],
         ];
+
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
         ];
+
         return $behaviors;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -35,6 +39,7 @@ class ThreadController extends \yii\rest\ActiveController
         
         return $actions;
     }
+
     /**
      * {@inheritdoc}
      */

@@ -1,4 +1,11 @@
-const SOCKET_URL = `http://localhost:1337`
+const SOCKET_HTTP_URL = `http://localhost:1337`
+const SOCKET_HTTPS_URL = `http://localhost:7331`
+
+const FR_HTTP_URL = `http://fr.msgr.io`
+const BK_HTTP_URL = `http://bk.msgr.io`
+
+const FR_HTTPS_URL = `https://fr.msgr.io`
+const BK_HTTPS_URL = `https://bk.msgr.io`
 
 let btnHeaderSetting,
     btnHeaderMessage,
@@ -158,10 +165,18 @@ const initUI = el => {
     contentChatboxInput.children[1].style.visibility = 'visible'
 }
 
+const playSound = uId => {
+    if (M_ID !== uId) {
+        const sound = new Howl({ src: [`${FR_HTTPS_URL}/audio/notif.mp3` ]})
+        sound.play()
+    }
+}
+
 const initConn = (M_ID, M_NAME) => {
     const query = buildURLQuery({ id: M_ID, name: M_NAME })
 
-    SIMPLE = io(`${SOCKET_URL}/simple`, { query })
+    SIMPLE = io(`${SOCKET_HTTP_URL}/simple`, { query, secure: true })
+
     SIMPLE.on('connect', _ => {
         console.log(`You connected to Private Messaging`)
     })
@@ -196,6 +211,7 @@ const initConn = (M_ID, M_NAME) => {
         cMsg.textContent = strTruncate(message, 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        playSound(uId)
     })
 
     SIMPLE.on('file', async data => {
@@ -228,7 +244,7 @@ const initConn = (M_ID, M_NAME) => {
             const tabImage = $('#tab-image')
             tabImage.nanogallery2('destroy')
     
-            const mImages = await axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=images`)
+            const mImages = await axios.get(`${BK_HTTPS_URL}/api/thread/${mConn.cId}?expand=images`)
             tabImage.nanogallery2({
                 items: mImages.data.images.map(msg => {
                     if(msg.file_path) {
@@ -247,7 +263,7 @@ const initConn = (M_ID, M_NAME) => {
             const tabDocs = $('#tab-docs')
             tabDocs.html('')
     
-            const mDocs = await axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=docs`)
+            const mDocs = await axios.get(`${BK_HTTPS_URL}/api/thread/${mConn.cId}?expand=docs`)
             mDocs.data.docs.map(doc => {
                 tabDocs.append(`
                     <li style="margin: 1rem 0;">
@@ -270,7 +286,7 @@ const initConn = (M_ID, M_NAME) => {
 
     /////------- GROUP -------/////
 
-    GROUP = io(`${SOCKET_URL}/group`, { query })
+    GROUP = io(`${SOCKET_HTTP_URL}/group`, { query })
     GROUP.on('connect', _ => {
         console.log(`You connected to Group Messaging`)
     })
@@ -303,7 +319,7 @@ const initConn = (M_ID, M_NAME) => {
 const renderUI = async (cId) => {
     if (contentChatboxList.children.length == 1) {
 
-        const mMsg = await axios.get(`${BK_URL}/api/thread/${cId}?expand=messages`)
+        const mMsg = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=messages`)
         mMsg.data.messages.map(msg => {
             
             let template
@@ -369,7 +385,7 @@ const renderUI = async (cId) => {
         const tabImage = $('#tab-image')
         tabImage.nanogallery2('destroy')
 
-        const mImages = await axios.get(`${BK_URL}/api/thread/${cId}?expand=images`)
+        const mImages = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=images`)
         tabImage.nanogallery2({
             items: mImages.data.images.map(msg => {
                 if(msg.file_path) {
@@ -387,7 +403,7 @@ const renderUI = async (cId) => {
         const tabDocs = $('#tab-docs')
         tabDocs.html('')
 
-        const mDocs = await axios.get(`${BK_URL}/api/thread/${cId}?expand=docs`)
+        const mDocs = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=docs`)
         mDocs.data.docs.map(doc => {
             tabDocs.append(`
                 <li style="margin: 1rem 0;">
@@ -463,7 +479,6 @@ const chatConfirm = params => {
         .previousElementSibling.children[1].children[0]
     const img = params.parentElement
     .previousElementSibling.children[0]
-    
 
     const mId = h4.dataset.id
     const mName = h4.textContent
@@ -474,8 +489,8 @@ const chatConfirm = params => {
         { member_id: mId, role: 'MEMBER' }
     ]
 
-    // Send request
-    axios.post(`${BK_URL}/api/thread`, {
+    // // Send request
+    axios.post(`${BK_HTTPS_URL}/api/thread`, {
         type: 'SIMPLE',
         name: `${M_NAME}:${mName}`,
         members: mMembers
@@ -548,7 +563,7 @@ const groupConfirm = params => {
                 showLoaderOnConfirm: true,
                 preConfirm: grpName => {
                     if(grpName) {
-                        return fetch(`${BK_URL}/api/thread`, {
+                        return fetch(`${BK_HTTPS_URL}/api/thread`, {
                             method: 'POST',
                             body: JSON.stringify({ 
                                 type: 'GROUP',
@@ -591,6 +606,23 @@ const groupConfirm = params => {
 }
 
 document.addEventListener('DOMContentLoaded', async _ => {
+
+    if('serviceWorker' in navigator) {
+        console.log('Registering service worker ..')
+
+        const register = await navigator.serviceWorker.register(`${FR_HTTPS_URL}/js/base/worker.js`)
+        const subscription = await register.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(PUB_VAPID_KEY)
+        })
+
+        console.log(subscription)
+
+        // axios.post(`${SOCKET_HTTP_URL}/msgr`, { subscription })
+
+    } else {
+        console.log('No service worker found ..')
+    }
 
     FilePond.registerPlugin(
         FilePondPluginImageCrop,
@@ -664,7 +696,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     })
 
     if(M_ID && M_NAME) {
-        axios.get(`${BK_URL}/api/member/${M_ID}?expand=threads`).then(resp => {
+        axios.get(`${BK_HTTPS_URL}/api/member/${M_ID}?expand=threads`, { headers: {'Access-Control-Allow-Origin': '*'} }).then(resp => {
             const template = resp.data.threads.map(th => {
                 // Filter user list.
                 Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
@@ -680,7 +712,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 return `
                     <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
                         <div class="msgr-sidebar-list-item-content">
-                            <img class="img-circle" src="/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
+                            <img class="img-circle" src="${FR_HTTPS_URL}/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
                             <div class="msgr-sidebar-list-item-content-details">
                                 <h4 style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold;' : 'normal;'}">${th.name}</h4>
                                 <p style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold; color:#000;' : 'normal;'}">${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>

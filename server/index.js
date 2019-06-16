@@ -1,5 +1,7 @@
+const http = require('http')
 const path = require('path')
 const cors = require('cors')
+const https = require('https')
 const fs = require('fs-extra')
 const axios = require('axios')
 const uuid = require('uuid/v4')
@@ -7,14 +9,14 @@ const morgan = require('morgan')
 const moment = require('moment')
 const express = require('express')
 const webPush = require('web-push')
+const socket = require('socket.io')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
 const siofu = require('socketio-file-upload')
-const thumb = require('node-thumbnail').thumb
 const sharedsession = require('express-socket.io-session')
 
-const pubVapidKey = 'BJEwuKSfuPqPqre3WU4mebqobg51_7RGH33f3wPSrjm1VOUzIHAS5op9Ia2usNrK8hmGm_f1klXIl-JJd3cClO0'
-const priVapidKey = 'UbzsbwwqAsKbUloLj3Ym5TbQLGp_qS3sE791ba0ublY'
+const pubVapidKey = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ'
+const priVapidKey = 'X50nQm5JEHSGxGJ31mfMcuWyQy4yjnwxFV6TsYbjqqs'
 
 webPush.setVapidDetails('mailto:admin@msgr.io', pubVapidKey, priVapidKey)       
 
@@ -35,272 +37,287 @@ app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(bodyParser.urlencoded({ extended: false }))
 
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
+const httpServer = http.createServer(app)
+const httpsServer = https.createServer({
+    key: '', cert: ''
+}, app)
 
-// Change `BASE_URL` on production.
-const BK_URL = `http://localhost:80/msgr/backend/web`
-const FR_URL = `http://localhost:80/msgr/frontend/web`
+// Change `BASE_URLS` on production.
+const BK_HTTP_URL = `http://localhost:80/msgr/backend/web`
+const FR_HTTP_URL = `http://localhost:80/msgr/frontend/web`
 
-const PORT = process.env.PORT || 1337
+const BK_HTTPS_URL = `https://localhost:443/msgr/backend/web`
+const FR_HTTPS_URL = `https://localhost:443/msgr/frontend/web`
 
-server.listen(PORT, _ => { console.log(`Server running on port ${PORT}.`) })
+const HTTP_PORT = 1337
+const HTTPS_PORT = 7331
 
-// Private Messaging
-io.of('/simple')
-    .use(sharedsession(session, { autoSave: true }))
-    .on('connection', simple => {
+httpServer.listen(HTTP_PORT, _ => { console.log(`Http server running on port ${HTTP_PORT}.`) })
+httpsServer.listen(HTTPS_PORT, _ => { console.log(`Https server running on port ${HTTPS_PORT}.`) })
 
-    // User id & name.
-    const { id, name } = simple.handshake.query
+// Initialize socket connection.
+initConn(httpServer)
+initConn(httpsServer)
 
-    // File Upload listener
-    const sUploader = new siofu()
-    sUploader.dir = '../frontend/web/files';
-    sUploader.listen(simple)
+function initConn(mServer) {
+    const io = socket.listen(mServer)
 
-    sUploader.on('start', event => {
-		if (/\.exe$/.test(event.file.name)) {
-			console.log(`Aborting: ${event.file.id}`)
-			sUploader.abort(event.file.id, socket)
-		}
-	})
+    // Private Messaging
+    io.of('/simple')
+        .use(sharedsession(session, { autoSave: true }))
+        .on('connection', simple => {
 
-    sUploader.on('saved', event => {
-        // Filename.
-        let fName = path.basename(event.file.pathName)
-        let mName = `${uuid() + path.parse(fName).ext}`
+        // User id & name.
+        const { id, name } = simple.handshake.query
 
-        // Create Directory.
-        let mDir = `../frontend/web/files/${event.file.meta.threadId}`
-        !fs.existsSync(mDir) && fs.mkdirSync(mDir)
+        // File Upload listener
+        const sUploader = new siofu()
+        sUploader.dir = '../frontend/web/files';
+        sUploader.listen(simple)
 
-        mDir = event.file.meta.fileType.includes('image') ?
-            `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
-
-        // Move File.
-        fs.move(event.file.pathName, mDir, err => {
-            if (err) return console.log(err)
-        })
-
-        // Request to yii backend db server.
-        axios.post(`${BK_URL}/api/thread-message`, { 
-            thread_id: event.file.meta.threadId,
-            member_id: event.file.meta.memberId,
-            text: null,
-            file: mDir,
-            file_name: fName,
-            file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
-            created_at: event.file.meta.createdAt
-        })
-        .then(async _ => {
-            if(event.file.meta.fileType.includes('image')) {
-                // Generate thumbnail
-                const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
-                !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
-
-                await thumb({
-                    source: mDir,
-                    destination: mThumb,
-                    quiet: true,
-                    width: 250,
-                    suffix: '-thumb',
-                })
-
-                // Emit back to client : IMAGE
-                const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
-                io.of('/simple').in(event.file.meta.threadId).emit('file', {
-                    member_id: event.file.meta.memberId, 
-                    filename: fName,
-                    filepath: mFilePath,
-                    type: 'image',
-                    created_at: event.file.meta.createdAt,
-                })
-            } else {
-                // Emit back to client = DOCS
-                io.of('/simple').in(event.file.meta.threadId).emit('file', {
-                    member_id: event.file.meta.memberId, 
-                    filename: fName,
-                    filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}`,
-                    type: 'docs',
-                    created_at: event.file.meta.createdAt,
-                })
+        sUploader.on('start', event => {
+            if (/\.exe$/.test(event.file.name)) {
+                console.log(`Aborting: ${event.file.id}`)
+                sUploader.abort(event.file.id, simple)
             }
         })
-        .catch(err => console.log(err.response))
-	})
 
-    sUploader.on('error', data => {
-		console.log(`Error: ${data.memo}`)
-		console.log(data.error)
-    })
+        sUploader.on('saved', event => {
+            // Filename.
+            let fName = path.basename(event.file.pathName)
+            let mName = `${uuid() + path.parse(fName).ext}`
 
-    // Join Room Handler
-    simple.on('join-room', room => {
-        simple.join(room.id)
-        console.log(`${name} has joined PM: ${room.id}`)
-    })
+            // Create Directory.
+            let mDir = `../frontend/web/files/${event.file.meta.threadId}`
+            !fs.existsSync(mDir) && fs.mkdirSync(mDir)
 
-    // Chat handler
-    simple.on('chat', ({ cId, uId, message, timestamp }) => {
+            mDir = event.file.meta.fileType.includes('image') ?
+                `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
 
-        axios.post(`${BK_URL}/api/thread-message`, {
-            thread_id: cId,
-            member_id: uId,
-            text: message,
-            file: null,
-            file_name: null,
-            file_type: null,
-            created_at: timestamp
-        }).then(mMsg => {
-
-            const payload = JSON.stringify({
-                uId,
-                message,
-                timestamp: moment(timestamp).format('MMM D, YYYY h:mm a')
+            // Move File.
+            fs.move(event.file.pathName, mDir, err => {
+                if (err) return console.log(err)
             })
 
-            io.of('/simple').in(cId).emit('chat', payload)
+            // Request to yii backend db server.
+            axios.post(`${BK_HTTP_URL}/api/thread-message`, { 
+                thread_id: event.file.meta.threadId,
+                member_id: event.file.meta.memberId,
+                text: null,
+                file: mDir,
+                file_name: fName,
+                file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
+                created_at: event.file.meta.createdAt
+            })
+            .then(async _ => {
+                if(event.file.meta.fileType.includes('image')) {
+                    // Generate thumbnail
+                    const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
+                    !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
 
-            // @TODO: Send to notif to browser.
-            // webPush.sendNotification('', payload).catch(err => console.log(err))
+                    await thumb({
+                        source: mDir,
+                        destination: mThumb,
+                        quiet: true,
+                        width: 250,
+                        suffix: '-thumb',
+                    })
+
+                    // Emit back to client : IMAGE
+                    const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
+                    io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                        member_id: event.file.meta.memberId, 
+                        filename: fName,
+                        filepath: mFilePath,
+                        type: 'image',
+                        created_at: event.file.meta.createdAt,
+                    })
+                } else {
+                    // Emit back to client = DOCS
+                    io.of('/simple').in(event.file.meta.threadId).emit('file', {
+                        member_id: event.file.meta.memberId, 
+                        filename: fName,
+                        filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}`,
+                        type: 'docs',
+                        created_at: event.file.meta.createdAt,
+                    })
+                }
+            })
+            .catch(err => console.log(err.response))
+        })
+
+        sUploader.on('error', data => {
+            console.log(`Error: ${data.memo}`)
+            console.log(data.error)
+        })
+
+        // Join Room Handler
+        simple.on('join-room', room => {
+            simple.join(room.id)
+            console.log(`${name} has joined PM: ${room.id}`)
+        })
+
+        // Chat handler
+        simple.on('chat', ({ cId, uId, message, timestamp }) => {
+
+            axios.post(`${BK_HTTP_URL}/api/thread-message`, {
+                thread_id: cId,
+                member_id: uId,
+                text: message,
+                file: null,
+                file_name: null,
+                file_type: null,
+                created_at: timestamp
+            }).then(mMsg => {
+
+                const payload = JSON.stringify({
+                    uId,
+                    message,
+                    timestamp: moment(timestamp).format('MMM D, YYYY h:mm a')
+                })
+
+                io.of('/simple').in(cId).emit('chat', payload)
+
+                // @TODO: Send to notif to browser.
+                // webPush.sendNotification('', payload).catch(err => console.log(err))
+            }).catch(err => console.error(err))
+        })
+
+        // Disconnect Handler
+        simple.on('disconnect', _ => {
+            console.log(`${name} disconnected to PM`)
         })
     })
 
-    // Disconnect Handler
-    simple.on('disconnect', _ => {
-        console.log(`${name} disconnected to PM`)
-    })
-})
+    // Group Messaging
+    io.of('/group')
+        .use(sharedsession(session, { autoSave: true }))
+        .on('connection', group => {
 
-// Group Messaging
-io.of('/group')
-    .use(sharedsession(session, { autoSave: true }))
-    .on('connection', group => {
+        // User id & name.
+        const { id, name } = group.handshake.query
 
-    // User id & name.
-    const { id, name } = group.handshake.query
+        // File Upload listener
+        const gUploader = new siofu()
+        gUploader.dir = '../frontend/web/files';
+        gUploader.listen(group)
 
-    // File Upload listener
-    const gUploader = new siofu()
-    gUploader.dir = '../frontend/web/files';
-    gUploader.listen(group)
-
-    gUploader.on('start', event => {
-		if (/\.exe$/.test(event.file.name)) {
-			console.log(`Aborting: ${event.file.id}`)
-			gUploader.abort(event.file.id, socket)
-		}
-	})
-
-    gUploader.on('saved', event => {
-        // Filename.
-        let fName = path.basename(event.file.pathName)
-        let mName = `${uuid() + path.parse(fName).ext}`
-
-        // Create Directory.
-        let mDir = `../frontend/web/files/${event.file.meta.threadId}`
-        !fs.existsSync(mDir) && fs.mkdirSync(mDir)
-
-        mDir = event.file.meta.fileType.includes('image') ?
-            `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
-
-        // Move File.
-        fs.move(event.file.pathName, mDir, err => {
-            if (err) return console.log(err)
-        })
-
-        // Request to yii backend db server.
-        axios.post(`${BK_URL}/api/thread-message`, { 
-            thread_id: event.file.meta.threadId,
-            member_id: event.file.meta.memberId,
-            text: null,
-            file: mDir,
-            file_name: fName,
-            file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
-            created_at: event.file.meta.createdAt
-        })
-        .then(async _ => {
-            if(event.file.meta.fileType.includes('image')) {
-                // Generate thumbnail
-                const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
-                !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
-
-                await thumb({
-                    source: mDir,
-                    destination: mThumb,
-                    quiet: true,
-                    width: 250,
-                    suffix: '-thumb',
-                })
-
-                // Emit back to client : IMAGE
-                const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
-                io.of('/group').in(event.file.meta.threadId).emit('file', {
-                    member_id: event.file.meta.memberId, 
-                    filename: fName,
-                    filepath: mFilePath,
-                    type: 'image',
-                    created_at: event.file.meta.createdAt,
-                })
-            } else {
-                // Emit back to client = DOCS
-                io.of('/group').in(event.file.meta.threadId).emit('file', {
-                    member_id: event.file.meta.memberId, 
-                    filename: fName,
-                    filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_URL)}`,
-                    type: 'docs',
-                    created_at: event.file.meta.createdAt,
-                })
+        gUploader.on('start', event => {
+            if (/\.exe$/.test(event.file.name)) {
+                console.log(`Aborting: ${event.file.id}`)
+                gUploader.abort(event.file.id, group)
             }
         })
-        .catch(err => console.log(err.response))
-	})
 
-    gUploader.on('error', data => {
-		console.log(`Error: ${data.memo}`)
-		console.log(data.error)
-    })
-    
-    // Upload Image Handler
-    group.on('upload-img', data => {
-        console.log(data)
-    })
+        gUploader.on('saved', event => {
+            // Filename.
+            let fName = path.basename(event.file.pathName)
+            let mName = `${uuid() + path.parse(fName).ext}`
 
-    // Join Room Handler
-    group.on('join-room', room => {
-        group.join(room.id)
-        console.log(`${name} has joined GM: ${room.id}`)
-    })
+            // Create Directory.
+            let mDir = `../frontend/web/files/${event.file.meta.threadId}`
+            !fs.existsSync(mDir) && fs.mkdirSync(mDir)
 
-    // Chat handler
-    group.on('chat', ({ cId, uId, message, timestamp }) => {
+            mDir = event.file.meta.fileType.includes('image') ?
+                `${mDir}/image/${mName}` : `${mDir}/docs/${mName}`
 
-        axios.post(`${BK_URL}/api/thread-message`, {
-            thread_id: cId,
-            member_id: uId,
-            text: message,
-            file: null,
-            file_name: null,
-            file_type: null,
-            created_at: timestamp
-        }).then(mMsg => {
-
-            const payload = JSON.stringify({
-                uId,
-                message,
-                timestamp: moment(timestamp).format('MMM D, YYYY h:mm a')
+            // Move File.
+            fs.move(event.file.pathName, mDir, err => {
+                if (err) return console.log(err)
             })
 
-            io.of('/group').in(cId).emit('chat', payload)
+            // Request to yii backend db server.
+            axios.post(`${BK_HTTP_URL}/api/thread-message`, { 
+                thread_id: event.file.meta.threadId,
+                member_id: event.file.meta.memberId,
+                text: null,
+                file: mDir,
+                file_name: fName,
+                file_type: event.file.meta.fileType.includes('image') ? 'image' : 'docs',
+                created_at: event.file.meta.createdAt
+            })
+            .then(async _ => {
+                if(event.file.meta.fileType.includes('image')) {
+                    // Generate thumbnail
+                    const mThumb = mDir.replace(/\/[^\/]*$/, '/thumb')
+                    !fs.existsSync(mThumb) && fs.mkdirSync(mThumb)
 
-            // @TODO: Send to notif to browser.
-            // webPush.sendNotification('', payload).catch(err => console.log(err))
+                    await thumb({
+                        source: mDir,
+                        destination: mThumb,
+                        quiet: true,
+                        width: 250,
+                        suffix: '-thumb',
+                    })
+
+                    // Emit back to client : IMAGE
+                    const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
+                    io.of('/group').in(event.file.meta.threadId).emit('file', {
+                        member_id: event.file.meta.memberId, 
+                        filename: fName,
+                        filepath: mFilePath,
+                        type: 'image',
+                        created_at: event.file.meta.createdAt,
+                    })
+                } else {
+                    // Emit back to client = DOCS
+                    io.of('/group').in(event.file.meta.threadId).emit('file', {
+                        member_id: event.file.meta.memberId, 
+                        filename: fName,
+                        filepath: `${mDir.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}`,
+                        type: 'docs',
+                        created_at: event.file.meta.createdAt,
+                    })
+                }
+            })
+            .catch(err => console.log(err.response))
+        })
+
+        gUploader.on('error', data => {
+            console.log(`Error: ${data.memo}`)
+            console.log(data.error)
+        })
+        
+        // Upload Image Handler
+        group.on('upload-img', data => {
+            console.log(data)
+        })
+
+        // Join Room Handler
+        group.on('join-room', room => {
+            group.join(room.id)
+            console.log(`${name} has joined GM: ${room.id}`)
+        })
+
+        // Chat handler
+        group.on('chat', ({ cId, uId, message, timestamp }) => {
+
+            axios.post(`${BK_HTTP_URL}/api/thread-message`, {
+                thread_id: cId,
+                member_id: uId,
+                text: message,
+                file: null,
+                file_name: null,
+                file_type: null,
+                created_at: timestamp
+            }).then(mMsg => {
+
+                const payload = JSON.stringify({
+                    uId,
+                    message,
+                    timestamp: moment(timestamp).format('MMM D, YYYY h:mm a')
+                })
+
+                io.of('/group').in(cId).emit('chat', payload)
+
+                // @TODO: Send to notif to browser.
+                // webPush.sendNotification('', payload).catch(err => console.log(err))
+            }).catch(err => console.error(err))
+        })
+
+        // Disconnect Handler
+        group.on('disconnect', _ => {
+            console.log(`${name} disconnected to GM`)
         })
     })
-
-    // Disconnect Handler
-    group.on('disconnect', _ => {
-        console.log(`${name} disconnected to GM`)
-    })
-})
+}

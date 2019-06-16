@@ -18,6 +18,7 @@ class AppAsset extends AssetBundle
     ];
 
     public $js = [
+        'js/base/worker.js',
         'js/base/default.js'
     ];
     

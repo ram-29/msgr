@@ -60,8 +60,9 @@ class MsgrController extends Controller
         // 0bc08464-87b4-4c6a-afea-6960bf90b02b : Weissnat Kurtis
         // 17626558-9d93-420d-9b3e-4234a80859dc : Howell Ervin
 
-        $M_ID = '4f0da359-0f14-4913-93af-0a648cdf3cf9';
-        $M_NAME = 'Nicholas Runolfsdottir';
+        $M_ID = '0bc08464-87b4-4c6a-afea-6960bf90b02b';
+        $M_NAME = 'Weissnat Kurtis';
+        $PUB_VAPID_KEY = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ';
 
         $BK_URL = Getter::getUrl();
 
@@ -70,7 +71,7 @@ class MsgrController extends Controller
             ->get("{$BK_URL}/api/member")
             ->send()->getData();
 
-        return $this->render('index', compact("members", "M_ID", "M_NAME"));
+        return $this->render('index', compact("members", "M_ID", "M_NAME", "PUB_VAPID_KEY"));
     }
 
     /**
