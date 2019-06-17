@@ -167,7 +167,7 @@ const initUI = el => {
 
 const playSound = uId => {
     if (M_ID !== uId) {
-        const sound = new Howl({ src: [`${FR_HTTPS_URL}/audio/notif.mp3` ]})
+        const sound = new Howl({ src: [`${FR_HTTP_URL}/audio/notif.mp3` ]})
         sound.play()
     }
 }
@@ -244,7 +244,7 @@ const initConn = (M_ID, M_NAME) => {
             const tabImage = $('#tab-image')
             tabImage.nanogallery2('destroy')
     
-            const mImages = await axios.get(`${BK_HTTPS_URL}/api/thread/${mConn.cId}?expand=images`)
+            const mImages = await axios.get(`${BK_HTTP_URL}/api/thread/${mConn.cId}?expand=images`)
             tabImage.nanogallery2({
                 items: mImages.data.images.map(msg => {
                     if(msg.file_path) {
@@ -263,7 +263,7 @@ const initConn = (M_ID, M_NAME) => {
             const tabDocs = $('#tab-docs')
             tabDocs.html('')
     
-            const mDocs = await axios.get(`${BK_HTTPS_URL}/api/thread/${mConn.cId}?expand=docs`)
+            const mDocs = await axios.get(`${BK_HTTP_URL}/api/thread/${mConn.cId}?expand=docs`)
             mDocs.data.docs.map(doc => {
                 tabDocs.append(`
                     <li style="margin: 1rem 0;">
@@ -277,6 +277,7 @@ const initConn = (M_ID, M_NAME) => {
         cMsg.textContent = strTruncate((type === 'image' ? 'You sent an image.' : 'You sent a document.'), 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        playSound(member_id)
     })
 
     SIMPLE.on('disconnect', _ => {
@@ -319,7 +320,7 @@ const initConn = (M_ID, M_NAME) => {
 const renderUI = async (cId) => {
     if (contentChatboxList.children.length == 1) {
 
-        const mMsg = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=messages`)
+        const mMsg = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=messages`)
         mMsg.data.messages.map(msg => {
             
             let template
@@ -385,7 +386,7 @@ const renderUI = async (cId) => {
         const tabImage = $('#tab-image')
         tabImage.nanogallery2('destroy')
 
-        const mImages = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=images`)
+        const mImages = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=images`)
         tabImage.nanogallery2({
             items: mImages.data.images.map(msg => {
                 if(msg.file_path) {
@@ -403,7 +404,7 @@ const renderUI = async (cId) => {
         const tabDocs = $('#tab-docs')
         tabDocs.html('')
 
-        const mDocs = await axios.get(`${BK_HTTPS_URL}/api/thread/${cId}?expand=docs`)
+        const mDocs = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=docs`)
         mDocs.data.docs.map(doc => {
             tabDocs.append(`
                 <li style="margin: 1rem 0;">
@@ -490,7 +491,7 @@ const chatConfirm = params => {
     ]
 
     // // Send request
-    axios.post(`${BK_HTTPS_URL}/api/thread`, {
+    axios.post(`${BK_HTTP_URL}/api/thread`, {
         type: 'SIMPLE',
         name: `${M_NAME}:${mName}`,
         members: mMembers
@@ -563,7 +564,7 @@ const groupConfirm = params => {
                 showLoaderOnConfirm: true,
                 preConfirm: grpName => {
                     if(grpName) {
-                        return fetch(`${BK_HTTPS_URL}/api/thread`, {
+                        return fetch(`${BK_HTTP_URL}/api/thread`, {
                             method: 'POST',
                             body: JSON.stringify({ 
                                 type: 'GROUP',
@@ -605,23 +606,40 @@ const groupConfirm = params => {
     })
 }
 
+const checkSWSupport = _ => {
+    let isSupported = true
+
+    if (!('serviceWorker' in navigator)) {
+        console.error('No Service Worker support!')
+        isSupported = false
+    }
+
+    if (!('PushManager' in window)) {
+        console.error('No Push API Support!')
+        isSupported = false
+    }
+
+    return isSupported
+}
+
 document.addEventListener('DOMContentLoaded', async _ => {
 
-    if('serviceWorker' in navigator) {
+    if(checkSWSupport()) {
         console.log('Registering service worker ..')
 
-        const register = await navigator.serviceWorker.register(`${FR_HTTPS_URL}/js/base/worker.js`)
-        const subscription = await register.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(PUB_VAPID_KEY)
-        })
+        const register = await navigator.serviceWorker
+            .register(`${FR_HTTP_URL}/js/base/worker.js`)
+            .catch(err => console.error(err))
 
-        console.log(subscription)
+        const subscription = await register.pushManager
+            .subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(PUB_VAPID_KEY)
+            })
+            .catch(err => console.error(err))
 
+        // @TODO: Handle this on backend.
         // axios.post(`${SOCKET_HTTP_URL}/msgr`, { subscription })
-
-    } else {
-        console.log('No service worker found ..')
     }
 
     FilePond.registerPlugin(
@@ -696,7 +714,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
     })
 
     if(M_ID && M_NAME) {
-        axios.get(`${BK_HTTPS_URL}/api/member/${M_ID}?expand=threads`, { headers: {'Access-Control-Allow-Origin': '*'} }).then(resp => {
+        axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads`, { headers: {'Access-Control-Allow-Origin': '*'} }).then(resp => {
             const template = resp.data.threads.map(th => {
                 // Filter user list.
                 Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
@@ -712,7 +730,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 return `
                     <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
                         <div class="msgr-sidebar-list-item-content">
-                            <img class="img-circle" src="${FR_HTTPS_URL}/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
+                            <img class="img-circle" src="${FR_HTTP_URL}/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
                             <div class="msgr-sidebar-list-item-content-details">
                                 <h4 style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold;' : 'normal;'}">${th.name}</h4>
                                 <p style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold; color:#000;' : 'normal;'}">${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>

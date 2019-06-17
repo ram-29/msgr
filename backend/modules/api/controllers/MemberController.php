@@ -80,6 +80,9 @@ class MemberController extends \yii\rest\ActiveController
         return $model;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function actionId()
     {
 
@@ -96,6 +99,25 @@ class MemberController extends \yii\rest\ActiveController
             return $model;
         } else {
             return $details;
-        }   
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actionUnread($id)
+    {
+        $model = \common\models\Member::findOne(['intranet_id' => $id]);
+
+        $BK_HTTP_URL = 'http://bk.msgr.io';
+        $BK_HTTPS_URL = 'https://bk.msgr.io';
+
+        if(!empty($model)) {
+            return (new  \yii\httpclient\Client())
+                ->get("{$BK_HTTP_URL}/api/member/{$model->id}?expand=unread_count")
+                ->send()->getData();
+        }
+
+        return new \yii\web\NotFoundHttpException('The requested page does not exist.');
     }
 }

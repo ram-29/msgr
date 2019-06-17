@@ -60,9 +60,13 @@ return [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/member', 'pluralize' => false,
                     'extraPatterns' => [
                         'POST id' => 'id',
+                        'GET unread' => 'unread',
                     ],
-                 'tokens' => ['{id}' => '<id:[\w-]+>']],
-
+                    'tokens' => [
+                        '{id}' => '<id:[\w-]+>',
+                        '{unread}' => '<id:[\w-]+>',
+                    ]
+                ],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-member', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
 
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/thread-global-config', 'pluralize' => false, 'tokens' => ['{id}' => '<id:[\w-]+>']],
