@@ -106,7 +106,7 @@ class ThreadMember extends \yii\db\ActiveRecord
      */    
     public static function findThreadByMember($members) {
         
-        $thread = self::find()->select(['thread_id', 'member_id', 'nickname', 'thread.type'])->joinWith(['thread', 'member'])->where(['in', 'member_id', $members])->andWhere(['role' => 'MEMBER'])->andWhere(['type' => 'SIMPLE'])->one();
+        $thread = self::find()->select(['thread_id', 'member_id', 'nickname', 'thread.type', 'role'])->joinWith(['thread', 'member'])->where(['member_id' => $members[1]])->andWhere(['role' => 'MEMBER'])->andWhere(['type' => 'SIMPLE'])->one();
 
         if (!empty($thread)) {
             $data = [
@@ -119,5 +119,6 @@ class ThreadMember extends \yii\db\ActiveRecord
         } else {
             return null;
         }
+        return $thread;
     }      
 }

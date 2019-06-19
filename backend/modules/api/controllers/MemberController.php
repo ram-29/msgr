@@ -101,7 +101,16 @@ class MemberController extends \yii\rest\ActiveController
             $model->save();
             return $model;
         } else {
-            return $details;
+            $member = \common\models\Member::findOne($details->id);
+            $member->name = $model->name;
+            $member->gravatar = $model->gravatar;
+            $member->email = $model->email;
+            $member->mobile_phone = $model->mobile_phone;
+            $member->office = $model->office;
+            $member->save();
+            return $member;
         }   
+
+        return $model->gravatar;
     }
 }

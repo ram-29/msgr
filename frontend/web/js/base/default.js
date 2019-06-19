@@ -1,7 +1,6 @@
 (_ => {
     moment.createFromInputFallback = function(config) { config._d = new Date(config._i); }
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
-
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
     let offset = 1
@@ -34,7 +33,7 @@
                                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                                         </span>
 
-                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
                                             <img class="img-circle" src="${src}" alt="User image">
                                             <div class="msgr-main-content-chatbox-list-item-details-content">
                                                 <p>${msg.text}</p>
@@ -51,10 +50,10 @@
                                             <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
                                         </span>
 
-                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === id ? 'owner' : ''}">
+                                        <div class="msgr-main-content-chatbox-list-item-details ${msg.member_id === M_ID ? 'owner' : ''}">
                                             <img class="img-circle" src="${src}" alt="User image">
                                             <div class="msgr-main-content-chatbox-list-item-details-content">
-                                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color:#fff !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${msg.member_id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
                                             </div>
                                         </div>
                                     </div>

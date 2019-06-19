@@ -112,6 +112,7 @@ class Thread extends \yii\db\ActiveRecord
                         $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
                         $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
                         $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+                        $mFileThumb = $thMsg['file_type'] == 'image' ? $mFileThumb : null;
 
                         return [
                             'member_id' => $thMsg['member_id'],

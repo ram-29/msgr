@@ -55,10 +55,41 @@ class ThreadMessageController extends \yii\rest\ActiveController
         // Set attributes.
         $model->setAttrs();
         
-        // Save & return.
+        // Save ThreadMessage.
         $model->save();
 
-        return $model;
+        // Get Thread & ThreadMembers.
+        $mTh = \common\models\Thread::findOne($model->thread_id);
+        $mThMem = array_filter($mTh->threadMembers, function($mThm) use ($model) {
+            return $mThm['member_id'] !== $model->member_id;
+        });
+
+        // Add a ThreadMessageSeen.
+        foreach($mThMem as $mThmem) {
+            // Initialize a ThreadMessageSeen model.
+            $mThMsgSeen = new \common\models\ThreadMessageSeen();
+
+            // Set Attrs.
+            $mThMsgSeen->setAttrs();
+
+            // Save ThreadMessageSeen.
+            $mThMsgSeen->thread_message_id = $model->id;
+            $mThMsgSeen->member_id = $mThmem['member_id'];
+            $mThMsgSeen->seen_at = null;
+            $mThMsgSeen->save();
+        }
+
+        // Return model.
+        // $model->recipients = $mThMem;
+        $data = [
+            'thread_id' => $model->thread_id,
+            'text' => $model->text,
+            'member_id' => $model->member_id,
+            'id' => $model->id,
+            'recipients' => $mThMem
+        ];
+
+        return $data;
     }
 
 
@@ -136,9 +167,9 @@ class ThreadMessageController extends \yii\rest\ActiveController
             
             $directory_file = $path . $filename;
 
-            $model->file_name = '/web/files/'.$model->thread_id.'/documents/' . $filename;
+            $model->file_name = '../frontend/web/files/'.$model->thread_id.'/documents/' . $filename;
             $model->file_type = $upload->type;
-            $model->file = Yii::$app->homeUrl;
+            $model->file = $upload->name;
 
             $upload->saveAs($directory_file);  
 

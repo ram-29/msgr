@@ -22,7 +22,9 @@ use Yii;
  * @property ThreadMessageSeen[] $threadMessageSeens
  */
 class ThreadMessage extends \yii\db\ActiveRecord
-{
+{	
+
+	public $recipients;
     /**
      * {@inheritdoc}
      */
