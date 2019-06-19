@@ -21,9 +21,11 @@ class MemberController extends \yii\rest\ActiveController
                 'application/json' => \yii\web\Response::FORMAT_JSON,
             ],
         ];
+        
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
         ];
+        
         return $behaviors;
     }
 
@@ -47,8 +49,10 @@ class MemberController extends \yii\rest\ActiveController
         // Initalize a model.
         $model = new \common\models\Member();
         $model->load(\Yii::$app->request->post(), '');
+
         // Set attributes.
         $model->setAttrs();
+
         // Save & return.
         $model->save();
         return $model;

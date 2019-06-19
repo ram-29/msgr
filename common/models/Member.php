@@ -152,11 +152,11 @@ class Member extends \yii\db\ActiveRecord
                 // Sort by key.
                 \usort($mArr, function($a, $b) {
                     if((!empty($a['message']))) {
-                        return $a['message']['time'] + $b['message']['time'];
+                        return strtotime($a['message']['time']) - strtotime($b['message']['time']);
                     }
                 });
 
-                return \array_reverse($mArr);
+                return array_reverse($mArr);
             },
             'unread_count' => function($x) {
                 return array_sum(\yii\helpers\ArrayHelper::getColumn($x->threadMembers, function($thm) {
