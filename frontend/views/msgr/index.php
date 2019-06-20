@@ -193,7 +193,7 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#images" aria-controls="images" role="tab" data-toggle="tab">Images</a></li>
                         <li role="presentation"><a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a></li>
-                        <!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
+                        <li role="presentation"><a href="#about" aria-controls="about" role="tab" data-toggle="tab">About</a></li>
                     </ul>
                     
                     <div class="tab-content">
@@ -203,7 +203,10 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
                         <div role="tabpanel" class="tab-pane fade" id="files">
                             <ul id="tab-docs"></ul>
                         </div>
-                        <!-- <div role="tabpanel" class="tab-pane fade" id="settings">Settings</div> -->
+                        <div role="tabpanel" class="tab-pane fade" id="about">
+                            <div class="tab-about-header" style="display:flex; justify-content:center; align-items:center; flex-direction:column;"></div>
+                            <ul id="tab-about"></ul>
+                        </div>
                     </div>
                 </div>
             </div>

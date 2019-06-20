@@ -240,6 +240,7 @@ const initConn = (M_ID, M_NAME) => {
                 </div>
             </div>
         `
+
         if(type === 'image') {
             const tabImage = $('#tab-image')
             tabImage.nanogallery2('destroy')
@@ -261,17 +262,13 @@ const initConn = (M_ID, M_NAME) => {
 
         } else {
             const tabDocs = $('#tab-docs')
-            tabDocs.html('')
-    
-            const mDocs = await axios.get(`${BK_HTTP_URL}/api/thread/${mConn.cId}?expand=docs`)
-            mDocs.data.docs.map(doc => {
-                tabDocs.append(`
-                    <li style="margin: 1rem 0;">
-                        <a href="${doc.file_path}" target="_blank" style="text-decoration:underline;" title="${doc.file_name}">${doc.file_name}</a> <br/>
-                        <span class="label label-default">${moment(doc.created_at).format('MMM DD, YYYY hh:mm a')}</span>
-                    </li>
-                `)
-            })
+
+            tabDocs.append(`
+                <li style="margin: 1rem 0;">
+                    <a href="${filepath}" target="_blank" style="text-decoration:underline;" title="${filename}">${filename}</a> <br/>
+                    <span class="label label-default">${moment(created_at).format('MMM DD, YYYY hh:mm a')}</span>
+                </li>
+            `)
         }
 
         cMsg.textContent = strTruncate((type === 'image' ? 'You sent an image.' : 'You sent a document.'), 20)
@@ -319,6 +316,27 @@ const initConn = (M_ID, M_NAME) => {
 
 const renderUI = async (cId) => {
     if (contentChatboxList.children.length == 1) {
+
+        const tabAboutHeader = $('.tab-about-header')
+        const tabAbout = $('#tab-about')
+        
+        tabAboutHeader.empty()
+        tabAbout.empty()
+        
+        const req = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=members`)
+
+        if(req.data.type == 'GROUP') {
+            req.data.members.map(mMem => {
+                tabAbout.append(`
+                    <li>${mMem.name}</li>
+                `)
+            })
+        }
+
+        tabAboutHeader.append(`
+            <img class="img-circle" src="${contentChatboxHeaderImg.src}" alt="User image">
+            <h4>${contentChatboxHeaderDetailsH4.textContent}</h4>
+        `)
 
         const mMsg = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=messages`)
         mMsg.data.messages.map(msg => {
@@ -610,12 +628,12 @@ const checkSWSupport = _ => {
     let isSupported = true
 
     if (!('serviceWorker' in navigator)) {
-        console.error('No Service Worker support!')
+        console.warn('No Service Worker support!')
         isSupported = false
     }
 
     if (!('PushManager' in window)) {
-        console.error('No Push API Support!')
+        console.warn('No Push API Support!')
         isSupported = false
     }
 

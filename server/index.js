@@ -13,6 +13,7 @@ const socket = require('socket.io')
 const bodyParser = require('body-parser')
 const errorhandler = require('errorhandler')
 const siofu = require('socketio-file-upload')
+const thumb = require('node-thumbnail').thumb
 const sharedsession = require('express-socket.io-session')
 
 const pubVapidKey = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ'
@@ -121,7 +122,7 @@ function initConn(mServer) {
                         quiet: true,
                         width: 250,
                         suffix: '-thumb',
-                    })
+                    }).catch(err => console.log(err.response))
 
                     // Emit back to client : IMAGE
                     const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
