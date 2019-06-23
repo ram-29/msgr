@@ -24,6 +24,7 @@ class Thread extends \yii\db\ActiveRecord
     {
         return 'thread';
     }
+    
     /**
      * {@inheritdoc}
      */
@@ -37,6 +38,7 @@ class Thread extends \yii\db\ActiveRecord
             [['id'], 'unique'],
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -46,6 +48,7 @@ class Thread extends \yii\db\ActiveRecord
         $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
         parent::init();
     }
+
     /**
      * {@inheritdoc}
      */
@@ -54,6 +57,7 @@ class Thread extends \yii\db\ActiveRecord
         $mName = \common\helpers\Getter::getModelName($event->sender);
         \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -61,6 +65,7 @@ class Thread extends \yii\db\ActiveRecord
     {
         $this->id = \Ramsey\Uuid\Uuid::uuid4()->toString();
     }
+    
     /**
      * {@inheritdoc}
      */
@@ -72,6 +77,7 @@ class Thread extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -194,6 +200,7 @@ class Thread extends \yii\db\ActiveRecord
             }
         ];
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -201,6 +208,7 @@ class Thread extends \yii\db\ActiveRecord
     {
         return $this->hasOne(ThreadGlobalConfig::className(), ['id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -208,6 +216,7 @@ class Thread extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMember::className(), ['thread_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -215,6 +224,7 @@ class Thread extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMemberConfig::className(), ['thread_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */

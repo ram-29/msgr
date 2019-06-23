@@ -23,6 +23,7 @@ use common\helpers\Logger;
  */
 class Member extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -30,6 +31,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return 'member';
     }
+
     /**
      * {@inheritdoc}
      */
@@ -44,6 +46,7 @@ class Member extends \yii\db\ActiveRecord
             [['id'], 'unique'],
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -53,6 +56,7 @@ class Member extends \yii\db\ActiveRecord
         $this->on(self::EVENT_AFTER_UPDATE, [ $this, 'setFlash' ]);
         parent::init();
     }
+
     /**
      * {@inheritdoc}
      */
@@ -61,6 +65,7 @@ class Member extends \yii\db\ActiveRecord
         $mName = \common\helpers\Getter::getModelName($event->sender);
         \common\helpers\Getter::setFlash("{$mName} | {$event->sender->id}", $event->name);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -70,6 +75,7 @@ class Member extends \yii\db\ActiveRecord
         $this->joined_at = date("Y-m-d H:i:s", time());
         $this->logged_at = null;
     }
+    
     /**
      * {@inheritdoc}
      */
@@ -85,6 +91,7 @@ class Member extends \yii\db\ActiveRecord
             'logged_at' => 'Logged At',
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -173,9 +180,30 @@ class Member extends \yii\db\ActiveRecord
 
                     return 0;
                 }));
+            },
+            'threads_group' => function($x) {
+                $mMember = \common\models\Member::findOne($x->id);
+
+                if($mMember) {
+                    return array_filter(array_map(function($mThMember) {
+                        $mThMem = $mThMember->getThread()->where(['type' => 'GROUP'])->asArray()->one();
+                        if(!empty($mThMem)) {
+                            $mThMem['members'] = array_map(
+                                function($mMem) {
+                                    $mMem['id'] = $mMem['member_id'];
+                                    unset($mMem['thread_id']); unset($mMem['member_id']);
+                                    return $mMem;
+                                },
+                                \common\models\Thread::findOne($mThMem['id'])->getThreadMembers()->all()
+                            );
+                            return $mThMem;
+                        }
+                    }, $mMember->getThreadMembers()->all()));
+                }
             }
         ];
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -183,6 +211,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMember::className(), ['member_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -190,6 +219,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMemberConfig::className(), ['member_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -197,6 +227,7 @@ class Member extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ThreadMessage::className(), ['member_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */

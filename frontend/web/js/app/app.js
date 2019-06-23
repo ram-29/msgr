@@ -326,10 +326,10 @@ const renderUI = async (cId) => {
         const req = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=members`)
 
         if(req.data.type == 'GROUP') {
+            tabAbout.append(`<h4>Members</h4>`)
+
             req.data.members.map(mMem => {
-                tabAbout.append(`
-                    <li>${mMem.name}</li>
-                `)
+                tabAbout.append(`<li>${mMem.name} ${(mMem.id === M_ID) ? '(You)' : ''}</li>`)
             })
         }
 
@@ -569,7 +569,7 @@ const groupConfirm = params => {
             <br/>Add <strong>${mName}</strong> <br/>to an Existing Group
         `,
         cancelButtonAriaLabel: 'Add to an Existing Group',
-    }).then(res => {
+    }).then(async res => {
         if(res.value) {
             // New Group
             swal({
@@ -620,6 +620,14 @@ const groupConfirm = params => {
         } else {
             // Existing Group
             console.log('Existing Group')
+
+            const req = await axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads_group`)
+            const mArr = Object
+                .keys(req.data.threads_group)
+                .map(x => req.data.threads_group[x])
+                .filter(x => !(x.members.find(m => m.id === mId)))
+
+            console.log(mArr)
         }
     })
 }

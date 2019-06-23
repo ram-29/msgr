@@ -33,10 +33,10 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
             <h4><?= Yii::$app->name ?></h4>
 
             <?= Html::button(
-                FA::icon('pencil-square-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                FA::icon('sign-out')->size(FA::SIZE_LARGE)->fixedWidth(), [
                     'class' => 'btn btn-default btn-sm',
-                    'id' => 'btn-header-write-message',
-                    'style' => 'visibility:hidden;'
+                    'id' => 'btn-header-sign-out',
+                    // 'style' => 'visibility:hidden;'
                 ])
             ?>
         </div>
