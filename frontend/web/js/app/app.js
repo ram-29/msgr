@@ -622,12 +622,13 @@ const groupConfirm = params => {
             console.log('Existing Group')
 
             const req = await axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads_group`)
-            const mArr = Object
+            const mGroups = Object
                 .keys(req.data.threads_group)
                 .map(x => req.data.threads_group[x])
                 .filter(x => !(x.members.find(m => m.id === mId)))
+                .map(x => x.global_config.name)
 
-            console.log(mArr)
+            console.log(mGroups)
         }
     })
 }

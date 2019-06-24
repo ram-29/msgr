@@ -188,14 +188,19 @@ class Member extends \yii\db\ActiveRecord
                     return array_filter(array_map(function($mThMember) {
                         $mThMem = $mThMember->getThread()->where(['type' => 'GROUP'])->asArray()->one();
                         if(!empty($mThMem)) {
-                            $mThMem['members'] = array_map(
-                                function($mMem) {
-                                    $mMem['id'] = $mMem['member_id'];
-                                    unset($mMem['thread_id']); unset($mMem['member_id']);
-                                    return $mMem;
-                                },
-                                \common\models\Thread::findOne($mThMem['id'])->getThreadMembers()->all()
-                            );
+                            $mmTh = \common\models\Thread::findOne($mThMem['id']);
+
+                            $mmThConfig = $mmTh->getThreadGlobalConfig()->one();
+                            unset($mmThConfig['id']);
+
+                            $mThMem['global_config'] = $mmThConfig;
+                            
+                            $mThMem['members'] = array_map(function($mMem) {
+                                $mMem['id'] = $mMem['member_id'];
+                                unset($mMem['thread_id']); unset($mMem['member_id']);
+                                return $mMem;
+                            }, $mmTh->getThreadMembers()->all());
+
                             return $mThMem;
                         }
                     }, $mMember->getThreadMembers()->all()));
