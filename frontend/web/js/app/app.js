@@ -619,16 +619,44 @@ const groupConfirm = params => {
             })
         } else {
             // Existing Group
-            console.log('Existing Group')
-
             const req = await axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads_group`)
             const mGroups = Object
                 .keys(req.data.threads_group)
                 .map(x => req.data.threads_group[x])
                 .filter(x => !(x.members.find(m => m.id === mId)))
-                .map(x => x.global_config.name)
+                .map(x => ({ id: x.id, name: x.global_config.name }))
+                .reduce((acc, cur) => {
+                    acc[cur.id] = cur.name
+                    return acc
+                }, {})
 
-            console.log(mGroups)
+            if(!_.isEmpty(mGroups)) {
+                swal({
+                    title: 'Select an existing group ..',
+                    input: 'select',
+                    inputOptions: mGroups,
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                }).then(async res => {
+                    if(res.value) {
+                        const resp = await axios.post(`${BK_HTTP_URL}/api/thread-member`, {
+                            thread_id: res.value,
+                            member_id: mId,
+                            role: 'MEMBER'
+                        })
+
+                        if(resp.data) {
+                            // Rerender about
+                            tabAbout.append(`<li>${mName}}</li>`)
+                            
+                            // @TOOD: Emit to backend to notify.
+                            // GROUP.emit('join-chat-group', { id: cId })
+                        }
+
+                        console.log(resp.data)
+                    }
+                })
+            }
         }
     })
 }
