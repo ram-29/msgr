@@ -284,7 +284,8 @@ const initConn = (M_ID, M_NAME) => {
 
     /////------- GROUP -------/////
 
-    GROUP = io(`${SOCKET_HTTP_URL}/group`, { query })
+    GROUP = io(`${SOCKET_HTTP_URL}/group`, { query, secure: true })
+
     GROUP.on('connect', _ => {
         console.log(`You connected to Group Messaging`)
     })
@@ -292,20 +293,97 @@ const initConn = (M_ID, M_NAME) => {
     GROUP.on('chat', data => {
         const { uId, message, timestamp } = JSON.parse(data)
 
+        const src = contentChatboxHeaderImg.getAttribute('src')
+
+        const mDate = moment(timestamp).format('MMM DD, YYYY')
+        const mTime = moment(timestamp).format('hh:mm a')
+
+        const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
+        const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
+
         const template  = `
             <div class="msgr-main-content-chatbox-list-item">
-                <span>${timestamp}</span>
+                <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                    <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                    <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                </span>
 
                 <div class="msgr-main-content-chatbox-list-item-details ${uId === M_ID ? 'owner' : ''}">
-                    <img class="img-circle" src="/img/1.png" alt="User image">
+                    <img class="img-circle" src="${src}" alt="User image">
                     <div class="msgr-main-content-chatbox-list-item-details-content">
                         <p>${message.trim()}</p>
                     </div>
                 </div>
             </div>
         `
+
+        cMsg.textContent = strTruncate(message, 20)
         contentChatboxList.insertAdjacentHTML('beforeend', template)
         contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        playSound(uId)
+    })
+
+    GROUP.on('file', async data => {
+        const { member_id, filename, filepath, type, created_at } = data
+
+        const src = contentChatboxHeaderImg.getAttribute('src')
+
+        const mDate = moment(created_at).format('MMM DD, YYYY')
+        const mTime = moment(created_at).format('hh:mm a')
+
+        const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
+        const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
+
+        const template = `
+            <div class="msgr-main-content-chatbox-list-item">
+                <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                    <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span>
+                    <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                </span>
+
+                <div class="msgr-main-content-chatbox-list-item-details ${member_id === M_ID ? 'owner' : ''}">
+                    <img class="img-circle" src="${src}" alt="User image">
+                    <div class="msgr-main-content-chatbox-list-item-details-content">
+                        ${type === 'image' ? `<img src="${filepath}" alt="${filename}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${filepath}" target="_blank" style="color:#fff !important; text-decoration:underline;">${filename}</a></p>`}
+                    </div>
+                </div>
+            </div>
+        `
+
+        if(type === 'image') {
+            const tabImage = $('#tab-image')
+            tabImage.nanogallery2('destroy')
+    
+            const mImages = await axios.get(`${BK_HTTP_URL}/api/thread/${mConn.cId}?expand=images`)
+            tabImage.nanogallery2({
+                items: mImages.data.images.map(msg => {
+                    if(msg.file_path) {
+                        return {
+                            src: msg.file_path,
+                            srct: msg.file_thumb,
+                            title: msg.file_name
+                        }
+                    }
+                }),
+                thumbnailWidth: 'auto',
+                thumbnailHeight: 100,
+            })
+
+        } else {
+            const tabDocs = $('#tab-docs')
+
+            tabDocs.append(`
+                <li style="margin: 1rem 0;">
+                    <a href="${filepath}" target="_blank" style="text-decoration:underline;" title="${filename}">${filename}</a> <br/>
+                    <span class="label label-default">${moment(created_at).format('MMM DD, YYYY hh:mm a')}</span>
+                </li>
+            `)
+        }
+
+        cMsg.textContent = strTruncate((type === 'image' ? 'You sent an image.' : 'You sent a document.'), 20)
+        contentChatboxList.insertAdjacentHTML('beforeend', template)
+        contentChatboxList.parentNode.scrollTop = contentChatboxList.parentNode.scrollHeight
+        playSound(member_id)
     })
 
     GROUP.on('disconnect', _ => {
@@ -434,7 +512,7 @@ const renderUI = async (cId) => {
     }
 }
 
-let mConn = {};
+let mConn = {}
 const connect = async (el, cId, type) => {
 
     switch(type) {

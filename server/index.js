@@ -39,9 +39,7 @@ app.use(morgan('combined'))
 app.use(bodyParser.urlencoded({ extended: false }))
 
 const httpServer = http.createServer(app)
-const httpsServer = https.createServer({
-    key: '', cert: ''
-}, app)
+const httpsServer = https.createServer({ key: '', cert: '' }, app)
 
 // Change `BASE_URLS` on production.
 const BK_HTTP_URL = `http://localhost:80/msgr/backend/web`
@@ -58,18 +56,47 @@ httpsServer.listen(HTTPS_PORT, _ => { console.log(`Https server running on port 
 
 // Initialize socket connection.
 initConn(httpServer)
-initConn(httpsServer)
+// initConn(httpsServer)
 
 function initConn(mServer) {
     const io = socket.listen(mServer)
 
-    // Private Messaging
+    // Custom server code
+    io.on('connection', mSocket => {
+        
+        let USER_ID = {}
+        let DISPLAY_NAME = {}
+
+        const updateActiveUsers = _ => io.sockets.emit('online-users', Object.keys(DISPLAY_NAME))
+
+        mSocket.on('set-user', (data, cb) => {
+            if (data.user_id in USER_ID) {
+                cb(false)
+                mSocket.user_id = data.user_id
+                mSocket.name = data.name
+            } else {
+                cb(true)
+                mSocket.user_id = data.user_id
+                mSocket.name = data.name
+
+                USER_ID[mSocket.user_id] = mSocket
+                DISPLAY_NAME[mSocket.name] = mSocket.name
+
+                updateActiveUsers()
+            }
+        })
+
+    })
+
+    /////------- Private Messaging -------/////
+
     io.of('/simple')
         .use(sharedsession(session, { autoSave: true }))
         .on('connection', simple => {
 
         // User id & name.
         const { id, name } = simple.handshake.query
+        console.log(`${name} has connected to PM.`)
 
         // File Upload listener
         const sUploader = new siofu()
@@ -190,13 +217,15 @@ function initConn(mServer) {
         })
     })
 
-    // Group Messaging
+    /////------- Group Messaging -------/////
+
     io.of('/group')
         .use(sharedsession(session, { autoSave: true }))
         .on('connection', group => {
 
         // User id & name.
         const { id, name } = group.handshake.query
+        console.log(`${name} has connected to GM.`)
 
         // File Upload listener
         const gUploader = new siofu()
@@ -249,7 +278,7 @@ function initConn(mServer) {
                         quiet: true,
                         width: 250,
                         suffix: '-thumb',
-                    })
+                    }).catch(err => console.log(err.response))
 
                     // Emit back to client : IMAGE
                     const mFilePath = `${mThumb.replace(/(\.\.\/\w*\/\w*)/i, FR_HTTP_URL)}/${path.parse(mName).name}-thumb${path.parse(mName).ext}`
@@ -279,11 +308,6 @@ function initConn(mServer) {
             console.log(data.error)
         })
         
-        // Upload Image Handler
-        group.on('upload-img', data => {
-            console.log(data)
-        })
-
         // Join Room Handler
         group.on('join-room', room => {
             group.join(room.id)

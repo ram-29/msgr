@@ -36,7 +36,7 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
                 FA::icon('sign-out')->size(FA::SIZE_LARGE)->fixedWidth(), [
                     'class' => 'btn btn-default btn-sm',
                     'id' => 'btn-header-sign-out',
-                    // 'style' => 'visibility:hidden;'
+                    'style' => 'visibility:hidden;'
                 ])
             ?>
         </div>
