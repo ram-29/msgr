@@ -63,8 +63,8 @@ class MsgrController extends Controller
         // $M_ID = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf';
         // $M_NAME = 'Maria Powell';
 
-        // $M_ID = '';
-        // $M_NAME = '';
+        $M_ID = '';
+        $M_NAME = '';
 
         $PUB_VAPID_KEY = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ';
 
