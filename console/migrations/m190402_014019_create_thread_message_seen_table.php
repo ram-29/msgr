@@ -32,14 +32,14 @@ class m190402_014019_create_thread_message_seen_table extends Migration
             ], $tableOptions_mysql);
         }
         }
-         
-         
-        $this->createIndex('idx_thread_message_id_9736_00','thread_message_seen','thread_message_id',0);
-        $this->createIndex('idx_member_id_9736_01','thread_message_seen','member_id',0);
-         
+        
+        
+        $this->createIndex('idx_thread_message_id_6211_00','thread_message_seen','thread_message_id',0);
+        $this->createIndex('idx_member_id_6211_01','thread_message_seen','member_id',0);
+        
         $this->execute('SET foreign_key_checks = 0');
-        $this->addForeignKey('fk_thread_message_9733_00','{{%thread_message_seen}}', 'thread_message_id', '{{%thread_message}}', 'id', 'CASCADE', 'CASCADE' );
-        $this->addForeignKey('fk_member_9733_01','{{%thread_message_seen}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_member_6202_00','{{%thread_message_seen}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_thread_message_6203_01','{{%thread_message_seen}}', 'thread_message_id', '{{%thread_message}}', 'id', 'CASCADE', 'CASCADE' );
         $this->execute('SET foreign_key_checks = 1;');
     }
 

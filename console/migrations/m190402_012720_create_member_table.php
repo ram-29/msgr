@@ -26,15 +26,20 @@ class m190402_012720_create_member_table extends Migration
             $this->createTable('{{%member}}', [
                 'id' => 'CHAR(36) NOT NULL',
                 0 => 'PRIMARY KEY (`id`)',
-                'intranet_id' => 'VARCHAR(200) NULL',
+                'intranet_id' => 'INT(11) NULL',
                 'name' => 'VARCHAR(200) NOT NULL',
                 'sex' => 'ENUM(\'M\',\'F\') NOT NULL DEFAULT \'M\'',
                 'status' => 'ENUM(\'ACTIVE\',\'INACTIVE\') NOT NULL DEFAULT \'ACTIVE\'',
                 'joined_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ',
                 'logged_at' => 'DATETIME NULL DEFAULT CURRENT_TIMESTAMP ',
+                'username' => 'VARCHAR(200) NULL',
+                'gravatar' => 'VARCHAR(200) NULL',
+                'email' => 'VARCHAR(200) NULL',
+                'mobile_phone' => 'VARCHAR(200) NULL',
+                'office' => 'VARCHAR(200) NULL',
             ], $tableOptions_mysql);
         }
-        }
+        }        
     }
 
     /**

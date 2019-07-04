@@ -36,7 +36,7 @@ class m190402_013018_create_thread_global_config_table extends Migration
          
          
         $this->execute('SET foreign_key_checks = 0');
-        $this->addForeignKey('fk_thread_2556_00','{{%thread_global_config}}', 'id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_thread_0728_00','{{%thread_global_config}}', 'id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
         $this->execute('SET foreign_key_checks = 1;');
     }
 

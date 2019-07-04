@@ -35,12 +35,12 @@ class m190402_013602_create_thread_member_table extends Migration
         }
          
          
-        $this->createIndex('idx_thread_id_046_00','thread_member','thread_id',0);
-        $this->createIndex('idx_member_id_046_01','thread_member','member_id',0);
+        $this->createIndex('idx_thread_id_3059_00','thread_member','thread_id',0);
+        $this->createIndex('idx_member_id_3059_01','thread_member','member_id',0);
          
         $this->execute('SET foreign_key_checks = 0');
-        $this->addForeignKey('fk_thread_0456_00','{{%thread_member}}', 'thread_id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
-        $this->addForeignKey('fk_member_0456_01','{{%thread_member}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_member_3055_00','{{%thread_member}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_thread_3055_01','{{%thread_member}}', 'thread_id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
         $this->execute('SET foreign_key_checks = 1;');
     }
 

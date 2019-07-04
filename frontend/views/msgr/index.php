@@ -13,8 +13,8 @@ use common\helpers\Logger;
 
 $this->title = Yii::$app->name;
 
-$this->registerJs("const M_ID = '{$M_ID}';", View::POS_HEAD);
-$this->registerJs("const M_NAME = '{$M_NAME}';", View::POS_HEAD);
+$this->registerJs("let M_ID = '{$M_ID}';", View::POS_HEAD);
+$this->registerJs("let M_NAME = '{$M_NAME}';", View::POS_HEAD);
 $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
 ?>
 <div class="msgr-index">

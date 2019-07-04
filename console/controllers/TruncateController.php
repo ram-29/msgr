@@ -12,10 +12,11 @@ class TruncateController extends Controller
         // 'thread',
         // 'member',
 
-        // 'thread_member',
+        'thread',
+        'thread_member',
 
-        // 'thread_global_config',
-        // 'thread_member_config',
+        'thread_global_config',
+        'thread_member_config',
     
         'thread_message',
         'thread_message_seen',

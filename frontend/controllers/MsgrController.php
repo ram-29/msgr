@@ -60,8 +60,12 @@ class MsgrController extends Controller
         // 0bc08464-87b4-4c6a-afea-6960bf90b02b : Weissnat Kurtis
         // 17626558-9d93-420d-9b3e-4234a80859dc : Howell Ervin
 
-        $M_ID = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf';
-        $M_NAME = 'Maria Powell';
+        // $M_ID = 'f9c159af-6f58-441d-b26f-a6ab4b497eaf';
+        // $M_NAME = 'Maria Powell';
+
+        // $M_ID = '';
+        // $M_NAME = '';
+
         $PUB_VAPID_KEY = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ';
 
         $BK_URL = Getter::getUrl();

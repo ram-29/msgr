@@ -55,6 +55,10 @@ const fileTypes = [
     'text/plain'
 ];
 
+const leaveGroup = grpId => {
+    console.log(grpId)
+}
+
 const initSearch = (pElem, cName, sTerm) => {
     Array.from(pElem.getElementsByClassName(cName))
     .forEach(mItem => {
@@ -409,6 +413,15 @@ const renderUI = async (cId) => {
             req.data.members.map(mMem => {
                 tabAbout.append(`<li>${mMem.name} ${(mMem.id === M_ID) ? '(You)' : ''}</li>`)
             })
+
+            tabAbout.append(`
+                <div style="display:flex; justify-content:center; padding:1rem 0;">
+                    <button class="btn btn-danger" onclick="leaveGroup('${req.data.id}')">
+                        Leave group
+                        <i class="fa fa-sign-out" aria-hidden="true"></i>
+                    </button>
+                </div>
+            `)
         }
 
         tabAboutHeader.append(`
@@ -586,7 +599,7 @@ const chatConfirm = params => {
         { member_id: mId, role: 'MEMBER' }
     ]
 
-    // // Send request
+    // Send request
     axios.post(`${BK_HTTP_URL}/api/thread`, {
         type: 'SIMPLE',
         name: `${M_NAME}:${mName}`,
@@ -693,7 +706,24 @@ const groupConfirm = params => {
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then(res => {
-                console.log(res)
+                // Render template
+                const template = `
+                    <div class="msgr-sidebar-list-item" onclick="connect(this, '${res.value.id}', 'GROUP')">
+                        <div class="msgr-sidebar-list-item-content">
+                            <img class="img-circle" src="${FR_HTTP_URL}/img/3.png" alt="User image">                        
+                            <div class="msgr-sidebar-list-item-content-details">
+                                <h4>${res.value.result}</h4>
+                                <p>-</p>
+                            </div>
+                        </div>
+
+                        <div class="msgr-sidebar-list-item-settings">
+                            <span>-</span>
+                        </div>
+                    </div>
+                `
+                
+                $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
             })
         } else {
             // Existing Group
@@ -725,7 +755,7 @@ const groupConfirm = params => {
 
                         if(resp.data) {
                             // Rerender about
-                            tabAbout.append(`<li>${mName}}</li>`)
+                            $(`<li>${mName}}</li>`).insertBefore("#tab-about > button")
                             
                             // @TOOD: Emit to backend to notify.
                             // GROUP.emit('join-chat-group', { id: cId })
@@ -753,6 +783,64 @@ const checkSWSupport = _ => {
     }
 
     return isSupported
+}
+
+const initialize = async _ => {
+    axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads`, { headers: {'Access-Control-Allow-Origin': '*'} }).then(resp => {
+        const template = resp.data.threads.map(th => {
+            // Filter user list.
+            Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
+            .forEach(mItem => {
+                if(mItem.children[0].children[1].children[0]
+                    .textContent.toLowerCase() == th.name.toLowerCase()
+                ) {
+                    mItem.children[1].children[0].style.display = 'none'
+                }
+            })
+
+            // Render list
+            return `
+                <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
+                    <div class="msgr-sidebar-list-item-content">
+                        <img class="img-circle" src="${FR_HTTP_URL}/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
+                        <div class="msgr-sidebar-list-item-content-details">
+                            <h4 style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold;' : 'normal;'}">${th.name}</h4>
+                            <p style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold; color:#000;' : 'normal;'}">${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
+                        </div>
+                    </div>
+    
+                    <div class="msgr-sidebar-list-item-settings">
+                        <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
+                    </div>
+                </div>
+            `
+        }).join('')
+
+        sidebarList.innerHTML = template
+
+        OverlayScrollbars(sidebarList, {})
+    })
+
+    initConn(M_ID, M_NAME)
+
+    contentChatboxInputBox.addEventListener('keydown', e => {
+        if(e.keyCode === 13 && !e.shiftKey) {
+            e.preventDefault()
+    
+            const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
+            const message = e.target.value
+
+            if(message) {
+                if(mConn.type == 'GROUP') {
+                    GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+                } else {
+                    SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+                }
+
+                contentChatboxInputBox.value = ''
+            }
+        }
+    })
 }
 
 document.addEventListener('DOMContentLoaded', async _ => {
@@ -847,59 +935,29 @@ document.addEventListener('DOMContentLoaded', async _ => {
     })
 
     if(M_ID && M_NAME) {
-        axios.get(`${BK_HTTP_URL}/api/member/${M_ID}?expand=threads`, { headers: {'Access-Control-Allow-Origin': '*'} }).then(resp => {
-            const template = resp.data.threads.map(th => {
-                // Filter user list.
-                Array.from(userList.getElementsByClassName('msgr-main-content-tools-user-list-item'))
-                .forEach(mItem => {
-                    if(mItem.children[0].children[1].children[0]
-                        .textContent.toLowerCase() == th.name.toLowerCase()
-                    ) {
-                        mItem.children[1].children[0].style.display = 'none'
-                    }
-                })
+        initialize()
+    } else {
+        Swal.mixin({
+            input: 'text',
+            confirmButtonText: 'Next &rarr;',
+            showCancelButton: true,
+            progressSteps: ['1', '2'],
+            inputValidator: (value) => !value && 'You need to write something!'
+        }).queue([
+            {
+                title: 'Question 1',
+                text: 'Enter your ID'
+            },
+            {
+                title: 'Question 2: For Test Purpose',
+                text: 'Enter your name'
+            }
+        ]).then((result) => {
+            if (result.value) {
+                M_ID  = result.value[0]
+                M_NAME  = result.value[1]
 
-                // Render list
-                return `
-                    <div class="msgr-sidebar-list-item" onClick="connect(this, '${th.id}', '${th.type}')">
-                        <div class="msgr-sidebar-list-item-content">
-                            <img class="img-circle" src="${FR_HTTP_URL}/img/${th.type == 'GROUP' ? '3' : th.sex == 'M' ? '1' : '2'}.png" alt="User image">                        
-                            <div class="msgr-sidebar-list-item-content-details">
-                                <h4 style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold;' : 'normal;'}">${th.name}</h4>
-                                <p style="font-weight: ${(th.message && th.message.unread) && (M_ID !== th.message.sent_by) ? 'bold; color:#000;' : 'normal;'}">${th.message ? strTruncate(th.message.latest, 20) : '-'}</p>
-                            </div>
-                        </div>
-        
-                        <div class="msgr-sidebar-list-item-settings">
-                            <span>${th.message ? moment(th.message.time).format('ddd') : '-'}</span>
-                        </div>
-                    </div>
-                `
-            }).join('')
-    
-            sidebarList.innerHTML = template
-    
-            OverlayScrollbars(sidebarList, {})
-        })
-    
-        initConn(M_ID, M_NAME)
-    
-        contentChatboxInputBox.addEventListener('keydown', e => {
-            if(e.keyCode === 13 && !e.shiftKey) {
-                e.preventDefault()
-        
-                const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
-                const message = e.target.value
-    
-                if(message) {
-                    if(mConn.type == 'GROUP') {
-                        GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
-                    } else {
-                        SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
-                    }
-
-                    contentChatboxInputBox.value = ''
-                }
+                initialize()
             }
         })
     }

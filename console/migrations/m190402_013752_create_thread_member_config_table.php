@@ -28,18 +28,18 @@ class m190402_013752_create_thread_member_config_table extends Migration
                 0 => 'PRIMARY KEY (`id`)',
                 'thread_id' => 'CHAR(36) NOT NULL',
                 'member_id' => 'CHAR(36) NOT NULL',
-                'is_muted' => 'TINYINT(1) NOT NULL DEFAULT \'0\'',
+                'is_muted' => 'TINYINT(1) NOT NULL',
             ], $tableOptions_mysql);
         }
         }
          
          
-        $this->createIndex('idx_thread_id_818_00','thread_member_config','thread_id',0);
-        $this->createIndex('idx_member_id_818_01','thread_member_config','member_id',0);
+        $this->createIndex('idx_thread_id_8094_00','thread_member_config','thread_id',0);
+        $this->createIndex('idx_member_id_8094_01','thread_member_config','member_id',0);
          
         $this->execute('SET foreign_key_checks = 0');
-        $this->addForeignKey('fk_thread_8177_00','{{%thread_member_config}}', 'thread_id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
-        $this->addForeignKey('fk_member_8177_01','{{%thread_member_config}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_member_809_00','{{%thread_member_config}}', 'member_id', '{{%member}}', 'id', 'CASCADE', 'CASCADE' );
+        $this->addForeignKey('fk_thread_809_01','{{%thread_member_config}}', 'thread_id', '{{%thread}}', 'id', 'CASCADE', 'CASCADE' );
         $this->execute('SET foreign_key_checks = 1;');
     }
 
