@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -69,6 +70,8 @@ class MsgrController extends Controller
         $PUB_VAPID_KEY = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ';
 
         $BK_URL = Getter::getUrl();
+
+        // Logger::log($BK_URL);
 
         // Get messenger members.
         $members = (new Client())

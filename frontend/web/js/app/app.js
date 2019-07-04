@@ -940,7 +940,8 @@ document.addEventListener('DOMContentLoaded', async _ => {
         Swal.mixin({
             input: 'text',
             confirmButtonText: 'Next &rarr;',
-            showCancelButton: true,
+            showCancelButton: false,
+            allowOutsideClick: false,
             progressSteps: ['1', '2'],
             inputValidator: (value) => !value && 'You need to write something!'
         }).queue([
@@ -949,7 +950,7 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 text: 'Enter your ID'
             },
             {
-                title: 'Question 2: For Test Purpose',
+                title: 'Question 2',
                 text: 'Enter your name'
             }
         ]).then((result) => {
@@ -957,7 +958,12 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 M_ID  = result.value[0]
                 M_NAME  = result.value[1]
 
-                initialize()
+                const mUserList = document.querySelector('.msgr-main-content-tools-user-list > .os-padding > .os-viewport > .os-content')
+                console.log(mUserList.children)
+
+                // TODO: Filter the list.
+
+                // initialize()
             }
         })
     }
