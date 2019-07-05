@@ -1,11 +1,19 @@
-const SOCKET_HTTP_URL = `http://localhost:1337`
-const SOCKET_HTTPS_URL = `http://localhost:7331`
+let SOCKET_HTTP_URL = `http://localhost:1337`
+let SOCKET_HTTPS_URL = `http://localhost:7331`
 
-const FR_HTTP_URL = `http://fr.msgr.io`
-const BK_HTTP_URL = `http://bk.msgr.io`
+SOCKET_HTTP_URL = `${window.location.origin}:1337`
+SOCKET_HTTPS_URL = `${window.location.origin}:7331`
 
-const FR_HTTPS_URL = `https://fr.msgr.io`
-const BK_HTTPS_URL = `https://bk.msgr.io`
+let FR_HTTP_URL = `http://fr.msgr.io`
+let BK_HTTP_URL = `http://bk.msgr.io`
+
+let FR_HTTPS_URL = `https://fr.msgr.io`
+let BK_HTTPS_URL = `https://bk.msgr.io`
+
+FR_HTTP_URL = window.location.href
+    .replace('backend', 'frontend').replace('/chat', '')
+BK_HTTP_URL = window.location.href
+    .replace('frontend', 'backend').replace('/chat', '')
 
 let btnHeaderSetting,
     btnHeaderMessage,
@@ -959,11 +967,16 @@ document.addEventListener('DOMContentLoaded', async _ => {
                 M_NAME  = result.value[1]
 
                 const mUserList = document.querySelector('.msgr-main-content-tools-user-list > .os-padding > .os-viewport > .os-content')
-                console.log(mUserList.children)
 
-                // TODO: Filter the list.
+                // Filter the list.
+                Array.from(mUserList.children)
+                .forEach(e => {
+                    if (e.children[0].children[1].children[0].dataset.id == M_ID) {
+                        e.style.display = 'none'
+                    }
+                })
 
-                // initialize()
+                initialize()
             }
         })
     }

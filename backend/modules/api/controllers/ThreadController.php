@@ -24,6 +24,14 @@ class ThreadController extends \yii\rest\ActiveController
 
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => ['*'], 
+                'Access-Control-Request-Method' => ['GET'], 
+                'Access-Control-Request-Headers' => ['*'], 
+                'Access-Control-Allow-Credentials' => null, 
+                'Access-Control-Max-Age' => 86400, 
+                'Access-Control-Expose-Headers' => []
+            ]
         ];
 
         return $behaviors;

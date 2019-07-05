@@ -112,9 +112,9 @@ class Thread extends \yii\db\ActiveRecord
                     if (!empty($thMsg['file'])) {
                         $mPathInfo = pathinfo($thMsg['file']);
 
-                        $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $thMsg['file']);
+                        $mFile = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $thMsg['file']);
                         $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $thMsg['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
-                        $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+                        $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $mFileThumb);
                         $mFileThumb = $thMsg['file_type'] == 'image' ? $mFileThumb : null;
 
                         $mMember = \common\models\Member::findOne($thMsg['member_id']);
@@ -161,15 +161,15 @@ class Thread extends \yii\db\ActiveRecord
             'images' => function($x) {
                 return array_map(function($img) {
                     $mPathInfo = pathinfo($img['file']);
-                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $img['file']);
                     $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $img['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
                     $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
 
                     $mPathInfo = pathinfo($img['file']);
 
-                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $img['file']);
                     $mFileThumb = \preg_replace('/\/[^\/]*$/', '/thumb', $img['file']).'/'.$mPathInfo['filename'].'-thumb.'.$mPathInfo['extension'];
-                    $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $mFileThumb);
+                    $mFileThumb = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $mFileThumb);
 
                     return [
                         // 'member_id' => $img['member_id'],
@@ -186,7 +186,7 @@ class Thread extends \yii\db\ActiveRecord
 
                     $mPathInfo = pathinfo($img['file']);
 
-                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false), $img['file']);
+                    $mFilePath = \preg_replace('/(\.\.\/\w*\/\w*)/i', \common\helpers\Getter::getUrl(false, false, false), $img['file']);
 
                     return [
                         // 'member_id' => $img['member_id'],

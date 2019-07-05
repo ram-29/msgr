@@ -246,6 +246,7 @@ html, body, .msgr-index {
     padding: 1rem;
     display: flex;
     align-items: center;
+    border-bottom: 1px solid #cccccc;
 }
 
 .msgr-main-content-tools-user-header > i {
@@ -269,10 +270,6 @@ html, body, .msgr-index {
 .msgr-main-content-tools-user-list-item:hover {
     cursor: default;
     background-color: #f2f2f2;
-}
-
-.msgr-main-content-tools-user-list-item:first-child {
-    border-top: 1px solid #cccccc;
 }
 
 .msgr-main-content-tools-user-list-item:last-child {

@@ -1,3 +1,4 @@
+const url = require('url')
 const http = require('http')
 const path = require('path')
 const cors = require('cors')
@@ -42,16 +43,16 @@ const httpServer = http.createServer(app)
 const httpsServer = https.createServer({ key: '', cert: '' }, app)
 
 // Change `BASE_URLS` on production.
-const BK_HTTP_URL = `http://localhost:80/msgr/backend/web`
-const FR_HTTP_URL = `http://localhost:80/msgr/frontend/web`
+let BK_HTTP_URL = `http://localhost:80/msgr/backend/web`
+let FR_HTTP_URL = `http://localhost:80/msgr/frontend/web`
 
-const BK_HTTPS_URL = `https://localhost:443/msgr/backend/web`
-const FR_HTTPS_URL = `https://localhost:443/msgr/frontend/web`
+let BK_HTTPS_URL = `https://localhost:443/msgr/backend/web`
+let FR_HTTPS_URL = `https://localhost:443/msgr/frontend/web`
 
 const HTTP_PORT = 1337
 const HTTPS_PORT = 7331
 
-httpServer.listen(HTTP_PORT, _ => { console.log(`Http server running on port ${HTTP_PORT}.`) })
+httpServer.listen(HTTP_PORT, _ => { console.log(`Http server running on port ${HTTP_PORT}.`)})
 httpsServer.listen(HTTPS_PORT, _ => { console.log(`Https server running on port ${HTTPS_PORT}.`) })
 
 // Initialize socket connection.

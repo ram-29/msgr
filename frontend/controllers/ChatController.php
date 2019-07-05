@@ -17,9 +17,9 @@ use common\helpers\Logger;
 use common\helpers\Getter;
 
 /**
- * Msgr controller
+ * Chat controller
  */
-class MsgrController extends Controller
+class ChatController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -69,9 +69,7 @@ class MsgrController extends Controller
 
         $PUB_VAPID_KEY = 'BM_rgVMC88LMFjWGiTQOHVKUF4W7An0fT_2k9Z60AQYxH656dcRwyeFQ7vZRo6sGNPyQlNKksPHdgvNZWWuqjTQ';
 
-        $BK_URL = Getter::getUrl();
-
-        // Logger::log($BK_URL);
+        $BK_URL = Getter::getUrl(true, false, false);
 
         // Get messenger members.
         $members = (new Client())

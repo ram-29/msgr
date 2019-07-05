@@ -13,8 +13,8 @@ use common\helpers\Getter;
 
 AppAsset::register($this);
 
-$BK_URL = Getter::getUrl();
-$FR_URL = Getter::getUrl(false);
+$BK_URL = Getter::getUrl(true, false, false);
+$FR_URL = Getter::getUrl(false, false, false);
 
 $this->registerJs("const BK_URL = '{$BK_URL}';", View::POS_HEAD);
 $this->registerJs("const FR_URL = '{$FR_URL}';", View::POS_HEAD);
