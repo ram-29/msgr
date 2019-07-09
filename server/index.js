@@ -187,11 +187,12 @@ function initConn(mServer) {
         })
 
         // Chat handler
-        simple.on('chat', ({ cId, uId, message, timestamp }) => {
+        simple.on('chat', ({ cId, uId, type, message, timestamp }) => {
 
             axios.post(`${BK_HTTP_URL}/api/thread-message`, {
                 thread_id: cId,
                 member_id: uId,
+                type,
                 text: message,
                 file: null,
                 file_name: null,
@@ -316,11 +317,12 @@ function initConn(mServer) {
         })
 
         // Chat handler
-        group.on('chat', ({ cId, uId, message, timestamp }) => {
+        group.on('chat', ({ cId, uId, type, message, timestamp }) => {
 
             axios.post(`${BK_HTTP_URL}/api/thread-message`, {
                 thread_id: cId,
                 member_id: uId,
+                type,
                 text: message,
                 file: null,
                 file_name: null,

@@ -10,6 +10,7 @@ use Yii;
  * @property string $id
  * @property string $thread_id
  * @property string $member_id
+ * @property string $type
  * @property string $text
  * @property string $file
  * @property string $file_name
@@ -37,8 +38,8 @@ class ThreadMessage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'thread_id', 'member_id'], 'required'],
-            [['text', 'file', 'file_name', 'file_type', 'deleted_by'], 'string'],
+            [['id', 'member_id'], 'required'],
+            [['type', 'text', 'file', 'file_name', 'file_type', 'deleted_by'], 'string'],
             [['created_at'], 'safe'],
             [['id', 'thread_id', 'member_id'], 'string', 'max' => 36],
             [['id'], 'unique'],
@@ -56,6 +57,7 @@ class ThreadMessage extends \yii\db\ActiveRecord
             'id' => 'ID',
             'thread_id' => 'Thread ID',
             'member_id' => 'Member ID',
+            'type' => 'Type',
             'text' => 'Text',
             'file' => 'File',
             'file_name' => 'File Name',

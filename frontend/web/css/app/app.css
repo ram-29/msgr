@@ -187,6 +187,19 @@ html, body, .msgr-index {
     white-space: pre-wrap !important;
 }
 
+.msgr-main-content-chatbox-list-item-details >
+.msgr-main-content-chatbox-list-item-details-content > img {
+    border: 1.5rem solid #f1f0f0 !important;
+    border-radius: 2.5rem;
+    max-width: 70%;
+}
+
+.msgr-main-content-chatbox-list-item-details >
+.msgr-main-content-chatbox-list-item-details-content > p > a {
+    color:#09f; 
+    text-decoration:underline;
+}
+
 /* Main Content Chatbox List Item (Owner) */
 .msgr-main-content-chatbox-list-item-details.owner {
     justify-content: flex-end;
@@ -205,6 +218,20 @@ html, body, .msgr-index {
 .msgr-main-content-chatbox-list-item-details-content > p {
     color: #ffffff;
     background-color: #0099ff;
+}
+
+
+.msgr-main-content-chatbox-list-item-details.owner >
+.msgr-main-content-chatbox-list-item-details-content > img {
+    border: 1.5rem solid #09f !important;
+    border-radius: 2.5rem; 
+    max-width:70%;
+}
+
+.msgr-main-content-chatbox-list-item-details.owner >
+.msgr-main-content-chatbox-list-item-details-content > p > a {
+    color:#09f !important;
+    text-decoration:underline;
 }
 
 /* Main Content Chatbox Input & Tools */

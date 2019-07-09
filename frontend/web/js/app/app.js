@@ -237,6 +237,8 @@ const initConn = (M_ID, M_NAME) => {
         const mPrevDate = contentChatboxList.lastElementChild.firstElementChild.firstElementChild
         const mPrevTime = contentChatboxList.lastElementChild.firstElementChild.lastElementChild
 
+        const mPath = filepath.replace('http://localhost:80/msgr/frontend/web', FR_HTTP_URL)
+
         const template = `
             <div class="msgr-main-content-chatbox-list-item">
                 <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
@@ -247,7 +249,7 @@ const initConn = (M_ID, M_NAME) => {
                 <div class="msgr-main-content-chatbox-list-item-details ${member_id === M_ID ? 'owner' : ''}">
                     <img class="img-circle" src="${src}" alt="User image">
                     <div class="msgr-main-content-chatbox-list-item-details-content">
-                        ${type === 'image' ? `<img src="${filepath}" alt="${filename}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${filepath}" target="_blank" style="color:#fff !important; text-decoration:underline;">${filename}</a></p>`}
+                        ${ type === 'image' ? `<img src="${mPath}" alt="${filename}">` : `<p><a href="${mPath}" target="_blank">${filename}</a></p>` }
                     </div>
                 </div>
             </div>
@@ -439,7 +441,7 @@ const renderUI = async (cId) => {
 
         const mMsg = await axios.get(`${BK_HTTP_URL}/api/thread/${cId}?expand=messages`)
         mMsg.data.messages.map(msg => {
-            
+
             let template
             const src = contentChatboxHeaderImg.getAttribute('src')
 
@@ -451,50 +453,59 @@ const renderUI = async (cId) => {
 
             const { id, name, sex } = msg.member
 
-            if(msg.text) {
-                // Render text
+             // NOTIF
+            if(msg.type == 'NOTIF') {
                 template  = `
-                    <div class="msgr-main-content-chatbox-list-item">
-                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
-                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
-                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
-                        </span>
-
-                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
-                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
-                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
-                            <div class="msgr-main-content-chatbox-list-item-details-content">
-                                <p>${msg.text}</p>
-                            </div>
-                        </div>
+                    <div class="msgr-main-content-chatbox-list-item" style="align-items:center;">
+                        <p style="margin-bottom: unset; color: #999;">${msg.text}</p>
                     </div>
                 `
-
-                contentChatboxList.insertAdjacentHTML('beforeend', template)
-                $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
-            } else {
-                // Photo or docs
-                template = `
-                    <div class="msgr-main-content-chatbox-list-item">
-                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
-                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
-                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
-                        </span>
-
-                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
-                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
-                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
-                            <div class="msgr-main-content-chatbox-list-item-details-content">
-                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
-                            </div>
-                        </div>
-                    </div>
-                `
-
-                contentChatboxList.insertAdjacentHTML('beforeend', template)
-                $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
             }
 
+            // MSG
+            if(msg.type == 'MSG') {
+                if(msg.text) {
+                    // Render text
+                    template  = `
+                        <div class="msgr-main-content-chatbox-list-item">
+                            <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                            </span>
+    
+                            <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                            <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                                <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
+                                <div class="msgr-main-content-chatbox-list-item-details-content">
+                                    <p>${msg.text}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `
+    
+                } else {
+                    // Photo or docs
+                    template = `
+                        <div class="msgr-main-content-chatbox-list-item">
+                            <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                            </span>
+    
+                            <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                            <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                                <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
+                                <div class="msgr-main-content-chatbox-list-item-details-content">
+                                    ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                                </div>
+                            </div>
+                        </div>
+                    `
+                }
+            }
+
+            contentChatboxList.insertAdjacentHTML('beforeend', template)
+            $('.msgr-main-content-chatbox-list').overlayScrollbars().scroll({ y: '100%' })
         })
 
         btnChatboxPhoto.setAttribute('data-conn', 'SIMPLE')
@@ -837,12 +848,13 @@ const initialize = async _ => {
     
             const timestamp = moment().format('YYYY-MM-DD HH:mm:ss')
             const message = e.target.value
+            const type = 'MSG'
 
             if(message) {
                 if(mConn.type == 'GROUP') {
-                    GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+                    GROUP.emit('chat', { cId: mConn.cId, uId: M_ID, type, message, timestamp, })
                 } else {
-                    SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, message, timestamp })
+                    SIMPLE.emit('chat', { cId: mConn.cId, uId: M_ID, type, message, timestamp })
                 }
 
                 contentChatboxInputBox.value = ''

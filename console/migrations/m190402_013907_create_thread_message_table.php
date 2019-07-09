@@ -27,7 +27,7 @@ class m190402_013907_create_thread_message_table extends Migration
                 'id' => 'CHAR(36) NOT NULL',
                 0 => 'PRIMARY KEY (`id`)',
                 'thread_id' => 'CHAR(36) NOT NULL',
-                'member_id' => 'CHAR(36) NOT NULL',
+                'member_id' => 'CHAR(36) NULL',
                 'type' => 'ENUM(\'MSG\',\'NOTIF\') NOT NULL DEFAULT \'MSG\'',
                 'text' => 'LONGTEXT NULL',
                 'file' => 'TEXT NULL',

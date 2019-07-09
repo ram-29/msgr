@@ -125,6 +125,7 @@ class Thread extends \yii\db\ActiveRecord
                             // 'member_id' => $thMsg['member_id'],
                             'member' => $mMember,
 
+                            'type' => $thMsg['type'],
                             'text' => $thMsg['text'],
                             'file_path' => $mFile,
                             'file_thumb' => $mFileThumb,
@@ -142,6 +143,7 @@ class Thread extends \yii\db\ActiveRecord
                         // 'member_id' => $thMsg['member_id'],
                         'member' => $mMember,
 
+                        'type' => $thMsg['type'],
                         'text' => $thMsg['text'],
                         'file_path' => null,
                         'file_thumb' => null,

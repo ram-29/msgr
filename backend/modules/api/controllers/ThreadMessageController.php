@@ -69,19 +69,21 @@ class ThreadMessageController extends \yii\rest\ActiveController
             return $mThm['member_id'] !== $model->member_id;
         });
 
-        // Add a ThreadMessageSeen.
-        foreach($mThMem as $mThmem) {
-            // Initialize a ThreadMessageSeen model.
-            $mThMsgSeen = new \common\models\ThreadMessageSeen();
+        if($model->type == 'MSG') {
+            // Add a ThreadMessageSeen.
+            foreach($mThMem as $mThmem) {
+                // Initialize a ThreadMessageSeen model.
+                $mThMsgSeen = new \common\models\ThreadMessageSeen();
 
-            // Set Attrs.
-            $mThMsgSeen->setAttrs();
+                // Set Attrs.
+                $mThMsgSeen->setAttrs();
 
-            // Save ThreadMessageSeen.
-            $mThMsgSeen->thread_message_id = $model->id;
-            $mThMsgSeen->member_id = $mThmem['member_id'];
-            $mThMsgSeen->seen_at = null;
-            $mThMsgSeen->save();
+                // Save ThreadMessageSeen.
+                $mThMsgSeen->thread_message_id = $model->id;
+                $mThMsgSeen->member_id = $mThmem['member_id'];
+                $mThMsgSeen->seen_at = null;
+                $mThMsgSeen->save();
+            }
         }
 
         // Return model.
