@@ -44,6 +44,7 @@ class ThreadMemberController extends \yii\rest\ActiveController
     {
         $actions = parent::actions();
         unset($actions['create']);
+        unset($actions['delete']);
         
         return $actions;
     }
@@ -63,5 +64,31 @@ class ThreadMemberController extends \yii\rest\ActiveController
         // Save & return.
         $model->save();
         return $model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actionDelete($id)
+    {
+        // Check body params if "group" attr. is available
+        $params = \Yii::$app->request->bodyParams;
+
+        $threadMember;
+        if(\array_key_exists('group', $params)) {
+            $threadMember = \common\models\ThreadMember::findOne([
+                'thread_id' => $params['group'],
+                'member_id' => $id
+            ]);
+        } else {
+            $threadMember = \common\models\ThreadMember::findOne($id);
+        }
+
+        if(!empty($threadMember)) {
+            $threadMember->delete();
+            return $threadMember;
+        }
+
+        return new \yii\web\NotFoundHttpException();
     }
 }

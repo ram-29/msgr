@@ -1,9 +1,10 @@
-(_ => {
+let M_OFFSET = 1;
+
+;(_ => {
     moment.createFromInputFallback = function(config) { config._d = new Date(config._i); }
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
     
     // $('.msgr-sidebar-list').overlayScrollbars({})
-    let offset = 1
     const mChatboxList = $('.msgr-main-content-chatbox-list').overlayScrollbars({
         callbacks: {
             onScrollStop: e => {
@@ -12,7 +13,7 @@
                 if (scrollInfo.ratio.y === 0) {
                     $('#spinner-container').removeClass('spinner-hide').addClass('spinner-show')
 
-                    axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=messages&offset=${offset}`).then(mMsg => {
+                    axios.get(`${BK_URL}/api/thread/${mConn.cId}?expand=messages&offset=${M_OFFSET}`).then(mMsg => {
                         mMsg.data.messages.map((msg, idx) => {
 
                             let template
@@ -24,44 +25,68 @@
                             const mPrevDate = $('#spinner-container').next()[0].firstElementChild.firstElementChild
                             const mPrevTime = $('#spinner-container').next()[0].firstElementChild.lastElementChild
 
-                            const { id, name, sex } = msg.member
+                            let id, name, sex
+                            if(msg.member) {
+                                id = msg.member.id
+                                name = msg.member.name
+                                sex = msg.member.sex
+                            }
 
-                            if(msg.text) {
-                                // Render text
+                            // NOTIF
+                            if(msg.type == 'NOTIF') {
                                 template  = `
                                     <div class="msgr-main-content-chatbox-list-item">
-                                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
-                                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
-                                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                                        <span style="display:flex; align-items:center; flex-direction:column;">
+                                            <span>
+                                                <span>${mDate}</span> at
+                                                <span>${mTime}</span>
+                                            </span>
+                                            <span>${msg.text}</span>
                                         </span>
-
-                                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
-                                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
-                                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
-                                            <div class="msgr-main-content-chatbox-list-item-details-content">
-                                                <p>${msg.text}</p>
-                                            </div>
-                                        </div>
                                     </div>
                                 `
-                            } else {
-                                // Photo or docs
-                                template = `
-                                    <div class="msgr-main-content-chatbox-list-item">
-                                        <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
-                                            <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
-                                            <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
-                                        </span>
+                            }
 
-                                        <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
-                                        <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
-                                            <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
-                                            <div class="msgr-main-content-chatbox-list-item-details-content">
-                                                ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                            // MSG
+                            if(msg.type == 'MSG') {
+                                if(msg.text) {
+                                    // Render text
+                                    template  = `
+                                        <div class="msgr-main-content-chatbox-list-item">
+                                            <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                                <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                                <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                                            </span>
+                    
+                                            <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                                            <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                                                <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
+                                                <div class="msgr-main-content-chatbox-list-item-details-content">
+                                                    <p>${msg.text}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                `
+                                    `
+                    
+                                } else {
+                                    // Photo or docs
+                                    template = `
+                                        <div class="msgr-main-content-chatbox-list-item">
+                                            <span class="${(mPrevDate.textContent == mDate) && (mPrevTime.textContent == mTime) ? 'stamp-hide' : ''}">
+                                                <span class="${mPrevDate.textContent == mDate ? 'stamp-hide' : ''}">${mDate}</span> 
+                                                <span class="${mPrevTime.textContent == mTime ? 'stamp-hide' : ''}">${mTime}</span>
+                                            </span>
+                    
+                                            <p style="display: ${mMsg.data.type == 'GROUP' ? (id === M_ID ? 'none;' : 'block;') : 'none;'} color:#999; margin:0 0 .5rem;">${name}</p>
+                                            <div class="msgr-main-content-chatbox-list-item-details ${id === M_ID ? 'owner' : ''}">
+                                                <img class="img-circle" src="${mMsg.data.type == 'GROUP' ? (sex == 'M' ? '/img/1.png' : '/img/2.png') : src}" alt="User image">
+                                                <div class="msgr-main-content-chatbox-list-item-details-content">
+                                                    ${msg.file_type === 'image' ? `<img src="${msg.file_thumb}" alt="${msg.file_name}" style="border: 1.5rem solid #09f; border-radius: 2.5rem; max-width:70%;">` : `<p><a href="${msg.file_path}" target="_blank" style="color: ${id === M_ID ? '#fff' : '#0099ff'} !important; text-decoration:underline;">${msg.file_name}</a></p>`}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `
+                                }
                             }
 
                             $('#spinner-container').after(template)
@@ -70,7 +95,7 @@
 
                         $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
                     })
-                    offset++
+                    M_OFFSET++
 
                 } else {
                     $('#spinner-container').removeClass('spinner-show').addClass('spinner-hide')
@@ -81,7 +106,7 @@
 
     $('.msgr-main-content-tools-user-list').overlayScrollbars({})
     $('.tab-pane').overlayScrollbars({})
-})()
+})();
 
 const strTruncate = (str, len) => {
     return (str.length > len) ?

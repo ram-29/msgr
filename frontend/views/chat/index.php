@@ -219,7 +219,7 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
 
 <?php
     $this->registerJsFile(
-        Url::to(['/js/app.min.js']), [
+        Url::to(['/js/app/app.js']), [
         'depends' => 'frontend\assets\AppAsset'
     ]);
 ?>

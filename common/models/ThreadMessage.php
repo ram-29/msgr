@@ -38,7 +38,7 @@ class ThreadMessage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'member_id'], 'required'],
+            [['id', 'thread_id'], 'required'],
             [['type', 'text', 'file', 'file_name', 'file_type', 'deleted_by'], 'string'],
             [['created_at'], 'safe'],
             [['id', 'thread_id', 'member_id'], 'string', 'max' => 36],

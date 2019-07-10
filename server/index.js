@@ -347,5 +347,10 @@ function initConn(mServer) {
         group.on('disconnect', _ => {
             console.log(`${name} disconnected to GM`)
         })
+
+        // Leave Group Handler
+        group.on('leave-group', ({ groupId, memberId }) => {
+            console.log(`${memberId} has left: ${groupId}`)
+        })
     })
 }

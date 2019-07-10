@@ -85,10 +85,32 @@ class ThreadController extends \yii\rest\ActiveController
             foreach ($params['members'] as $member) {
                 $thMember = new \common\models\ThreadMember();
                 $thMember->setAttrs();
+
                 $thMember->thread_id = $model->id;
                 $thMember->member_id = $member['member_id'];
                 $thMember->role = $member['role'];
                 $thMember->save();
+            }
+
+            // Get group admin/creator.
+            $mAdmin = array_filter($params['members'], function($m) { return $m['role'] === 'ADMIN'; })[0];
+            $mMember = \common\models\Member::findOne($mAdmin['member_id']);
+
+            // Create "%user% created the group %groupname%." action notif.
+            if($model->type == 'GROUP') {
+                $thMessage = new \common\models\ThreadMessage();
+                $thMessage->setAttrs();
+                
+                $thMessage->thread_id = $model->id;
+                $thMessage->member_id = null;
+                $thMessage->type = 'NOTIF';
+                $thMessage->text = "{$mMember->name} created the group {$thGlobCfg->name}.";
+                $thMessage->file = null;
+                $thMessage->file_name = null;
+                $thMessage->file_type = null;
+                $thMessage->created_at = date('Y-m-d H:i:s');
+                $thMessage->deleted_by = null;
+                $thMessage->save();
             }
         }
 
