@@ -194,6 +194,30 @@ const initConn = (M_ID, M_NAME) => {
         console.log(`You connected to Private Messaging`)
     })
 
+    SIMPLE.on('chat-confirm', data => {
+
+        console.log(data)
+
+        // @TODO :Render template : SELF
+        // const template = `
+        //     <div class="msgr-sidebar-list-item" onclick="connect(this, '${resp.data.id}', 'SIMPLE')">
+        //         <div class="msgr-sidebar-list-item-content">
+        //             <img class="img-circle" src="${mImg}" alt="User image">                        
+        //             <div class="msgr-sidebar-list-item-content-details">
+        //                 <h4>${mName}</h4>
+        //                 <p>-</p>
+        //             </div>
+        //         </div>
+
+        //         <div class="msgr-sidebar-list-item-settings">
+        //             <span>-</span>
+        //         </div>
+        //     </div>
+        // `
+
+        // $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
+    })
+
     SIMPLE.on('chat', data => {
         const { uId, message, timestamp } = JSON.parse(data)
 
@@ -633,7 +657,7 @@ const chatConfirm = params => {
     const h4 = params.parentElement
         .previousElementSibling.children[1].children[0]
     const img = params.parentElement
-    .previousElementSibling.children[0]
+        .previousElementSibling.children[0]
 
     const mId = h4.dataset.id
     const mName = h4.textContent
@@ -644,32 +668,14 @@ const chatConfirm = params => {
         { member_id: mId, role: 'MEMBER' }
     ]
 
-    // Send request
-    axios.post(`${BK_HTTP_URL}/api/thread`, {
+    // Emit to server.
+    SIMPLE.emit('chat-confirm', { 
         type: 'SIMPLE',
         name: `${M_NAME}:${mName}`,
         members: mMembers
-    }).then(resp => {
+    })
 
-        // Render template
-        const template = `
-            <div class="msgr-sidebar-list-item" onclick="connect(this, '${resp.data.id}', 'SIMPLE')">
-                <div class="msgr-sidebar-list-item-content">
-                    <img class="img-circle" src="${mImg}" alt="User image">                        
-                    <div class="msgr-sidebar-list-item-content-details">
-                        <h4>${mName}</h4>
-                        <p>-</p>
-                    </div>
-                </div>
-
-                <div class="msgr-sidebar-list-item-settings">
-                    <span>-</span>
-                </div>
-            </div>
-        `
-        $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
-
-    }).catch(err => console.error(err))
+    
 }
 
 const groupConfirm = params => {

@@ -148,42 +148,42 @@ $this->registerJs("const PUB_VAPID_KEY = '{$PUB_VAPID_KEY}';", View::POS_HEAD);
                         <?php foreach($members as $i => $member) :?>
                             <?php $img = $member['sex'] == 'M' ? "1" : "2"; ?>
 
-                            <?php if(!($member['id'] == $M_ID)) :?>
-                                <div class="msgr-main-content-tools-user-list-item">
-                                    <div class="msgr-main-content-tools-user-list-item-content">
-                                        <?= Html::img("@web/img/{$img}.png", [
-                                            'class' => 'img-circle',
-                                            'alt' => 'User image'
-                                        ]) ?>
+                            <?php // @TODO: Filter user by ID ?>
 
-                                        <div class="msgr-main-content-tools-user-list-item-content-details">
-                                            <h4 data-id="<?= $member['id'] ?>"><?= $member['name'] ?></h4>
-                                            <!-- <p>Associate Software Engineer</p> -->
-                                        </div>
-                                    </div>
+                            <div class="msgr-main-content-tools-user-list-item">
+                                <div class="msgr-main-content-tools-user-list-item-content">
+                                    <?= Html::img("@web/img/{$img}.png", [
+                                        'class' => 'img-circle',
+                                        'alt' => 'User image'
+                                    ]) ?>
 
-                                    <div class="msgr-main-content-tools-user-list-item-tools-right">
-                                        <?= Html::button(FA::icon('comments-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                            'class' => 'btn btn-default btn-sm',
-                                            'id' => 'btn-user-chat',
-                                            'data-toggle' => 'tooltip',
-                                            'data-placement' => 'left',
-                                            'data-html' => 'true',
-                                            'title' => 'Chat this person',
-                                            'onclick' => new JsExpression("chatConfirm(this)")
-                                        ]) ?>
-                                        <?= Html::button(FA::icon('user-plus')->size(FA::SIZE_LARGE)->fixedWidth(), [
-                                            'class' => 'btn btn-default btn-sm',
-                                            'id' => 'btn-user-group',
-                                            'data-toggle' => 'tooltip',
-                                            'data-placement' => 'left',
-                                            'data-html' => 'true',
-                                            'title' => 'Add this person to a group',
-                                            'onclick' => new JsExpression("groupConfirm(this)")
-                                        ]) ?>
+                                    <div class="msgr-main-content-tools-user-list-item-content-details">
+                                        <h4 data-id="" data-intranet_id="<?= $member['intranet_id'] ?>"><?= $member['name'] ?></h4>
+                                        <!-- <p>Associate Software Engineer</p> -->
                                     </div>
                                 </div>
-                            <?php endif ?>
+
+                                <div class="msgr-main-content-tools-user-list-item-tools-right">
+                                    <?= Html::button(FA::icon('comments-o')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                        'class' => 'btn btn-default btn-sm',
+                                        'id' => 'btn-user-chat',
+                                        'data-toggle' => 'tooltip',
+                                        'data-placement' => 'left',
+                                        'data-html' => 'true',
+                                        'title' => 'Chat this person',
+                                        'onclick' => new JsExpression("chatConfirm(this)")
+                                    ]) ?>
+                                    <?= Html::button(FA::icon('user-plus')->size(FA::SIZE_LARGE)->fixedWidth(), [
+                                        'class' => 'btn btn-default btn-sm',
+                                        'id' => 'btn-user-group',
+                                        'data-toggle' => 'tooltip',
+                                        'data-placement' => 'left',
+                                        'data-html' => 'true',
+                                        'title' => 'Add this person to a group',
+                                        'onclick' => new JsExpression("groupConfirm(this)")
+                                    ]) ?>
+                                </div>
+                            </div>
                             
                         <?php endforeach ?>
                     </div>

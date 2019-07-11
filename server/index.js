@@ -186,6 +186,29 @@ function initConn(mServer) {
             console.log(`${name} has joined PM: ${room.id}`)
         })
 
+        // Chat confirm handler
+        simple.on('chat-confirm', ({ type, name, members }) => {
+
+            axios.post(`${BK_HTTP_URL}/api/thread`, {
+                type,
+                name,
+                members
+            }).then(resp => {
+
+                const { type, id, } = resp.data
+
+                const payload =  JSON.stringify({
+                    id,
+                    type,
+                    members
+                })
+
+                simple.emit('chat-confirm', payload)
+        
+            }).catch(err => console.error(err))
+
+        })
+
         // Chat handler
         simple.on('chat', ({ cId, uId, type, message, timestamp }) => {
 
@@ -350,7 +373,16 @@ function initConn(mServer) {
 
         // Leave Group Handler
         group.on('leave-group', ({ groupId, memberId }) => {
-            console.log(`${memberId} has left: ${groupId}`)
+            console.log(groupId, memberId)
+
+            // Send ajax request.
+            axios.delete(`${BK_HTTP_URL}/api/thread-member/${memberId}`, {
+                data: { group: groupId }
+            }).then(resp => {
+                if(!(resp.data.hasOwnProperty("statusCode"))) {
+                    // Emit back to client
+                }
+            })
         })
     })
 }

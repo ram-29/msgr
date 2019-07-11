@@ -1,6 +1,10 @@
 <?php
+
 namespace common\models;
+
 use Yii;
+use yii\db\Query;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use Underscore\Underscore as __;
 use common\helpers\Logger;
@@ -239,6 +243,34 @@ class Member extends \yii\db\ActiveRecord
     public function getThreadMessageSeens()
     {
         return $this->hasMany(ThreadMessageSeen::className(), ['member_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\Query
+     */
+    public function getIntranetUsers($offset = 0)
+    {
+        $query = (new Query())
+            ->select(new Expression('
+                U.id AS intranet_id,
+                UPPER(CONCAT_WS(" ", UI.FIRST_M, UI.LAST_M)) AS name,
+                IF(STRCMP(UPPER(UI.SEX_C), "MALE") = 0, "M", "F") AS sex,
+                "ACTIVE" AS status,
+                null AS joined_at,
+                null AS logged_at,
+                U.username AS username,
+                PR.gravatar_id AS gravatar,
+                U.email AS email,
+                UI.MOBILEPHONE AS mobile_phone,
+                OFF.OFFICE_M AS office
+            '))
+            ->from(['U' => 'user'])
+            ->leftJoin(['UI' => 'user_info'], 'U.id = UI.user_id')
+            ->leftJoin(['PR' => 'profile'], 'U.id = PR.user_id')
+            ->leftJoin(['OFF' => 'tbloffice'], 'OFF.OFFICE_C = UI.OFFICE_C')
+            ->limit(20)->offset(20 * $offset);
+
+        return Yii::$app->db2->createCommand($query->createCommand()->rawSql)->queryAll();
     }
 }
 
