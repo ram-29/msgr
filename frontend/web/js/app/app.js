@@ -196,26 +196,36 @@ const initConn = (M_ID, M_NAME) => {
 
     SIMPLE.on('chat-confirm', data => {
 
-        console.log(data)
+        const { id, name, type, thread_members } = JSON.parse(data)
+        console.log(thread_members)
 
-        // @TODO :Render template : SELF
-        // const template = `
-        //     <div class="msgr-sidebar-list-item" onclick="connect(this, '${resp.data.id}', 'SIMPLE')">
-        //         <div class="msgr-sidebar-list-item-content">
-        //             <img class="img-circle" src="${mImg}" alt="User image">                        
-        //             <div class="msgr-sidebar-list-item-content-details">
-        //                 <h4>${mName}</h4>
-        //                 <p>-</p>
+        // members.forEach(m => {
+        //     let template
+
+        //     let src = contentChatboxHeaderImg.getAttribute('src')
+        //     src = src.replace('/.+(?=/\w+/\w+)/', FR_HTTP_URL)
+
+        //     // @TODO :Render template : SELF
+        //     if(m.member_id != M_ID) {
+        //         template = `
+        //             <div class="msgr-sidebar-list-item" onclick="connect(this, '${id}', 'SIMPLE')">
+        //                 <div class="msgr-sidebar-list-item-content">
+        //                     <img class="img-circle" src="${src}" alt="User image">                        
+        //                     <div class="msgr-sidebar-list-item-content-details">
+        //                         <h4>${mName}</h4>
+        //                         <p>-</p>
+        //                     </div>
+        //                 </div>
+
+        //                 <div class="msgr-sidebar-list-item-settings">
+        //                     <span>-</span>
+        //                 </div>
         //             </div>
-        //         </div>
+        //         `
 
-        //         <div class="msgr-sidebar-list-item-settings">
-        //             <span>-</span>
-        //         </div>
-        //     </div>
-        // `
-
-        // $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
+        //         $(`.msgr-sidebar-list > .os-padding > .os-viewport > .os-content`).prepend(template)
+        //     }
+        // })
     })
 
     SIMPLE.on('chat', data => {

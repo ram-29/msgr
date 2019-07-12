@@ -72,9 +72,9 @@ class ChatController extends Controller
         $BK_URL = Getter::getUrl(true, false, false);
 
         // Get messenger members.
-        $members = (new Client())
-            ->get("{$BK_URL}/api/member")
-            ->send()->getData();
+        // $members = (new Client())
+        //     ->get("{$BK_URL}/api/member")
+        //     ->send()->getData();
 
         $members = Member::getIntranetUsers();
 

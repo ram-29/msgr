@@ -115,7 +115,12 @@ class ThreadController extends \yii\rest\ActiveController
         }
 
         // Return Thread.
-        return $model;
+        return [
+            'id' => $model->id,
+            'type' => $model->type,
+            'name' => $thGlobCfg->name,
+            'thread_members' => $model->threadMembers
+        ];
     }
 }
 

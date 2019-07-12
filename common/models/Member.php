@@ -264,13 +264,51 @@ class Member extends \yii\db\ActiveRecord
                 UI.MOBILEPHONE AS mobile_phone,
                 OFF.OFFICE_M AS office
             '))
-            ->from(['U' => 'user'])
+            // ->from(['HR' => 'hris_user']) # HRIS
+            ->from(['U' => 'user']) # INTRANET
+            // ->leftJoin(['U' => 'user'], 'U.id = HR.user_id') # HRIS
             ->leftJoin(['UI' => 'user_info'], 'U.id = UI.user_id')
             ->leftJoin(['PR' => 'profile'], 'U.id = PR.user_id')
             ->leftJoin(['OFF' => 'tbloffice'], 'OFF.OFFICE_C = UI.OFFICE_C')
+            ->leftJoin(['HR' => 'hris_user'], 'HR.user_id = U.id') # INTRANET
             ->limit(20)->offset(20 * $offset);
 
-        return Yii::$app->db2->createCommand($query->createCommand()->rawSql)->queryAll();
+        $result = Yii::$app->db2->createCommand($query->createCommand()->rawSql)->queryAll();
+
+        return array_map(function($x) {
+           
+            $mMem = \common\models\Member::findOne(['intranet_id' => $x['intranet_id']]);
+
+            // Has found in member table.
+            if($mMem) {
+                // Set the id.
+                $x['id'] = $mMem->id;
+            } else {
+
+                // Force create the member.
+                $mmMem = new \common\models\Member();
+                $mmMem->setAttrs();
+
+                $mmMem->intranet_id = $x['intranet_id'];
+                $mmMem->name = $x['name'];
+                $mmMem->sex = $x['sex'];
+                $mmMem->status = $x['status'];
+                $mmMem->joined_at = $x['joined_at'];
+                $mmMem->logged_at = $x['logged_at'];
+                $mmMem->username = $x['username'];
+                $mmMem->gravatar = $x['gravatar'];
+                $mmMem->email = $x['email'];
+                $mmMem->mobile_phone = $x['mobile_phone'];
+                $mmMem->office = $x['office'];
+                $mmMem->save();
+
+                // Set the id.
+                $x['id'] = $mmMem->id;
+            }
+
+            return $x;
+
+        }, $result);
     }
 }
 

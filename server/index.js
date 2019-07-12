@@ -195,12 +195,14 @@ function initConn(mServer) {
                 members
             }).then(resp => {
 
-                const { type, id, } = resp.data
+
+                const { id, name, type, thread_members } = resp.data
 
                 const payload =  JSON.stringify({
                     id,
+                    name,
                     type,
-                    members
+                    thread_members
                 })
 
                 simple.emit('chat-confirm', payload)
