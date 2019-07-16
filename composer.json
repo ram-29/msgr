@@ -75,7 +75,15 @@
         "npm-asset/filepond-plugin-file-validate-size": "@dev",
 
         "npm-asset/nanogallery2": "~2.4.2",
-        "npm-asset/howler": "~2.1.2"
+        "npm-asset/howler": "~2.1.2",
+
+        "akesandiego/data-dictionary-module": "dev-master",
+        "akesandiego/monitoring": "dev-master",
+        "akesandiego/single-sign-on-authentication": "dev-master",
+        "niksko12/yii2-user": "dev-master",
+        "niksko12/yii2-trees-graphs": "dev-master",
+        "niksko12/yii2-rbac": "dev-master",
+        "niksko12/yii2-audit-log": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -105,6 +113,38 @@
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/niksko12/yii2-user.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/niksko12/yii2-rbac.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/niksko12/yii2-trees-graphs.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/niksko12/yii2-audit-log.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/akesandiego/data-dictionary-module.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/akesandiego/monitoring.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/akesandiego/single-sign-on-authentication.git"
+        },
+        {
+            "type": "vcs",
+            "url": "http://git.istms/akesandiego/yii2-attachments.git"
         }
     ]
 }

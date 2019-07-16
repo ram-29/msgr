@@ -9,6 +9,8 @@ use yii\helpers\ArrayHelper;
 use Underscore\Underscore as __;
 use common\helpers\Logger;
 
+use niksko12\user\models\UserInfo;
+
 /**
  * This is the model class for table "member".
  *
@@ -27,13 +29,35 @@ use common\helpers\Logger;
  */
 class Member extends \yii\db\ActiveRecord
 {
+    // Declare attributes not found on base table.
+	public $name, $sex, $status, $joined_at, $logged_at, $intranet_id;
+
+    // Specifies the default db connection for this model.
+	public static function getDb() {
+		return Yii::$app->intranet;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function afterFind() {
+        parent::afterFind();
+        
+		// Match user information to declared attributes.
+		$this->name = ($this->userInfo) ? $this->userInfo->fullName : '';
+		$this->sex = $this->userInfo->SEX_C;
+		$this->joined_at = $this->created_at;
+		$this->logged_at = $this->created_at;
+		$this->intranet_id = $this->id;
+    }
 
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'member';
+        // return 'member';
+        return 'user';
     }
 
     /**
@@ -273,11 +297,11 @@ class Member extends \yii\db\ActiveRecord
             ->leftJoin(['HR' => 'hris_user'], 'HR.user_id = U.id') # INTRANET
             ->limit(20)->offset(20 * $offset);
 
-        $result = Yii::$app->db2->createCommand($query->createCommand()->rawSql)->queryAll();
+        $result = Yii::$app->intranet->createCommand($query->createCommand()->rawSql)->queryAll();
 
         return array_map(function($x) {
            
-            $mMem = \common\models\Member::findOne(['intranet_id' => $x['intranet_id']]);
+            $mMem = \common\models\Member::findOne(['id' => $x['intranet_id']]);
 
             // Has found in member table.
             if($mMem) {
@@ -309,6 +333,14 @@ class Member extends \yii\db\ActiveRecord
             return $x;
 
         }, $result);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserInfo()
+    {
+        return $this->hasMany(UserInfo::className(), ['id' => 'user_id']);
     }
 }
 

@@ -30,7 +30,7 @@ class m190402_012720_create_member_table extends Migration
                 'name' => 'VARCHAR(200) NOT NULL',
                 'sex' => 'ENUM(\'M\',\'F\') NOT NULL DEFAULT \'M\'',
                 'status' => 'ENUM(\'ACTIVE\',\'INACTIVE\') NOT NULL DEFAULT \'ACTIVE\'',
-                'joined_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ',
+                'joined_at' => 'DATETIME NULL DEFAULT CURRENT_TIMESTAMP ',
                 'logged_at' => 'DATETIME NULL DEFAULT CURRENT_TIMESTAMP ',
                 'username' => 'VARCHAR(200) NULL',
                 'gravatar' => 'VARCHAR(200) NULL',

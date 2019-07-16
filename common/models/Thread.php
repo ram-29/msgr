@@ -139,6 +139,7 @@ class Thread extends \yii\db\ActiveRecord
                     $mMember = \common\models\Member::findOne($thMsg['member_id']);
                     unset($mMember['joined_at']); unset($mMember['logged_at']); 
                     unset($mMember['intranet_id']); unset($mMember['status']);
+                    
                     return [
                         // 'member_id' => $thMsg['member_id'],
                         'member' => $mMember,

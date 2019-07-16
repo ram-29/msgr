@@ -4,7 +4,20 @@ let M_OFFSET = 1;
     moment.createFromInputFallback = function(config) { config._d = new Date(config._i); }
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' })
     
-    // $('.msgr-sidebar-list').overlayScrollbars({})
+    // User List
+    const mToolsUserList = $('.msgr-main-content-tools-user-list').overlayScrollbars({
+        callbacks: {
+            onScrollStop: e => {
+                const scrollInfo = mToolsUserList.scroll()
+
+                if(scrollInfo.ratio.y === 1) {
+                    console.log("Im at bottom")
+                }
+            }
+        }
+    }).overlayScrollbars();
+
+    // Chatbox List
     const mChatboxList = $('.msgr-main-content-chatbox-list').overlayScrollbars({
         callbacks: {
             onScrollStop: e => {
@@ -102,7 +115,7 @@ let M_OFFSET = 1;
                 }
             }
         }
-    }).overlayScrollbars()
+    }).overlayScrollbars();
 
     $('.msgr-main-content-tools-user-list').overlayScrollbars({})
     $('.tab-pane').overlayScrollbars({})

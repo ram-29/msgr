@@ -77,6 +77,7 @@ class ChatController extends Controller
         //     ->send()->getData();
 
         $members = Member::getIntranetUsers();
+        Logger::log($members);
 
         return $this->render('index', compact("members", "M_ID", "M_NAME", "PUB_VAPID_KEY"));
     }
