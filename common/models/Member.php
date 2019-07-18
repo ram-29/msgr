@@ -9,7 +9,7 @@ use yii\helpers\ArrayHelper;
 use Underscore\Underscore as __;
 use common\helpers\Logger;
 
-use niksko12\user\models\UserInfo;
+use common\models\IntranetUserInfo;
 
 /**
  * This is the model class for table "member".
@@ -42,13 +42,20 @@ class Member extends \yii\db\ActiveRecord
      */
     public function afterFind() {
         parent::afterFind();
-        
+
+        $mUserInfo = $this->userInfo;
+
 		// Match user information to declared attributes.
-		$this->name = ($this->userInfo) ? $this->userInfo->fullName : '';
-		$this->sex = $this->userInfo->SEX_C;
+        $this->name = !empty($mUserInfo && $mUserInfo->fullName) ? 
+            ucwords(mb_strtolower($mUserInfo->fullName)) : '';
+        
+        $this->sex = !empty($mUserInfo) ? 
+            $mUserInfo->SEX_C : '';
+
+        $this->status = 'ACTIVE';
 		$this->joined_at = $this->created_at;
 		$this->logged_at = $this->created_at;
-		$this->intranet_id = $this->id;
+        $this->intranet_id = $this->id;
     }
 
     /**
@@ -340,7 +347,7 @@ class Member extends \yii\db\ActiveRecord
      */
     public function getUserInfo()
     {
-        return $this->hasMany(UserInfo::className(), ['id' => 'user_id']);
+        return $this->hasOne(IntranetUserInfo::className(), ['user_id' => 'id']);
     }
 }
 
